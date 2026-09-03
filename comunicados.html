@@ -1,48 +1,1403 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Comunicados | Siscard+</title>
-<link rel="stylesheet" href="css/styles.css">
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="description"
+        content="Noticias y comunicados del portal Siscard+"
+    >
+
+    <title>
+        Comunicados | Siscard+
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="css/styles.css"
+    >
+
+    <style>
+        :root
+        {
+            --naranja: #ff6c0c;
+            --gris: #4f4f4f;
+            --fondo: #f2f2f2;
+            --borde: #d9d9d9;
+            --azul: #2457a7;
+            --verde: #16825b;
+        }
+
+        body
+        {
+            background: var(--fondo);
+        }
+
+        .comunicados-encabezado,
+        .comunicados-panel
+        {
+            background: #ffffff;
+            border: 1px solid var(--borde);
+            box-shadow: 0 2px 7px #00000012;
+        }
+
+        .comunicados-encabezado
+        {
+            display: grid;
+            grid-template-columns: minmax(0, 1.35fr) minmax(260px, 0.65fr);
+            gap: 22px;
+            align-items: center;
+            padding: 26px;
+        }
+
+        .etiqueta
+        {
+            display: block;
+            margin-bottom: 6px;
+            color: #444444;
+            font-size: 11px;
+            font-weight: 850;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+
+        .comunicados-encabezado h1
+        {
+            margin: 6px 0 10px;
+            color: var(--naranja);
+            font-size: clamp(34px, 4vw, 50px);
+            font-weight: 300;
+        }
+
+        .comunicados-encabezado p
+        {
+            margin: 0;
+            color: #666666;
+            line-height: 1.55;
+        }
+
+        .resumen-destacado
+        {
+            padding: 18px;
+            border: 1px solid var(--borde);
+            border-top: 4px solid var(--naranja);
+            background: #fff5ec;
+        }
+
+        .resumen-destacado strong,
+        .resumen-destacado span
+        {
+            display: block;
+        }
+
+        .resumen-destacado strong
+        {
+            color: var(--gris);
+            font-size: 34px;
+        }
+
+        .resumen-destacado span
+        {
+            margin-top: 4px;
+            color: #666666;
+            font-size: 12px;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+
+        .barra-herramientas
+        {
+            display: grid;
+            grid-template-columns: minmax(260px, 1fr) auto;
+            gap: 12px;
+            margin-top: 14px;
+            padding: 14px;
+            background: #ffffff;
+            border: 1px solid var(--borde);
+            box-shadow: 0 2px 7px #00000012;
+        }
+
+        .busqueda
+        {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 8px;
+        }
+
+        .busqueda input
+        {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--borde);
+            border-radius: 8px;
+            background: #ffffff;
+        }
+
+        .busqueda input:focus
+        {
+            outline: 3px solid #ff6c0c20;
+            border-color: var(--naranja);
+        }
+
+        .boton
+        {
+            padding: 9px 14px;
+            border: 0;
+            border-radius: 8px;
+            background: var(--gris);
+            color: #ffffff;
+            font-weight: 800;
+            cursor: pointer;
+        }
+
+        .boton.naranja
+        {
+            background: var(--naranja);
+        }
+
+        .boton.claro
+        {
+            border: 1px solid var(--borde);
+            background: #ffffff;
+            color: var(--gris);
+        }
+
+        .filtros
+        {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .filtro
+        {
+            padding: 9px 13px;
+            border: 1px solid #cccccc;
+            border-radius: 999px;
+            background: #ffffff;
+            color: var(--gris);
+            font-weight: 800;
+            cursor: pointer;
+        }
+
+        .filtro:hover,
+        .filtro.activo
+        {
+            border-color: var(--naranja);
+            background: var(--naranja);
+            color: #ffffff;
+        }
+
+        .destacado
+        {
+            display: grid;
+            grid-template-columns: 150px 1fr auto;
+            gap: 18px;
+            align-items: center;
+            margin-top: 16px;
+            padding: 20px;
+            border: 1px solid var(--borde);
+            border-left: 7px solid var(--naranja);
+            background: #ffffff;
+            box-shadow: 0 2px 7px #00000012;
+        }
+
+        .destacado-fecha
+        {
+            padding: 14px;
+            border: 1px solid #ffd1ad;
+            background: #fff5ec;
+            text-align: center;
+        }
+
+        .destacado-fecha strong,
+        .destacado-fecha span
+        {
+            display: block;
+        }
+
+        .destacado-fecha strong
+        {
+            color: var(--naranja);
+            font-size: 30px;
+            font-weight: 300;
+        }
+
+        .destacado-fecha span
+        {
+            color: #666666;
+            font-size: 11px;
+            font-weight: 850;
+            text-transform: uppercase;
+        }
+
+        .destacado h2
+        {
+            margin: 5px 0 8px;
+            color: var(--gris);
+            font-weight: 400;
+        }
+
+        .destacado p
+        {
+            margin: 0;
+            color: #666666;
+            line-height: 1.5;
+        }
+
+        .categoria
+        {
+            display: inline-block;
+            padding: 5px 8px;
+            border-radius: 999px;
+            background: #fff5ec;
+            color: var(--naranja);
+            font-size: 10px;
+            font-weight: 850;
+            text-transform: uppercase;
+        }
+
+        .contenido-grid
+        {
+            display: grid;
+            grid-template-columns: minmax(0, 1.3fr) minmax(290px, 0.7fr);
+            gap: 14px;
+            margin-top: 16px;
+        }
+
+        .panel-encabezado
+        {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            padding: 13px 16px;
+            border-bottom: 1px solid var(--borde);
+        }
+
+        .panel-encabezado h2
+        {
+            margin: 0;
+            color: var(--naranja);
+            font-size: 25px;
+            font-weight: 300;
+        }
+
+        .panel-encabezado small
+        {
+            color: #666666;
+        }
+
+        .panel-cuerpo
+        {
+            padding: 16px;
+        }
+
+        .lista-comunicados
+        {
+            display: grid;
+            gap: 11px;
+        }
+
+        .comunicado
+        {
+            display: grid;
+            grid-template-columns: 60px 1fr auto;
+            gap: 13px;
+            align-items: center;
+            padding: 14px;
+            border: 1px solid var(--borde);
+            border-top: 4px solid #bbbbbb;
+            background: #fafafa;
+            transition: 0.18s;
+        }
+
+        .comunicado:hover
+        {
+            border-top-color: var(--naranja);
+            background: #fff5ec;
+            transform: translateY(-1px);
+        }
+
+        .comunicado.oculto
+        {
+            display: none;
+        }
+
+        .comunicado-icono
+        {
+            display: grid;
+            place-items: center;
+            width: 46px;
+            height: 46px;
+            border: 1px solid #ffd1ad;
+            border-radius: 10px;
+            background: #ffffff;
+            color: var(--naranja);
+            font-size: 20px;
+        }
+
+        .comunicado h3
+        {
+            margin: 5px 0;
+            color: var(--gris);
+            font-size: 17px;
+        }
+
+        .comunicado p
+        {
+            margin: 0;
+            color: #666666;
+            font-size: 13px;
+            line-height: 1.4;
+        }
+
+        .comunicado-meta
+        {
+            min-width: 105px;
+            color: #777777;
+            font-size: 11px;
+            text-align: right;
+        }
+
+        .timeline-item
+        {
+            position: relative;
+            padding: 0 0 18px 24px;
+            border-left: 2px solid var(--borde);
+        }
+
+        .timeline-item:last-child
+        {
+            padding-bottom: 0;
+        }
+
+        .timeline-item::before
+        {
+            content: "";
+            position: absolute;
+            top: 3px;
+            left: -7px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--naranja);
+        }
+
+        .timeline-item strong,
+        .timeline-item span
+        {
+            display: block;
+        }
+
+        .timeline-item span
+        {
+            margin-top: 4px;
+            color: #666666;
+            font-size: 12px;
+            line-height: 1.4;
+        }
+
+        .sin-resultados
+        {
+            display: none;
+            padding: 26px;
+            border: 1px dashed var(--borde);
+            background: #fafafa;
+            color: #666666;
+            text-align: center;
+        }
+
+        .modal-comunicado
+        {
+            position: fixed;
+            inset: 0;
+            z-index: 200;
+            display: grid;
+            place-items: center;
+            padding: 18px;
+            background: #00000077;
+        }
+
+        .modal-comunicado[hidden]
+        {
+            display: none;
+        }
+
+        .modal-tarjeta
+        {
+            width: min(650px, 100%);
+            overflow: hidden;
+            border: 1px solid var(--borde);
+            border-radius: 14px;
+            background: #ffffff;
+            box-shadow: 0 16px 45px #00000055;
+        }
+
+        .modal-encabezado
+        {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 13px 16px;
+            background: var(--naranja);
+            color: #ffffff;
+        }
+
+        .modal-encabezado h2
+        {
+            margin: 0;
+            font-size: 20px;
+        }
+
+        .modal-encabezado button
+        {
+            border: 0;
+            background: transparent;
+            color: #ffffff;
+            font-size: 23px;
+            cursor: pointer;
+        }
+
+        .modal-cuerpo
+        {
+            padding: 20px;
+            color: #555555;
+            line-height: 1.6;
+        }
+
+        @media (max-width: 1050px)
+        {
+            .comunicados-encabezado,
+            .contenido-grid
+            {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 760px)
+        {
+            .barra-herramientas,
+            .busqueda,
+            .destacado,
+            .comunicado
+            {
+                grid-template-columns: 1fr;
+            }
+
+            .comunicado-meta
+            {
+                text-align: left;
+            }
+
+            .destacado-fecha
+            {
+                width: 120px;
+            }
+        }
+    </style>
 </head>
+
 <body>
-<div class="app-shell">
-<div class="main-area">
-<main class="content">
-<h1>Noticias y Comunicados</h1>
-<p>Portal centralizado de anuncios, cambios y novedades del ecosistema Siscard+.</p>
+    <div class="app-shell">
+        <aside
+            class="sidebar"
+            id="sidebar"
+        >
+            <div class="brand">
+                <div class="brand-mark"></div>
 
-<section class="metrics-grid">
-<div class="metric-card"><div><strong>24</strong><span>Comunicados activos</span></div></div>
-<div class="metric-card"><div><strong>8</strong><span>Actualizaciones</span></div></div>
-<div class="metric-card"><div><strong>4</strong><span>Avisos críticos</span></div></div>
-<div class="metric-card"><div><strong>12</strong><span>Novedades operativas</span></div></div>
-</section>
+                <div class="brand-copy">
+                    <strong>
+                        Landing
+                        <span>
+                            Siscard+
+                        </span>
+                    </strong>
 
-<h2>Comunicado destacado</h2>
-<div class="panel">
-<h3>Nuevo Portal Siscard+</h3>
-<p>Se incorpora una experiencia centralizada para documentación, parámetros, seguridad y solicitudes.</p>
-</div>
+                    <small>
+                        Autogestión digital
+                    </small>
+                </div>
+            </div>
 
-<h2>Últimos comunicados</h2>
-<div class="panel">
-<h3>Documentación</h3>
-<p>Disponibles nuevas guías operativas.</p>
-</div>
-<div class="panel">
-<h3>Seguridad</h3>
-<p>Actualización del proceso de accesos y usuarios.</p>
-</div>
-<div class="panel">
-<h3>Parámetros</h3>
-<p>Nuevos contenidos documentados para emisor.</p>
-</div>
+            <nav class="side-nav">
+                <p class="nav-label">
+                    Principal
+                </p>
 
-</main>
-</div>
-</div>
-<script src="js/app.js"></script>
+                <a
+                    class="nav-link"
+                    href="index.html"
+                >
+                    <span class="nav-icon">
+                        ⌂
+                    </span>
+
+                    <span>
+                        Inicio
+                    </span>
+                </a>
+
+                <p class="nav-label">
+                    Conocimiento
+                </p>
+
+                <a
+                    class="nav-link"
+                    href="manuales.html"
+                >
+                    <span class="nav-icon">
+                        ▤
+                    </span>
+
+                    <span>
+                        Manuales
+                    </span>
+                </a>
+
+                <a
+                    class="nav-link"
+                    href="#"
+                    data-coming-soon="Parámetros Siscard"
+                >
+                    <span class="nav-icon">
+                        ⚙
+                    </span>
+
+                    <span>
+                        Parámetros
+                    </span>
+                </a>
+
+                <a
+                    class="nav-link"
+                    href="landing-ia.html"
+                >
+                    <span class="nav-icon">
+                        ✦
+                    </span>
+
+                    <span>
+                        Landing IA
+                    </span>
+                </a>
+
+                <p class="nav-label">
+                    Gestión
+                </p>
+
+                <a
+                    class="nav-link"
+                    href="seguridad.html"
+                >
+                    <span class="nav-icon">
+                        🔐
+                    </span>
+
+                    <span>
+                        Seguridad
+                    </span>
+                </a>
+
+                <a
+                    class="nav-link active"
+                    href="comunicados.html"
+                >
+                    <span class="nav-icon">
+                        ◉
+                    </span>
+
+                    <span>
+                        Comunicados
+                    </span>
+                </a>
+            </nav>
+
+            <div class="side-note">
+                <strong>
+                    Información centralizada
+                </strong>
+
+                <p>
+                    Consulte avisos, novedades y actualizaciones del portal.
+                </p>
+            </div>
+        </aside>
+
+        <div class="main-area">
+            <header class="topbar">
+                <button
+                    class="menu-button"
+                    id="menuButton"
+                    type="button"
+                    aria-label="Abrir menú"
+                >
+                    ☰
+                </button>
+
+                <div class="top-title">
+                    <strong>
+                        Comunicados Siscard+
+                    </strong>
+
+                    <small>
+                        Noticias y novedades
+                    </small>
+                </div>
+
+                <div class="top-actions">
+                    <button
+                        class="help-button"
+                        type="button"
+                        data-coming-soon="Centro de ayuda"
+                    >
+                        Ayuda
+                    </button>
+
+                    <button
+                        class="profile-button"
+                        id="profileButton"
+                        type="button"
+                    >
+                        <span class="avatar">
+                            CL
+                        </span>
+
+                        <span class="profile-copy">
+                            <strong>
+                                Cliente Siscard+
+                            </strong>
+
+                            <small>
+                                Portal de servicios
+                            </small>
+                        </span>
+                    </button>
+                </div>
+
+                <div
+                    class="profile-menu"
+                    id="profileMenu"
+                    hidden
+                >
+                    <button type="button">
+                        Mi perfil
+                    </button>
+                </div>
+            </header>
+
+            <main class="content">
+                <section class="comunicados-encabezado">
+                    <div>
+                        <span class="etiqueta">
+                            Centro de comunicaciones
+                        </span>
+
+                        <h1>
+                            Noticias y comunicados
+                        </h1>
+
+                        <p>
+                            Consulte actualizaciones de documentación,
+                            parámetros, seguridad y operación del ecosistema
+                            Siscard+.
+                        </p>
+                    </div>
+
+                    <div class="resumen-destacado">
+                        <strong id="totalComunicados">
+                            6
+                        </strong>
+
+                        <span>
+                            Comunicados disponibles
+                        </span>
+                    </div>
+                </section>
+
+                <section class="barra-herramientas">
+                    <form
+                        class="busqueda"
+                        id="formularioBusqueda"
+                    >
+                        <input
+                            id="buscarComunicado"
+                            type="search"
+                            placeholder="Buscar por título o palabra clave..."
+                        >
+
+                        <button
+                            class="boton naranja"
+                            type="submit"
+                        >
+                            Buscar
+                        </button>
+                    </form>
+
+                    <div
+                        class="filtros"
+                        id="filtros"
+                    >
+                        <button
+                            class="filtro activo"
+                            type="button"
+                            data-category="todos"
+                        >
+                            Todos
+                        </button>
+
+                        <button
+                            class="filtro"
+                            type="button"
+                            data-category="documentación"
+                        >
+                            Documentación
+                        </button>
+
+                        <button
+                            class="filtro"
+                            type="button"
+                            data-category="parámetros"
+                        >
+                            Parámetros
+                        </button>
+
+                        <button
+                            class="filtro"
+                            type="button"
+                            data-category="seguridad"
+                        >
+                            Seguridad
+                        </button>
+
+                        <button
+                            class="filtro"
+                            type="button"
+                            data-category="operaciones"
+                        >
+                            Operaciones
+                        </button>
+                    </div>
+                </section>
+
+                <section class="destacado">
+                    <div class="destacado-fecha">
+                        <strong>
+                            03
+                        </strong>
+
+                        <span>
+                            Septiembre 2026
+                        </span>
+                    </div>
+
+                    <div>
+                        <span class="categoria">
+                            Portal Siscard+
+                        </span>
+
+                        <h2>
+                            Nueva experiencia centralizada de autogestión
+                        </h2>
+
+                        <p>
+                            El portal integra accesos a manuales, parámetros,
+                            seguridad, comunicados y herramientas de consulta.
+                        </p>
+                    </div>
+
+                    <button
+                        class="boton naranja"
+                        type="button"
+                        data-open-title="Nueva experiencia centralizada de autogestión"
+                        data-open-body="Esta comunicación presenta la propuesta de acceso centralizado a los servicios disponibles en Landing Siscard+. El contenido mostrado es demostrativo y puede sustituirse posteriormente por información oficial."
+                    >
+                        Leer comunicado
+                    </button>
+                </section>
+
+                <section class="contenido-grid">
+                    <div class="comunicados-panel">
+                        <div class="panel-encabezado">
+                            <div>
+                                <h2>
+                                    Comunicados recientes
+                                </h2>
+
+                                <small id="contadorResultados">
+                                    6 resultados
+                                </small>
+                            </div>
+                        </div>
+
+                        <div class="panel-cuerpo">
+                            <div
+                                class="lista-comunicados"
+                                id="listaComunicados"
+                            >
+                                <article
+                                    class="comunicado"
+                                    data-category="documentación"
+                                    data-search="manuales guías documentación centro documental"
+                                >
+                                    <span class="comunicado-icono">
+                                        ▤
+                                    </span>
+
+                                    <div>
+                                        <span class="categoria">
+                                            Documentación
+                                        </span>
+
+                                        <h3>
+                                            Nuevas guías disponibles en Manuales
+                                        </h3>
+
+                                        <p>
+                                            El Centro Documental incorpora nuevos
+                                            accesos demostrativos por producto.
+                                        </p>
+                                    </div>
+
+                                    <div class="comunicado-meta">
+                                        <span>
+                                            03/09/2026
+                                        </span>
+
+                                        <button
+                                            class="boton claro"
+                                            type="button"
+                                            data-open-title="Nuevas guías disponibles en Manuales"
+                                            data-open-body="El Centro Documental incorpora accesos demostrativos organizados por producto y categoría. Esta información puede reemplazarse por comunicados oficiales cuando se conecte la fuente definitiva."
+                                        >
+                                            Ver
+                                        </button>
+                                    </div>
+                                </article>
+
+                                <article
+                                    class="comunicado"
+                                    data-category="parámetros"
+                                    data-search="parámetros emisor país producto repositorio"
+                                >
+                                    <span class="comunicado-icono">
+                                        ⚙
+                                    </span>
+
+                                    <div>
+                                        <span class="categoria">
+                                            Parámetros
+                                        </span>
+
+                                        <h3>
+                                            Consulta organizada por país y producto
+                                        </h3>
+
+                                        <p>
+                                            El repositorio de parámetros permite
+                                            localizar información mediante filtros.
+                                        </p>
+                                    </div>
+
+                                    <div class="comunicado-meta">
+                                        <span>
+                                            02/09/2026
+                                        </span>
+
+                                        <button
+                                            class="boton claro"
+                                            type="button"
+                                            data-open-title="Consulta organizada por país y producto"
+                                            data-open-body="El repositorio de parámetros se presenta como uno de los servicios disponibles dentro del portal. La tarjeta definitiva podrá enlazarse a la URL publicada del repositorio."
+                                        >
+                                            Ver
+                                        </button>
+                                    </div>
+                                </article>
+
+                                <article
+                                    class="comunicado"
+                                    data-category="seguridad"
+                                    data-search="seguridad usuarios grupos accesos mantenimiento"
+                                >
+                                    <span class="comunicado-icono">
+                                        🔐
+                                    </span>
+
+                                    <div>
+                                        <span class="categoria">
+                                            Seguridad
+                                        </span>
+
+                                        <h3>
+                                            Gestión de usuarios, grupos y accesos
+                                        </h3>
+
+                                        <p>
+                                            El módulo reúne las principales opciones
+                                            administrativas en una sola vista.
+                                        </p>
+                                    </div>
+
+                                    <div class="comunicado-meta">
+                                        <span>
+                                            01/09/2026
+                                        </span>
+
+                                        <button
+                                            class="boton claro"
+                                            type="button"
+                                            data-open-title="Gestión de usuarios, grupos y accesos"
+                                            data-open-body="El módulo de Seguridad integra vistas demostrativas para crear usuarios, preparar grupos y gestionar solicitudes de accesos."
+                                        >
+                                            Ver
+                                        </button>
+                                    </div>
+                                </article>
+
+                                <article
+                                    class="comunicado"
+                                    data-category="operaciones"
+                                    data-search="operaciones solicitudes aprobación flujo digital"
+                                >
+                                    <span class="comunicado-icono">
+                                        ✓
+                                    </span>
+
+                                    <div>
+                                        <span class="categoria">
+                                            Operaciones
+                                        </span>
+
+                                        <h3>
+                                            Flujo digital para solicitudes
+                                        </h3>
+
+                                        <p>
+                                            La propuesta contempla validación,
+                                            aprobación y entrega de resultados.
+                                        </p>
+                                    </div>
+
+                                    <div class="comunicado-meta">
+                                        <span>
+                                            31/08/2026
+                                        </span>
+
+                                        <button
+                                            class="boton claro"
+                                            type="button"
+                                            data-open-title="Flujo digital para solicitudes"
+                                            data-open-body="La experiencia demostrativa muestra un flujo de solicitud, validación, aprobación, generación de documento y entrega."
+                                        >
+                                            Ver
+                                        </button>
+                                    </div>
+                                </article>
+
+                                <article
+                                    class="comunicado"
+                                    data-category="documentación"
+                                    data-search="búsqueda manual documentos recientes destacados"
+                                >
+                                    <span class="comunicado-icono">
+                                        ⌕
+                                    </span>
+
+                                    <div>
+                                        <span class="categoria">
+                                            Documentación
+                                        </span>
+
+                                        <h3>
+                                            Búsqueda centralizada de documentos
+                                        </h3>
+
+                                        <p>
+                                            Los manuales pueden filtrarse por categoría
+                                            y palabra clave.
+                                        </p>
+                                    </div>
+
+                                    <div class="comunicado-meta">
+                                        <span>
+                                            30/08/2026
+                                        </span>
+
+                                        <button
+                                            class="boton claro"
+                                            type="button"
+                                            data-open-title="Búsqueda centralizada de documentos"
+                                            data-open-body="El buscador del Centro Documental filtra los contenidos demostrativos por título, categoría y palabras relacionadas."
+                                        >
+                                            Ver
+                                        </button>
+                                    </div>
+                                </article>
+
+                                <article
+                                    class="comunicado"
+                                    data-category="operaciones"
+                                    data-search="landing ia asistente consultas servicios"
+                                >
+                                    <span class="comunicado-icono">
+                                        ✦
+                                    </span>
+
+                                    <div>
+                                        <span class="categoria">
+                                            Operaciones
+                                        </span>
+
+                                        <h3>
+                                            Asistente local para orientar consultas
+                                        </h3>
+
+                                        <p>
+                                            Landing IA identifica palabras clave y
+                                            dirige hacia los módulos disponibles.
+                                        </p>
+                                    </div>
+
+                                    <div class="comunicado-meta">
+                                        <span>
+                                            29/08/2026
+                                        </span>
+
+                                        <button
+                                            class="boton claro"
+                                            type="button"
+                                            data-open-title="Asistente local para orientar consultas"
+                                            data-open-body="La versión demostrativa de Landing IA procesa consultas localmente y ofrece accesos a módulos relacionados."
+                                        >
+                                            Ver
+                                        </button>
+                                    </div>
+                                </article>
+                            </div>
+
+                            <div
+                                class="sin-resultados"
+                                id="sinResultados"
+                            >
+                                No se encontraron comunicados para la búsqueda seleccionada.
+                            </div>
+                        </div>
+                    </div>
+
+                    <aside class="comunicados-panel">
+                        <div class="panel-encabezado">
+                            <div>
+                                <h2>
+                                    Línea de novedades
+                                </h2>
+
+                                <small>
+                                    Actividad demostrativa
+                                </small>
+                            </div>
+                        </div>
+
+                        <div class="panel-cuerpo">
+                            <div class="timeline-item">
+                                <strong>
+                                    Centro Documental habilitado
+                                </strong>
+
+                                <span>
+                                    Navegación y búsqueda por categorías.
+                                </span>
+                            </div>
+
+                            <div class="timeline-item">
+                                <strong>
+                                    Seguridad incorporada
+                                </strong>
+
+                                <span>
+                                    Gestión visual de usuarios, grupos y accesos.
+                                </span>
+                            </div>
+
+                            <div class="timeline-item">
+                                <strong>
+                                    Landing IA disponible
+                                </strong>
+
+                                <span>
+                                    Consultas locales con historial en el navegador.
+                                </span>
+                            </div>
+
+                            <div class="timeline-item">
+                                <strong>
+                                    Integración de Parámetros pendiente
+                                </strong>
+
+                                <span>
+                                    El acceso quedará conectado al repositorio publicado.
+                                </span>
+                            </div>
+                        </div>
+                    </aside>
+                </section>
+            </main>
+
+            <footer class="footer">
+                <span>
+                    <strong>
+                        Landing Siscard+
+                    </strong>
+                    · Comunicados
+                </span>
+
+                <span>
+                    Contenido demostrativo del portal
+                </span>
+            </footer>
+        </div>
+    </div>
+
+    <div
+        class="modal-comunicado"
+        id="modalComunicado"
+        hidden
+    >
+        <section
+            class="modal-tarjeta"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="modalTitulo"
+        >
+            <header class="modal-encabezado">
+                <h2 id="modalTitulo">
+                    Comunicado
+                </h2>
+
+                <button
+                    id="cerrarModal"
+                    type="button"
+                    aria-label="Cerrar"
+                >
+                    ×
+                </button>
+            </header>
+
+            <div
+                class="modal-cuerpo"
+                id="modalCuerpo"
+            ></div>
+        </section>
+    </div>
+
+    <div
+        class="toast"
+        id="toast"
+        role="status"
+        aria-live="polite"
+    ></div>
+
+    <script src="js/app.js"></script>
+
+    <script>
+        "use strict";
+
+        const comunicados =
+            Array.from(
+                document.querySelectorAll(".comunicado")
+            );
+
+        const formularioBusqueda =
+            document.getElementById("formularioBusqueda");
+
+        const buscarComunicado =
+            document.getElementById("buscarComunicado");
+
+        const contadorResultados =
+            document.getElementById("contadorResultados");
+
+        const totalComunicados =
+            document.getElementById("totalComunicados");
+
+        const sinResultados =
+            document.getElementById("sinResultados");
+
+        const modalComunicado =
+            document.getElementById("modalComunicado");
+
+        const modalTitulo =
+            document.getElementById("modalTitulo");
+
+        const modalCuerpo =
+            document.getElementById("modalCuerpo");
+
+        let categoriaActiva = "todos";
+
+        let consultaActiva = "";
+
+        function normalizarTexto(valor)
+        {
+            return String(valor || "")
+                .toLowerCase()
+                .normalize("NFD")
+                .replace(/[\u0300-\u036f]/g, "")
+                .trim();
+        }
+
+        function aplicarFiltros()
+        {
+            const consulta = normalizarTexto(consultaActiva);
+
+            let visibles = 0;
+
+            comunicados.forEach(
+                function(comunicado)
+                {
+                    const categoria = normalizarTexto(
+                        comunicado.dataset.category
+                    );
+
+                    const texto = normalizarTexto(
+                        `${comunicado.textContent} ${comunicado.dataset.search}`
+                    );
+
+                    const coincideCategoria =
+                        categoriaActiva === "todos" ||
+                        categoria.includes(
+                            normalizarTexto(categoriaActiva)
+                        );
+
+                    const coincideConsulta =
+                        !consulta ||
+                        texto.includes(consulta);
+
+                    const visible =
+                        coincideCategoria && coincideConsulta;
+
+                    comunicado.classList.toggle(
+                        "oculto",
+                        !visible
+                    );
+
+                    if (visible)
+                    {
+                        visibles += 1;
+                    }
+                }
+            );
+
+            contadorResultados.textContent =
+                `${visibles} resultado${visibles === 1 ? "" : "s"}`;
+
+            totalComunicados.textContent = visibles;
+
+            sinResultados.style.display =
+                visibles === 0 ? "block" : "none";
+        }
+
+        formularioBusqueda.addEventListener(
+            "submit",
+            function(evento)
+            {
+                evento.preventDefault();
+
+                consultaActiva = buscarComunicado.value;
+
+                aplicarFiltros();
+            }
+        );
+
+        document
+            .querySelectorAll("[data-category]")
+            .forEach(
+                function(boton)
+                {
+                    boton.addEventListener(
+                        "click",
+                        function()
+                        {
+                            categoriaActiva = boton.dataset.category;
+
+                            document
+                                .querySelectorAll("[data-category]")
+                                .forEach(
+                                    function(elemento)
+                                    {
+                                        elemento.classList.toggle(
+                                            "activo",
+                                            elemento === boton
+                                        );
+                                    }
+                                );
+
+                            aplicarFiltros();
+                        }
+                    );
+                }
+            );
+
+        document
+            .querySelectorAll("[data-open-title]")
+            .forEach(
+                function(boton)
+                {
+                    boton.addEventListener(
+                        "click",
+                        function()
+                        {
+                            modalTitulo.textContent =
+                                boton.dataset.openTitle;
+
+                            modalCuerpo.textContent =
+                                boton.dataset.openBody;
+
+                            modalComunicado.hidden = false;
+                        }
+                    );
+                }
+            );
+
+        document
+            .getElementById("cerrarModal")
+            .addEventListener(
+                "click",
+                function()
+                {
+                    modalComunicado.hidden = true;
+                }
+            );
+
+        modalComunicado.addEventListener(
+            "click",
+            function(evento)
+            {
+                if (evento.target === modalComunicado)
+                {
+                    modalComunicado.hidden = true;
+                }
+            }
+        );
+
+        document.addEventListener(
+            "keydown",
+            function(evento)
+            {
+                if (evento.key === "Escape")
+                {
+                    modalComunicado.hidden = true;
+                }
+            }
+        );
+
+        aplicarFiltros();
+    </script>
 </body>
+
 </html>
