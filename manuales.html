@@ -1,1 +1,659 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Centro documental del portal Siscard+">
+    <meta name="theme-color" content="#25292c">
+    <title>Manuales | Landing Siscard+</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        .document-hero {
+            position: relative;
+            overflow: hidden;
+            display: grid;
+            grid-template-columns: minmax(0, 1.35fr) minmax(260px, .65fr);
+            gap: 28px;
+            align-items: center;
+            padding: 38px 42px;
+            border-radius: 25px;
+            color: #fff;
+            background: linear-gradient(120deg, #292e32 0%, #343b40 55%, #315d72 100%);
+            box-shadow: var(--shadow);
+        }
 
+        .document-hero::after {
+            content: "";
+            position: absolute;
+            width: 330px;
+            height: 330px;
+            right: -150px;
+            top: -190px;
+            border: 1px solid rgba(255, 255, 255, .12);
+            transform: rotate(45deg);
+        }
+
+        .document-hero-content,
+        .document-hero-summary {
+            position: relative;
+            z-index: 1;
+        }
+
+        .document-hero h1 {
+            margin: 9px 0 12px;
+            font-size: clamp(36px, 4vw, 54px);
+            line-height: 1.04;
+        }
+
+        .document-hero p {
+            max-width: 760px;
+            margin: 0;
+            color: #d6dbdf;
+            line-height: 1.6;
+        }
+
+        .document-search {
+            display: flex;
+            gap: 8px;
+            max-width: 790px;
+            margin-top: 22px;
+            padding: 6px;
+            border-radius: 14px;
+            background: #fff;
+            box-shadow: 0 12px 28px rgba(0, 0, 0, .18);
+        }
+
+        .document-search input {
+            flex: 1;
+            min-width: 0;
+            padding: 12px 14px;
+            border: 0;
+            outline: 0;
+            color: var(--ink);
+            background: transparent;
+        }
+
+        .document-hero-summary {
+            padding: 22px;
+            border: 1px solid rgba(255, 255, 255, .15);
+            border-radius: 20px;
+            background: rgba(255, 255, 255, .09);
+            backdrop-filter: blur(7px);
+        }
+
+        .document-hero-summary strong {
+            display: block;
+            margin: 4px 0;
+            font-size: 43px;
+        }
+
+        .document-hero-summary span {
+            color: #bde8ff;
+            font-weight: 800;
+        }
+
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 15px;
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .breadcrumb a:hover {
+            color: var(--orange-dark);
+        }
+
+        .document-toolbar {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 15px;
+            align-items: end;
+            margin-bottom: 18px;
+        }
+
+        .document-filters {
+            display: flex;
+            gap: 9px;
+            flex-wrap: wrap;
+        }
+
+        .document-filters button {
+            padding: 9px 13px;
+            border: 1px solid var(--line);
+            border-radius: 999px;
+            color: var(--ink);
+            background: #fff;
+            font-weight: 700;
+        }
+
+        .document-filters button:hover,
+        .document-filters button.active {
+            color: var(--orange-dark);
+            border-color: var(--orange);
+            background: var(--orange-soft);
+        }
+
+        .view-summary {
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 13px;
+        }
+
+        .category-card {
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            gap: 13px;
+            align-items: center;
+            padding: 17px;
+            border: 1px solid var(--line);
+            border-radius: 16px;
+            background: #fff;
+            transition: .2s ease;
+        }
+
+        .category-card:hover {
+            transform: translateY(-3px);
+            border-color: #ffbd95;
+            box-shadow: 0 10px 24px rgba(29, 37, 43, .08);
+        }
+
+        .category-icon {
+            width: 43px;
+            height: 43px;
+            display: grid;
+            place-items: center;
+            border-radius: 13px;
+            background: #e9f3ff;
+            font-size: 21px;
+        }
+
+        .category-card:nth-child(2n) .category-icon {
+            background: var(--orange-soft);
+        }
+
+        .category-card:nth-child(3n) .category-icon {
+            background: #e4f8f2;
+        }
+
+        .category-card strong,
+        .category-card small {
+            display: block;
+        }
+
+        .category-card small {
+            margin-top: 3px;
+            color: var(--muted);
+        }
+
+        .category-card em {
+            color: var(--orange);
+            font-style: normal;
+            font-weight: 900;
+        }
+
+        .featured-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 15px;
+        }
+
+        .featured-document {
+            position: relative;
+            min-height: 205px;
+            display: flex;
+            flex-direction: column;
+            padding: 21px;
+            overflow: hidden;
+            border: 1px solid var(--line);
+            border-radius: 19px;
+            background: #fff;
+            box-shadow: 0 6px 17px rgba(29, 37, 43, .045);
+        }
+
+        .featured-document::after {
+            content: "";
+            position: absolute;
+            width: 120px;
+            height: 120px;
+            right: -55px;
+            top: -55px;
+            border-radius: 50%;
+            background: var(--orange-soft);
+        }
+
+        .document-type {
+            position: relative;
+            z-index: 1;
+            width: fit-content;
+            padding: 6px 8px;
+            border-radius: 8px;
+            color: var(--orange-dark);
+            background: var(--orange-soft);
+            font-size: 10px;
+            font-weight: 850;
+            text-transform: uppercase;
+        }
+
+        .featured-document h3 {
+            margin: 16px 0 8px;
+        }
+
+        .featured-document p {
+            margin: 0;
+            color: var(--muted);
+            line-height: 1.5;
+        }
+
+        .document-meta {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            margin-top: auto;
+            padding-top: 18px;
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        .open-document {
+            width: fit-content;
+            margin-top: 14px;
+            border: 0;
+            color: var(--orange-dark);
+            background: transparent;
+            font-weight: 800;
+        }
+
+        .library-layout {
+            display: grid;
+            grid-template-columns: minmax(0, 1.3fr) minmax(300px, .7fr);
+            gap: 18px;
+        }
+
+        .document-table-wrapper {
+            overflow-x: auto;
+        }
+
+        .document-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .document-table th,
+        .document-table td {
+            padding: 13px 12px;
+            border-bottom: 1px solid var(--line);
+            text-align: left;
+        }
+
+        .document-table th {
+            color: var(--muted);
+            font-size: 11px;
+            text-transform: uppercase;
+        }
+
+        .document-name {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 260px;
+        }
+
+        .file-icon {
+            width: 36px;
+            height: 36px;
+            display: grid;
+            place-items: center;
+            flex: 0 0 auto;
+            border-radius: 10px;
+            color: #b3261e;
+            background: #fde9e7;
+            font-size: 11px;
+            font-weight: 900;
+        }
+
+        .document-name small {
+            display: block;
+            margin-top: 3px;
+            color: var(--muted);
+        }
+
+        .table-action {
+            border: 0;
+            color: var(--orange-dark);
+            background: transparent;
+            font-weight: 800;
+        }
+
+        .recent-list article {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 11px;
+            padding: 13px 0;
+            border-bottom: 1px solid var(--line);
+        }
+
+        .recent-list article:last-child {
+            border-bottom: 0;
+        }
+
+        .recent-list strong,
+        .recent-list small {
+            display: block;
+        }
+
+        .recent-list small {
+            margin-top: 4px;
+            color: var(--muted);
+        }
+
+        .empty-state {
+            display: none;
+            padding: 30px;
+            border: 1px dashed var(--line);
+            border-radius: 15px;
+            color: var(--muted);
+            text-align: center;
+            background: #fff;
+        }
+
+        .document-card-hidden,
+        .document-row-hidden {
+            display: none !important;
+        }
+
+        @media (max-width: 1180px) {
+            .document-hero,
+            .library-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .category-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 760px) {
+            .document-hero {
+                padding: 29px 23px;
+            }
+
+            .document-hero-summary {
+                display: none;
+            }
+
+            .document-search {
+                flex-direction: column;
+            }
+
+            .document-search button {
+                width: 100%;
+            }
+
+            .document-toolbar {
+                grid-template-columns: 1fr;
+            }
+
+            .category-grid,
+            .featured-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-shell">
+        <aside class="sidebar" id="sidebar" aria-label="Navegación principal">
+            <div class="brand">
+                <div class="brand-mark" aria-hidden="true"></div>
+                <div class="brand-copy">
+                    <strong>Landing <span>Siscard+</span></strong>
+                    <small>Autogestión digital</small>
+                </div>
+            </div>
+
+            <nav class="side-nav">
+                <p class="nav-label">Principal</p>
+                <a class="nav-link" href="index.html"><span class="nav-icon">⌂</span><span>Inicio</span></a>
+                <p class="nav-label">Conocimiento</p>
+                <a class="nav-link active" href="manuales.html"><span class="nav-icon">▤</span><span>Manuales</span></a>
+                <a class="nav-link" href="#" data-coming-soon="Parámetros Siscard"><span class="nav-icon">⚙</span><span>Parámetros</span></a>
+                <a class="nav-link" href="#" data-coming-soon="Formularios"><span class="nav-icon">▧</span><span>Formularios</span></a>
+                <a class="nav-link" href="landing-ia.html"><span class="nav-icon">✦</span><span>Landing IA</span></a>
+                <p class="nav-label">Gestión</p>
+                <a class="nav-link" href="seguridad.html"><span class="nav-icon">🔐</span><span>Seguridad</span></a>
+                <a class="nav-link" href="index.html#solicitudes"><span class="nav-icon">✓</span><span>Aprobaciones</span></a>
+                <a class="nav-link" href="index.html#solicitudes"><span class="nav-icon">◷</span><span>Mis solicitudes</span></a>
+                <a class="nav-link" href="comunicados.html"><span class="nav-icon">◉</span><span>Comunicados</span></a>
+            </nav>
+
+            <div class="side-note">
+                <strong>Centro documental</strong>
+                <p>Consulte documentos publicados y localice rápidamente la información requerida.</p>
+            </div>
+        </aside>
+
+        <div class="main-area">
+            <header class="topbar">
+                <button class="menu-button" id="menuButton" type="button" aria-label="Abrir menú" aria-controls="sidebar" aria-expanded="false">☰</button>
+                <div class="top-title"><strong>Centro Documental Siscard+</strong><small>Manuales y guías</small></div>
+                <div class="top-actions">
+                    <button class="icon-button" type="button" data-coming-soon="Notificaciones">🔔<span class="notification-dot">3</span></button>
+                    <button class="help-button" type="button" data-coming-soon="Centro de ayuda">Ayuda</button>
+                    <button class="profile-button" id="profileButton" type="button" aria-expanded="false">
+                        <span class="avatar">CL</span>
+                        <span class="profile-copy"><strong>Cliente Siscard+</strong><small>Portal de servicios</small></span>
+                        <span>⌄</span>
+                    </button>
+                </div>
+                <div class="profile-menu" id="profileMenu" hidden>
+                    <button type="button" data-coming-soon="Mi perfil">Mi perfil</button>
+                    <button type="button" data-coming-soon="Preferencias">Preferencias</button>
+                    <button type="button" data-coming-soon="Cerrar sesión">Cerrar sesión</button>
+                </div>
+            </header>
+
+            <main class="content">
+                <nav class="breadcrumb" aria-label="Ruta de navegación">
+                    <a href="index.html">Inicio</a><span>›</span><strong>Manuales</strong>
+                </nav>
+
+                <section class="document-hero">
+                    <div class="document-hero-content">
+                        <span class="eyebrow">Biblioteca de conocimiento</span>
+                        <h1>Encuentre el documento que necesita</h1>
+                        <p>Consulte manuales funcionales, guías operativas y documentación de productos Siscard+ desde un único espacio.</p>
+                        <form class="document-search" id="manualSearch" role="search">
+                            <input id="manualSearchInput" type="search" placeholder="Buscar por título, producto o palabra clave..." aria-label="Buscar manual">
+                            <button class="primary-button" type="submit">Buscar</button>
+                        </form>
+                    </div>
+                    <div class="document-hero-summary">
+                        <span>Biblioteca disponible</span>
+                        <strong>165</strong>
+                        <p>documentos demostrativos organizados para facilitar la consulta.</p>
+                    </div>
+                </section>
+
+                <section class="section">
+                    <div class="section-heading">
+                        <div><span class="section-kicker">Explorar</span><h2>Categorías documentales</h2><p>Acceda directamente a la documentación según el producto o proceso.</p></div>
+                    </div>
+                    <div class="category-grid">
+                        <button class="category-card" type="button" data-category="siscard"><span class="category-icon">◆</span><span><strong>Siscard+</strong><small>Portal y operación general</small></span><em>→</em></button>
+                        <button class="category-card" type="button" data-category="click to pay"><span class="category-icon">◈</span><span><strong>Click to Pay</strong><small>Configuración y experiencia</small></span><em>→</em></button>
+                        <button class="category-card" type="button" data-category="cardpac"><span class="category-icon">▣</span><span><strong>CardPac</strong><small>Procesos y administración</small></span><em>→</em></button>
+                        <button class="category-card" type="button" data-category="adquirencia"><span class="category-icon">◎</span><span><strong>Adquirencia</strong><small>Operación adquirente</small></span><em>→</em></button>
+                        <button class="category-card" type="button" data-category="seath"><span class="category-icon">◫</span><span><strong>SEATH</strong><small>Herramientas relacionadas</small></span><em>→</em></button>
+                        <button class="category-card" type="button" data-category="seguridad"><span class="category-icon">🔐</span><span><strong>Seguridad</strong><small>Usuarios y accesos</small></span><em>→</em></button>
+                        <button class="category-card" type="button" data-category="operaciones"><span class="category-icon">↻</span><span><strong>Operaciones</strong><small>Gestiones operativas</small></span><em>→</em></button>
+                        <button class="category-card" type="button" data-category="todos"><span class="category-icon">▤</span><span><strong>Todos los documentos</strong><small>Biblioteca completa</small></span><em>→</em></button>
+                    </div>
+                </section>
+
+                <section class="section">
+                    <div class="section-heading">
+                        <div><span class="section-kicker">Recomendados</span><h2>Documentos destacados</h2><p>Accesos demostrativos a contenidos de consulta frecuente.</p></div>
+                    </div>
+                    <div class="featured-grid" id="featuredDocuments">
+                        <article class="featured-document searchable-document" data-category="siscard" data-search="manual usuario siscard portal navegación">
+                            <span class="document-type">Manual de usuario</span><h3>Manual de Usuario Siscard+</h3><p>Guía general de ingreso, navegación y principales funcionalidades.</p><div class="document-meta"><span>Versión 2.4</span><span>Actualizado</span></div><button class="open-document" type="button" data-document="Manual de Usuario Siscard+">Abrir documento →</button>
+                        </article>
+                        <article class="featured-document searchable-document" data-category="click to pay" data-search="click to pay guía configuración">
+                            <span class="document-type">Guía funcional</span><h3>Guía de Configuración Click to Pay</h3><p>Información funcional y pasos de referencia para la solución.</p><div class="document-meta"><span>Versión 1.8</span><span>Publicado</span></div><button class="open-document" type="button" data-document="Guía de Configuración Click to Pay">Abrir documento →</button>
+                        </article>
+                        <article class="featured-document searchable-document" data-category="seguridad" data-search="seguridad usuarios grupos accesos manual administración">
+                            <span class="document-type">Manual administrativo</span><h3>Administración de Seguridad</h3><p>Creación de usuarios, grupos y mantenimiento de accesos.</p><div class="document-meta"><span>Versión 3.1</span><span>Vigente</span></div><button class="open-document" type="button" data-document="Administración de Seguridad">Abrir documento →</button>
+                        </article>
+                    </div>
+                </section>
+
+                <section class="section library-layout">
+                    <div class="panel">
+                        <div class="panel-heading">
+                            <div><span class="section-kicker">Biblioteca</span><h2>Documentos disponibles</h2></div>
+                            <span class="view-summary" id="resultSummary">6 documentos</span>
+                        </div>
+
+                        <div class="document-toolbar">
+                            <div class="document-filters" id="documentFilters">
+                                <button class="active" type="button" data-filter="todos">Todos</button>
+                                <button type="button" data-filter="manual">Manuales</button>
+                                <button type="button" data-filter="guía">Guías</button>
+                                <button type="button" data-filter="seguridad">Seguridad</button>
+                            </div>
+                        </div>
+
+                        <div class="document-table-wrapper">
+                            <table class="document-table">
+                                <thead><tr><th>Documento</th><th>Categoría</th><th>Versión</th><th>Acción</th></tr></thead>
+                                <tbody id="documentRows">
+                                    <tr class="searchable-row" data-category="siscard manual" data-search="manual usuario siscard portal"><td><div class="document-name"><span class="file-icon">PDF</span><span><strong>Manual de Usuario Siscard+</strong><small>Navegación y funcionalidades</small></span></div></td><td>Siscard+</td><td>2.4</td><td><button class="table-action" type="button" data-document="Manual de Usuario Siscard+">Abrir</button></td></tr>
+                                    <tr class="searchable-row" data-category="click to pay guía" data-search="guía configuración click to pay"><td><div class="document-name"><span class="file-icon">PDF</span><span><strong>Guía de Configuración Click to Pay</strong><small>Configuración funcional</small></span></div></td><td>Click to Pay</td><td>1.8</td><td><button class="table-action" type="button" data-document="Guía de Configuración Click to Pay">Abrir</button></td></tr>
+                                    <tr class="searchable-row" data-category="seguridad manual" data-search="manual administración seguridad usuarios grupos accesos"><td><div class="document-name"><span class="file-icon">PDF</span><span><strong>Administración de Seguridad</strong><small>Usuarios, grupos y accesos</small></span></div></td><td>Seguridad</td><td>3.1</td><td><button class="table-action" type="button" data-document="Administración de Seguridad">Abrir</button></td></tr>
+                                    <tr class="searchable-row" data-category="cardpac manual" data-search="manual operativo cardpac procesos"><td><div class="document-name"><span class="file-icon">PDF</span><span><strong>Manual Operativo CardPac</strong><small>Procesos principales</small></span></div></td><td>CardPac</td><td>2.0</td><td><button class="table-action" type="button" data-document="Manual Operativo CardPac">Abrir</button></td></tr>
+                                    <tr class="searchable-row" data-category="adquirencia guía" data-search="guía adquirencia web operación"><td><div class="document-name"><span class="file-icon">PDF</span><span><strong>Guía de Adquirencia Web</strong><small>Consulta operativa</small></span></div></td><td>Adquirencia</td><td>1.5</td><td><button class="table-action" type="button" data-document="Guía de Adquirencia Web">Abrir</button></td></tr>
+                                    <tr class="searchable-row" data-category="seath operaciones guía" data-search="referencia seath operaciones guía"><td><div class="document-name"><span class="file-icon">PDF</span><span><strong>Referencia Operativa SEATH</strong><small>Procesos relacionados</small></span></div></td><td>SEATH</td><td>1.2</td><td><button class="table-action" type="button" data-document="Referencia Operativa SEATH">Abrir</button></td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="empty-state" id="emptyState"><strong>No se encontraron documentos.</strong><br>Pruebe con otra categoría o palabra clave.</div>
+                    </div>
+
+                    <aside class="panel">
+                        <div class="panel-heading"><div><span class="section-kicker">Historial</span><h2>Consultados recientemente</h2></div></div>
+                        <div class="recent-list" id="recentDocuments">
+                            <article><span class="file-icon">PDF</span><div><strong>Manual de Usuario Siscard+</strong><small>Consulta demostrativa · Hoy</small></div></article>
+                            <article><span class="file-icon">PDF</span><div><strong>Administración de Seguridad</strong><small>Consulta demostrativa · Ayer</small></div></article>
+                            <article><span class="file-icon">PDF</span><div><strong>Guía de Configuración Click to Pay</strong><small>Consulta demostrativa</small></div></article>
+                        </div>
+                        <button class="primary-button full" type="button" data-coming-soon="Carga de documentos">＋ Cargar documento</button>
+                    </aside>
+                </section>
+            </main>
+
+            <footer class="footer"><span><strong>Landing Siscard+</strong> · Centro Documental</span><span>Contenido demostrativo para la presentación</span></footer>
+        </div>
+    </div>
+
+    <div class="toast" id="toast" role="status" aria-live="polite" aria-hidden="true"></div>
+    <script src="js/app.js"></script>
+    <script>
+        "use strict";
+
+        const manualSearch = document.getElementById("manualSearch");
+        const manualSearchInput = document.getElementById("manualSearchInput");
+        const documentRows = [...document.querySelectorAll(".searchable-row")];
+        const featuredDocuments = [...document.querySelectorAll(".searchable-document")];
+        const resultSummary = document.getElementById("resultSummary");
+        const emptyState = document.getElementById("emptyState");
+        const filterButtons = [...document.querySelectorAll("[data-filter]")];
+        let activeFilter = "todos";
+        let activeQuery = "";
+
+        function cleanText(value) {
+            return value.toLocaleLowerCase("es").normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
+        }
+
+        function showManualToast(message) {
+            const manualToast = document.getElementById("toast");
+            manualToast.textContent = message;
+            manualToast.classList.add("show");
+            manualToast.setAttribute("aria-hidden", "false");
+            window.setTimeout(() => {
+                manualToast.classList.remove("show");
+                manualToast.setAttribute("aria-hidden", "true");
+            }, 3200);
+        }
+
+        function applyDocumentFilters() {
+            const query = cleanText(activeQuery);
+            let visibleRows = 0;
+
+            documentRows.forEach((row) => {
+                const text = cleanText(`${row.textContent} ${row.dataset.search || ""}`);
+                const category = cleanText(row.dataset.category || "");
+                const matchesQuery = !query || text.includes(query);
+                const matchesFilter = activeFilter === "todos" || category.includes(cleanText(activeFilter));
+                const visible = matchesQuery && matchesFilter;
+                row.classList.toggle("document-row-hidden", !visible);
+                if (visible) visibleRows += 1;
+            });
+
+            featuredDocuments.forEach((card) => {
+                const text = cleanText(`${card.textContent} ${card.dataset.search || ""}`);
+                const category = cleanText(card.dataset.category || "");
+                const matchesQuery = !query || text.includes(query);
+                const matchesFilter = activeFilter === "todos" || category.includes(cleanText(activeFilter));
+                card.classList.toggle("document-card-hidden", !(matchesQuery && matchesFilter));
+            });
+
+            resultSummary.textContent = `${visibleRows} documento${visibleRows === 1 ? "" : "s"}`;
+            emptyState.style.display = visibleRows === 0 ? "block" : "none";
+        }
+
+        manualSearch.addEventListener("submit", (event) => {
+            event.preventDefault();
+            activeQuery = manualSearchInput.value;
+            applyDocumentFilters();
+            document.getElementById("documentRows").scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+
+        filterButtons.forEach((button) => {
+            button.addEventListener("click", () => {
+                activeFilter = button.dataset.filter;
+                filterButtons.forEach((item) => item.classList.toggle("active", item === button));
+                applyDocumentFilters();
+            });
+        });
+
+        document.querySelectorAll("[data-category]").forEach((button) => {
+            button.addEventListener("click", () => {
+                const category = button.dataset.category;
+                activeQuery = category === "todos" ? "" : category;
+                activeFilter = "todos";
+                manualSearchInput.value = activeQuery;
+                filterButtons.forEach((item) => item.classList.toggle("active", item.dataset.filter === "todos"));
+                applyDocumentFilters();
+                document.getElementById("documentRows").scrollIntoView({ behavior: "smooth", block: "start" });
+            });
+        });
+
+        document.querySelectorAll("[data-document]").forEach((button) => {
+            button.addEventListener("click", () => {
+                const name = button.dataset.document;
+                localStorage.setItem("siscardLastDocument", name);
+                showManualToast(`${name}: vista preparada para conectar el PDF o enlace definitivo.`);
+            });
+        });
+
+        applyDocumentFilters();
+    </script>
+</body>
+</html>
