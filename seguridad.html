@@ -1,48 +1,2758 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Seguridad | Landing Siscard+</title>
-<link rel="stylesheet" href="css/styles.css">
-<style>
-:root{--naranja:#ff6c0c;--gris:#4f4f4f;--fondo:#f2f2f2;--borde:#d9d9d9;--verde:#16825b}body{background:var(--fondo)}
-.seg-head,.box{background:#fff;border:1px solid var(--borde);box-shadow:0 2px 7px #00000012}.seg-head{display:flex;justify-content:space-between;gap:18px;align-items:center;flex-wrap:wrap;padding:22px}.seg-head h1,.box-title h2{margin:0;color:var(--naranja);font-weight:300}.seg-head h1{font-size:clamp(30px,4vw,44px)}.seg-head p,.box-title small{color:#666}.label{display:block;margin-bottom:6px;color:#444;font-size:11px;font-weight:850;text-transform:uppercase}.stats{display:flex;gap:8px}.stat{min-width:130px;padding:11px;border:1px solid var(--borde);border-top:4px solid var(--naranja);background:#fafafa}.stat strong,.stat span{display:block}.stat strong{font-size:24px}.stat span{color:#666;font-size:10px;font-weight:850;text-transform:uppercase}
-.tabs{position:sticky;top:72px;z-index:15;display:flex;gap:8px;overflow-x:auto;padding:11px 0;background:var(--fondo)}.tab,.btn{padding:9px 14px;border:0;border-radius:8px;background:var(--gris);color:#fff;font-weight:800;white-space:nowrap}.tab{border:1px solid #ccc;border-radius:999px;background:#fff;color:var(--gris)}.tab.active{border-color:var(--gris);background:var(--gris);color:#fff}.btn.orange{background:var(--naranja)}.btn.light{border:1px solid var(--borde);background:#fff;color:var(--gris)}
-.view[hidden],.modal[hidden],.result[hidden]{display:none}.options{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.option{position:relative;min-height:148px;padding:17px;border:1px solid var(--borde);border-top:4px solid #bbb;background:#fff;box-shadow:0 2px 7px #00000012;text-align:left;transition:.18s}.option:hover{transform:translateY(-2px);border-top-color:var(--naranja)}.option.primary{border-top-color:var(--naranja);background:#fff5ec}.option i{display:grid;place-items:center;width:42px;height:42px;margin-bottom:11px;border:1px solid #ffd1ad;border-radius:10px;background:#fff;color:var(--naranja);font-size:21px;font-style:normal}.option strong,.option small{display:block}.option strong{color:var(--gris);font-size:17px}.option small{margin-top:6px;color:#666;line-height:1.4}.option em{position:absolute;right:14px;bottom:10px;color:var(--naranja);font-style:normal;font-weight:900}
-.workspace{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(270px,.65fr);gap:14px}.box-title{display:flex;justify-content:space-between;align-items:center;padding:13px 16px;border-bottom:1px solid var(--borde)}.box-title h2{font-size:26px}.box-body{padding:16px}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.field.full{grid-column:1/-1}.field input,.field select,.field textarea{width:100%;padding:10px;border:1px solid var(--borde);border-radius:8px;background:#fff}.field input:focus,.field select:focus,.field textarea:focus{outline:3px solid #ff6c0c20;border-color:var(--naranja)}.lookup{display:grid;grid-template-columns:1fr auto;gap:8px}.result{margin-top:12px;padding:12px;border:1px solid var(--borde);border-top:4px solid var(--naranja);background:#fafafa}.result-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.result-grid div{padding:9px;border:1px solid #e5e5e5;background:#fff}.result-grid span,.result-grid strong{display:block}.result-grid span{color:#666;font-size:10px;font-weight:850;text-transform:uppercase}.result-grid strong{margin-top:3px}.note{margin-top:12px;padding:11px;border-left:4px solid var(--naranja);background:#fff5ec;color:#555;font-size:13px;line-height:1.45}.note.red{border-left-color:#b42318;background:#fff1f0}.actions{display:flex;justify-content:flex-end;gap:8px;margin-top:16px}.summary{padding:12px;border:1px solid #e5e5e5;border-top:4px solid #bbb;background:#fafafa}.summary+.summary{margin-top:9px}.summary.orange{border-top-color:var(--naranja);background:#fff5ec}.summary span{display:block;margin-top:4px;color:#666;font-size:13px;line-height:1.4}
-.table-wrap{overflow-x:auto}.table{width:100%;border-collapse:collapse}.table th,.table td{padding:11px;border-bottom:1px solid var(--borde);text-align:left}.table th{background:#fafafa;color:#666;font-size:11px;text-transform:uppercase}.switch{position:relative;width:42px;height:23px;appearance:none;border-radius:999px;background:#bbb}.switch:after{content:"";position:absolute;top:3px;left:3px;width:17px;height:17px;border-radius:50%;background:#fff;transition:.2s}.switch:checked{background:var(--naranja)}.switch:checked:after{left:22px}.reports{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.report{padding:14px;border:1px solid var(--borde);border-top:4px solid #bbb;background:#fff;text-align:left}.report.active,.report:hover{border-top-color:var(--naranja);background:#fff5ec}.report strong,.report small{display:block}.report small{margin-top:5px;color:#666}.pill{padding:5px 8px;border-radius:999px;background:#e1f5ec;color:var(--verde);font-size:10px;font-weight:850}
-.modal{position:fixed;inset:0;z-index:200;display:grid;place-items:center;padding:18px;background:#0007}.modal-card{width:min(490px,100%);overflow:hidden;border-radius:14px;background:#fff;box-shadow:0 16px 45px #0005}.modal-head{display:flex;justify-content:space-between;align-items:center;padding:12px 15px;background:var(--naranja);color:#fff}.modal-head h3{margin:0}.modal-head button{border:0;background:transparent;color:#fff;font-size:22px}.modal-body{padding:16px}.code{margin:12px 0;padding:18px;border:1px solid var(--borde);background:#fafafa;text-align:center;font-size:24px;font-weight:850}
-@media(max-width:1050px){.options{grid-template-columns:repeat(2,1fr)}.workspace{grid-template-columns:1fr}.reports{grid-template-columns:repeat(2,1fr)}}@media(max-width:720px){.options,.grid,.result-grid,.reports{grid-template-columns:1fr}.field.full{grid-column:auto}.stats{width:100%}.stat{flex:1}}
-</style>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="description"
+        content="Administración de seguridad del portal Siscard+"
+    >
+
+    <title>
+        Seguridad | Landing Siscard+
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="css/styles.css"
+    >
+
+    <style>
+        .security-header,
+        .security-panel
+        {
+            background: #ffffff;
+            border: 1px solid var(--line);
+            box-shadow: var(--shadow-small);
+        }
+
+        .security-header
+        {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 18px;
+            flex-wrap: wrap;
+            padding: 22px;
+        }
+
+        .security-header h1
+        {
+            margin: 4px 0 8px;
+            color: var(--orange);
+            font-size: clamp(32px, 4vw, 46px);
+            font-weight: 300;
+        }
+
+        .security-header p
+        {
+            margin: 0;
+            color: var(--muted);
+        }
+
+        .security-stats
+        {
+            display: flex;
+            gap: 9px;
+        }
+
+        .security-stat
+        {
+            min-width: 126px;
+            padding: 11px;
+            border: 1px solid var(--line);
+            border-top: 4px solid var(--orange);
+            background: var(--surface-soft);
+        }
+
+        .security-stat strong,
+        .security-stat span
+        {
+            display: block;
+        }
+
+        .security-stat strong
+        {
+            color: var(--sidebar);
+            font-size: 24px;
+            font-weight: 400;
+        }
+
+        .security-stat span
+        {
+            margin-top: 3px;
+            color: var(--muted);
+            font-size: 10px;
+            font-weight: 850;
+            text-transform: uppercase;
+        }
+
+        .security-tabs
+        {
+            position: sticky;
+            top: 70px;
+            z-index: 12;
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding: 11px 0;
+            background: var(--background);
+        }
+
+        .security-tab
+        {
+            padding: 9px 14px;
+            border: 1px solid var(--line-strong);
+            border-radius: 999px;
+            background: #ffffff;
+            color: var(--sidebar);
+            font-weight: 800;
+            white-space: nowrap;
+        }
+
+        .security-tab.active
+        {
+            border-color: var(--orange-dark);
+            background: var(--orange);
+            color: #ffffff;
+        }
+
+        .security-view[hidden]
+        {
+            display: none;
+        }
+
+        .option-grid
+        {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 12px;
+        }
+
+        .security-option
+        {
+            position: relative;
+            min-height: 150px;
+            padding: 17px;
+            border: 1px solid var(--line);
+            border-top: 4px solid #b7b7b7;
+            border-radius: var(--radius);
+            background: #ffffff;
+            box-shadow: var(--shadow-small);
+            color: var(--ink);
+            text-align: left;
+            transition: var(--transition);
+        }
+
+        .security-option:hover
+        {
+            border-top-color: var(--orange);
+            background: #fffdfa;
+            box-shadow: var(--shadow-medium);
+            transform: translateY(-2px);
+        }
+
+        .security-option.primary
+        {
+            border-top-color: var(--orange);
+            background: var(--orange-soft);
+        }
+
+        .security-option-icon
+        {
+            display: grid;
+            place-items: center;
+            width: 42px;
+            height: 42px;
+            margin-bottom: 11px;
+            border: 1px solid #ffd1ad;
+            border-radius: var(--radius);
+            background: #ffffff;
+            color: var(--orange);
+            font-size: 21px;
+        }
+
+        .security-option strong,
+        .security-option small
+        {
+            display: block;
+        }
+
+        .security-option strong
+        {
+            color: var(--sidebar);
+            font-size: 17px;
+        }
+
+        .security-option small
+        {
+            margin-top: 6px;
+            color: var(--muted);
+            line-height: 1.4;
+        }
+
+        .security-option em
+        {
+            position: absolute;
+            right: 14px;
+            bottom: 10px;
+            color: var(--orange);
+            font-style: normal;
+            font-weight: 900;
+        }
+
+        .security-workspace
+        {
+            display: grid;
+            grid-template-columns: minmax(0, 1.35fr) minmax(270px, 0.65fr);
+            gap: 14px;
+        }
+
+        .security-panel-header
+        {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            padding: 13px 16px;
+            border-bottom: 1px solid var(--line);
+        }
+
+        .security-panel-header h2
+        {
+            margin: 0;
+            color: var(--orange);
+            font-size: 26px;
+            font-weight: 300;
+        }
+
+        .security-panel-header small
+        {
+            color: var(--muted);
+        }
+
+        .security-panel-body
+        {
+            padding: 16px;
+        }
+
+        .form-grid
+        {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+        }
+
+        .form-field.full
+        {
+            grid-column: 1 / -1;
+        }
+
+        .form-field label
+        {
+            display: block;
+            margin-bottom: 6px;
+            color: var(--ink);
+            font-size: 11px;
+            font-weight: 850;
+            text-transform: uppercase;
+        }
+
+        .form-field input,
+        .form-field select,
+        .form-field textarea
+        {
+            width: 100%;
+            padding: 10px;
+        }
+
+        .lookup-row
+        {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: 8px;
+        }
+
+        .user-result
+        {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 8px;
+            margin-top: 12px;
+            padding: 12px;
+            border: 1px solid var(--line);
+            border-top: 4px solid var(--orange);
+            background: var(--surface-soft);
+        }
+
+        .user-result[hidden]
+        {
+            display: none;
+        }
+
+        .user-result div
+        {
+            padding: 9px;
+            border: 1px solid var(--line);
+            background: #ffffff;
+        }
+
+        .user-result span,
+        .user-result strong
+        {
+            display: block;
+        }
+
+        .user-result span
+        {
+            color: var(--muted);
+            font-size: 10px;
+            font-weight: 850;
+            text-transform: uppercase;
+        }
+
+        .user-result strong
+        {
+            margin-top: 4px;
+        }
+
+        .form-note
+        {
+            margin-top: 12px;
+            padding: 11px;
+            border-left: 4px solid var(--orange);
+            background: var(--orange-soft);
+            color: #555555;
+            font-size: 13px;
+            line-height: 1.45;
+        }
+
+        .form-note.warning
+        {
+            border-left-color: var(--red);
+            background: #fff1f0;
+        }
+
+        .form-actions
+        {
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+            margin-top: 16px;
+        }
+
+        .security-button
+        {
+            min-height: 40px;
+            padding: 9px 15px;
+            border: 1px solid #9f9f9f;
+            border-radius: var(--radius-small);
+            background: #ababab;
+            color: #ffffff;
+            font-weight: 750;
+        }
+
+        .security-button.primary
+        {
+            border-color: var(--orange-dark);
+            background: var(--orange);
+        }
+
+        .security-button.light
+        {
+            border-color: var(--line-strong);
+            background: #ffffff;
+            color: var(--ink);
+        }
+
+        .summary-card
+        {
+            padding: 12px;
+            border: 1px solid var(--line);
+            border-top: 4px solid #b7b7b7;
+            background: var(--surface-soft);
+        }
+
+        .summary-card + .summary-card
+        {
+            margin-top: 9px;
+        }
+
+        .summary-card.orange
+        {
+            border-top-color: var(--orange);
+            background: var(--orange-soft);
+        }
+
+        .summary-card span
+        {
+            display: block;
+            margin-top: 4px;
+            color: var(--muted);
+            font-size: 13px;
+            line-height: 1.4;
+        }
+
+        .table-wrapper
+        {
+            overflow-x: auto;
+        }
+
+        .security-table
+        {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .security-table th,
+        .security-table td
+        {
+            padding: 11px;
+            border-bottom: 1px solid var(--line);
+            text-align: left;
+        }
+
+        .security-table th
+        {
+            background: var(--surface-soft);
+            color: var(--muted);
+            font-size: 11px;
+            text-transform: uppercase;
+        }
+
+        .access-switch
+        {
+            position: relative;
+            width: 42px;
+            height: 23px;
+            appearance: none;
+            border: 0;
+            border-radius: 999px;
+            background: #bbbbbb;
+        }
+
+        .access-switch::after
+        {
+            content: "";
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 17px;
+            height: 17px;
+            border-radius: 50%;
+            background: #ffffff;
+            transition: var(--transition);
+        }
+
+        .access-switch:checked
+        {
+            background: var(--orange);
+        }
+
+        .access-switch:checked::after
+        {
+            left: 22px;
+        }
+
+        .report-grid
+        {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 10px;
+        }
+
+        .report-card
+        {
+            padding: 14px;
+            border: 1px solid var(--line);
+            border-top: 4px solid #b7b7b7;
+            background: #ffffff;
+            color: var(--ink);
+            text-align: left;
+        }
+
+        .report-card:hover,
+        .report-card.active
+        {
+            border-top-color: var(--orange);
+            background: var(--orange-soft);
+        }
+
+        .report-card strong,
+        .report-card small
+        {
+            display: block;
+        }
+
+        .report-card small
+        {
+            margin-top: 5px;
+            color: var(--muted);
+        }
+
+        .modal-backdrop
+        {
+            position: fixed;
+            inset: 0;
+            z-index: 200;
+            display: grid;
+            place-items: center;
+            padding: 18px;
+            background: rgba(0, 0, 0, 0.48);
+        }
+
+        .modal-backdrop[hidden]
+        {
+            display: none;
+        }
+
+        .modal-card
+        {
+            width: min(500px, 100%);
+            overflow: hidden;
+            border-radius: var(--radius-large);
+            background: #ffffff;
+            box-shadow: var(--shadow-medium);
+        }
+
+        .modal-header
+        {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 13px 16px;
+            background: var(--orange);
+            color: #ffffff;
+        }
+
+        .modal-header h3
+        {
+            margin: 0;
+        }
+
+        .modal-header button
+        {
+            border: 0;
+            background: transparent;
+            color: #ffffff;
+            font-size: 23px;
+        }
+
+        .modal-body
+        {
+            padding: 18px;
+        }
+
+        .operation-code
+        {
+            margin: 12px 0;
+            padding: 17px;
+            border: 1px solid var(--line);
+            background: var(--surface-soft);
+            color: var(--sidebar);
+            text-align: center;
+            font-size: 24px;
+            font-weight: 850;
+        }
+
+        @media (max-width: 1050px)
+        {
+            .option-grid,
+            .report-grid
+            {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .security-workspace
+            {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 720px)
+        {
+            .option-grid,
+            .report-grid,
+            .form-grid,
+            .user-result
+            {
+                grid-template-columns: 1fr;
+            }
+
+            .form-field.full
+            {
+                grid-column: auto;
+            }
+
+            .security-stats
+            {
+                width: 100%;
+            }
+
+            .security-stat
+            {
+                flex: 1;
+            }
+
+            .lookup-row
+            {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
+
 <body>
-<div class="app-shell">
-<aside class="sidebar" id="sidebar"><div class="brand"><div class="brand-mark"></div><div class="brand-copy"><strong>Landing <span>Siscard+</span></strong><small>Autogestión digital</small></div></div><nav class="side-nav"><p class="nav-label">Principal</p><a class="nav-link" href="index.html"><span class="nav-icon">⌂</span><span>Inicio</span></a><p class="nav-label">Conocimiento</p><a class="nav-link" href="manuales.html"><span class="nav-icon">▤</span><span>Manuales</span></a><a class="nav-link" href="#" data-coming-soon="Parámetros"><span class="nav-icon">⚙</span><span>Parámetros</span></a><a class="nav-link" href="landing-ia.html"><span class="nav-icon">✦</span><span>Landing IA</span></a><p class="nav-label">Gestión</p><a class="nav-link active" href="seguridad.html"><span class="nav-icon">🔐</span><span>Seguridad</span></a><a class="nav-link" href="comunicados.html"><span class="nav-icon">◉</span><span>Comunicados</span></a></nav><div class="side-note"><strong>Módulo de seguridad</strong><p>Gestión funcional de demostración.</p></div></aside>
-<div class="main-area"><header class="topbar"><button class="menu-button" id="menuButton" type="button">☰</button><div class="top-title"><strong>Seguridad Siscard+</strong><small>Centro de administración</small></div><div class="top-actions"><button class="help-button" type="button" data-coming-soon="Ayuda">Ayuda</button><button class="profile-button" id="profileButton" type="button"><span class="avatar">AD</span><span class="profile-copy"><strong>Administrador</strong><small>Seguridad</small></span></button></div><div class="profile-menu" id="profileMenu" hidden><button type="button">Mi perfil</button></div></header>
-<main class="content"><section class="seg-head"><div><span class="label">Módulo de seguridad</span><h1>Administración de seguridad</h1><p>Seleccione una opción para ejecutar una gestión de demostración.</p></div><div class="stats"><div class="stat"><strong>8</strong><span>Opciones</span></div><div class="stat"><strong>1</strong><span>Reportes</span></div></div></section>
-<nav class="tabs"><button class="tab active" data-view="menu">Menú principal</button><button class="tab" data-view="usuario">Crear usuario</button><button class="tab" data-view="grupo">Crear grupo</button><button class="tab" data-view="accesos">Mantenimiento de accesos</button></nav>
-<section class="view" id="view-menu"><div class="options">
-<button class="option primary" data-open="usuario"><i>＋</i><strong>Crear usuario</strong><small>Registre un usuario normal, cajero, cobrador o vendedor.</small><em>→</em></button><button class="option primary" data-open="grupo"><i>👥</i><strong>Crear grupo</strong><small>Prepare la solicitud de un nuevo grupo.</small><em>→</em></button><button class="option primary" data-open="accesos"><i>🔐</i><strong>Mantenimiento de accesos</strong><small>Agregue, modifique o retire permisos.</small><em>→</em></button><button class="option" data-open="activar"><i>●</i><strong>Activar usuario</strong><small>Reactive un usuario deshabilitado.</small><em>→</em></button><button class="option" data-open="desactivar"><i>◐</i><strong>Desactivar usuario</strong><small>Inhabilite temporalmente un usuario.</small><em>→</em></button><button class="option" data-open="cambiar"><i>↔</i><strong>Cambiar grupo o localidad</strong><small>Actualice la asignación del usuario.</small><em>→</em></button><button class="option" data-open="reiniciar"><i>↻</i><strong>Reiniciar usuario</strong><small>Restablezca la contraseña.</small><em>→</em></button><button class="option" data-open="modificar"><i>✎</i><strong>Modificar usuario</strong><small>Actualice sus datos.</small><em>→</em></button><button class="option" data-open="consultar"><i>⌕</i><strong>Consulta de usuarios</strong><small>Busque por código o nombre.</small><em>→</em></button><button class="option" data-open="reportes"><i>▤</i><strong>Reportes</strong><small>Genere vistas previas.</small><em>→</em></button>
-</div></section>
+    <div class="app-shell">
+        <aside
+            class="sidebar"
+            id="sidebar"
+            aria-label="Navegación principal"
+        >
+            <div class="brand">
+                <div class="brand-mark"></div>
 
-<section class="view" id="view-usuario" hidden><div class="workspace"><form class="box" id="userForm"><div class="box-title"><div><h2>Crear usuario</h2><small>Registro demostrativo</small></div></div><div class="box-body"><div class="grid"><div class="field full"><label class="label">Nombre completo</label><input id="fullName" required></div><div class="field"><label class="label">Grupo</label><select required><option value="">Seleccione</option><option>OPERACIONES</option><option>SERVICIO AL CLIENTE</option></select></div><div class="field"><label class="label">Localidad</label><select required><option value="">Seleccione</option><option>01 - PRINCIPAL</option><option>60 - OFICINAS</option></select></div><div class="field"><label class="label">Tipo de usuario</label><select><option>Normal</option><option>Cajero</option><option>Cobrador</option><option>Vendedor</option></select></div><div class="field"><label class="label">Usuario aprobador LP</label><select><option>Sin definición</option><option>S - Aprobador</option><option>N - No aprobador</option></select></div><div class="field"><label class="label">Correo electrónico</label><input type="email" required></div><div class="field"><label class="label">Estado de ingreso</label><select><option>A - Activo</option><option>I - Inactivo</option></select></div></div><div class="note">Revise el indicador Usuario Aprobador LP antes de confirmar.</div><div class="actions"><button class="btn light" type="reset">Limpiar</button><button class="btn orange" type="submit">Confirmar creación</button></div></div></form><aside class="box"><div class="box-title"><h2>Resumen</h2></div><div class="box-body"><div class="summary orange"><strong>Multifactor</strong><span>El correo queda preparado para recibir el código de validación.</span></div></div></aside></div></section>
+                <div class="brand-copy">
+                    <strong>
+                        Landing
+                        <span>
+                            Siscard+
+                        </span>
+                    </strong>
 
-<section class="view" id="view-grupo" hidden><div class="workspace"><form class="box" id="groupForm"><div class="box-title"><div><h2>Crear grupo</h2><small>Solicitud demostrativa</small></div></div><div class="box-body"><div class="grid"><div class="field"><label class="label">Código propuesto</label><input id="groupCode" required></div><div class="field"><label class="label">Nombre</label><input required></div><div class="field"><label class="label">Localidad</label><select required><option value="">Seleccione</option><option>01 - PRINCIPAL</option></select></div><div class="field"><label class="label">Perfil base</label><select required><option value="">Seleccione</option><option>Consulta</option><option>Operativo</option></select></div><div class="field full"><label class="label">Justificación</label><textarea rows="4" required></textarea></div></div><div class="actions"><button class="btn orange" type="submit">Generar solicitud</button></div></div></form><aside class="box"><div class="box-title"><h2>Consideraciones</h2></div><div class="box-body"><div class="summary orange"><strong>Aprobación</strong><span>La solicitud quedará preparada para revisión.</span></div></div></aside></div></section>
+                    <small>
+                        Autogestión digital
+                    </small>
+                </div>
+            </div>
 
-<section class="view" id="view-accesos" hidden><div class="workspace"><form class="box" id="accessForm"><div class="box-title"><div><h2>Mantenimiento de accesos</h2><small>Gestión por grupo</small></div></div><div class="box-body"><div class="grid"><div class="field"><label class="label">Grupo</label><select required><option value="">Seleccione</option><option>OPERACIONES</option><option>SERVICIO AL CLIENTE</option></select></div><div class="field"><label class="label">Tipo</label><select required><option>Agregar accesos</option><option>Modificar accesos</option><option>Eliminar accesos</option></select></div></div><div class="table-wrap"><table class="table"><thead><tr><th>Programa</th><th>Categoría</th><th>Asignar</th></tr></thead><tbody><tr><td>Consulta de clientes</td><td>Operación</td><td><input class="switch" type="checkbox" checked></td></tr><tr><td>Mantenimiento de tarjetas</td><td>Tarjetas</td><td><input class="switch" type="checkbox"></td></tr><tr><td>Estados de cuenta</td><td>Consultas</td><td><input class="switch" type="checkbox" checked></td></tr><tr><td>Aprobación Landing Page</td><td>Landing Page</td><td><input class="switch" type="checkbox"></td></tr></tbody></table></div><div class="actions"><button class="btn orange" type="submit">Generar solicitud</button></div></div></form><aside class="box"><div class="box-title"><h2>Selección</h2></div><div class="box-body"><div class="summary orange"><strong id="accessCount">2 accesos</strong><span>seleccionados.</span></div></div></aside></div></section>
+            <nav class="side-nav">
+                <p class="nav-label">
+                    Principal
+                </p>
 
-<section class="view" id="view-activar" hidden><div data-operation="Usuario activado"></div></section><section class="view" id="view-desactivar" hidden><div data-operation="Usuario desactivado"></div></section><section class="view" id="view-cambiar" hidden><div data-operation="Grupo o localidad actualizados"></div></section><section class="view" id="view-reiniciar" hidden><div data-operation="Usuario reiniciado"></div></section><section class="view" id="view-modificar" hidden><div data-operation="Usuario modificado"></div></section>
-<section class="view" id="view-consultar" hidden><div class="box"><div class="box-title"><div><h2>Consulta de usuarios</h2><small>Búsqueda por código o nombre</small></div></div><div class="box-body"><form id="consultForm" class="lookup"><input id="consultQuery" required placeholder="Digite código o nombre"><button class="btn orange">Buscar</button></form><div class="result" id="consultResults" hidden><div class="table-wrap"><table class="table"><thead><tr><th>Usuario</th><th>Nombre</th><th>Grupo</th><th>Localidad</th><th>Estado</th></tr></thead><tbody><tr><td>USR00125</td><td>USUARIO DEMOSTRACIÓN</td><td>OPERACIONES</td><td>01</td><td><span class="pill">Activo</span></td></tr><tr><td>USR00126</td><td>USUARIO PRUEBA</td><td>SERVICIO AL CLIENTE</td><td>60</td><td><span class="pill">Activo</span></td></tr></tbody></table></div></div></div></div></section>
-<section class="view" id="view-reportes" hidden><div class="box"><div class="box-title"><div><h2>Reportes</h2><small>Seleccione el reporte</small></div></div><div class="box-body"><div class="reports"><button class="report active" data-report="Acceso a programas"><strong>Acceso a programas</strong><small>Programas por grupo.</small></button><button class="report" data-report="Control de cambios"><strong>Control de cambios</strong><small>Modificaciones realizadas.</small></button><button class="report" data-report="Usuarios"><strong>Usuarios</strong><small>Detalle de usuarios.</small></button><button class="report" data-report="Usuarios a una fecha"><strong>Usuarios a una fecha</strong><small>Consulta por fecha.</small></button><button class="report" data-report="Usuarios por localidad"><strong>Usuarios por localidad</strong><small>Distribución local.</small></button><button class="report" data-report="Aprobadores LP"><strong>Aprobadores LP</strong><small>Usuarios aprobadores.</small></button></div><div class="actions"><button class="btn orange" id="generateReport" type="button">Generar reporte</button></div><div class="result" id="reportPreview" hidden><div class="table-wrap"><table class="table"><thead><tr><th>Usuario</th><th>Nombre</th><th>Grupo</th><th>Localidad</th></tr></thead><tbody><tr><td>USR00125</td><td>USUARIO DEMOSTRACIÓN</td><td>OPERACIONES</td><td>01</td></tr><tr><td>USR00126</td><td>USUARIO PRUEBA</td><td>SERVICIO AL CLIENTE</td><td>60</td></tr></tbody></table></div></div></div></div></section>
-</main><footer class="footer"><span><strong>Landing Siscard+</strong> · Seguridad</span><span>Demostración funcional</span></footer></div></div>
-<div class="modal" id="modal" hidden><section class="modal-card"><header class="modal-head"><h3 id="modalTitle">Operación completada</h3><button id="modalClose">×</button></header><div class="modal-body" id="modalBody"></div></section></div><div class="toast" id="toast" role="status"></div>
-<script src="js/app.js"></script>
-<script>
-"use strict";const tabs=[...document.querySelectorAll('.tab')],views=[...document.querySelectorAll('.view')],modal=document.getElementById('modal');
-function openView(n){tabs.forEach(t=>t.classList.toggle('active',t.dataset.view===n));views.forEach(v=>v.hidden=v.id!==`view-${n}`);localStorage.setItem('siscardSecurityView',n);window.scrollTo({top:0,behavior:'smooth'})}tabs.forEach(t=>t.onclick=()=>openView(t.dataset.view));document.querySelectorAll('[data-open]').forEach(b=>b.onclick=()=>openView(b.dataset.open));
-function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2800)}function done(title,text,code){document.getElementById('modalTitle').textContent=title;document.getElementById('modalBody').innerHTML=`<p>${text}</p><div class="code">${code}</div><div class="actions"><button class="btn orange" onclick="document.getElementById('modal').hidden=true">Continuar</button></div>`;modal.hidden=false}document.getElementById('modalClose').onclick=()=>modal.hidden=true;modal.onclick=e=>{if(e.target===modal)modal.hidden=true};
-function userCard(code){return `<div class="result-grid"><div><span>Usuario</span><strong>${code}</strong></div><div><span>Nombre</span><strong>USUARIO DEMOSTRACIÓN</strong></div><div><span>Estado</span><strong>Activo</strong></div><div><span>Grupo</span><strong>OPERACIONES</strong></div><div><span>Localidad</span><strong>01 - PRINCIPAL</strong></div><div><span>Correo</span><strong>usuario@banco.com</strong></div></div>`}
-['activar','desactivar','cambiar','reiniciar','modificar'].forEach(name=>{const view=document.getElementById(`view-${name}`),title=view.querySelector('[data-operation]').dataset.operation;view.innerHTML=`<div class="workspace"><form class="box operation"><div class="box-title"><div><h2>${title.replace('ado','ar').replace('actualizados','Cambiar grupo o localidad')}</h2><small>Gestión funcional de demostración</small></div></div><div class="box-body"><div class="field"><label class="label">Código de usuario</label><div class="lookup"><input class="user-code" required placeholder="Ejemplo: USR00125"><button class="btn lookup-btn" type="button">Consultar</button></div></div><div class="result" hidden></div>${name==='desactivar'?'<div class="field" style="margin-top:12px"><label class="label">Motivo</label><textarea rows="3" required></textarea></div><div class="note red">Esta acción desactiva temporalmente el usuario.</div>':''}${name==='cambiar'?'<div class="grid" style="margin-top:12px"><div class="field"><label class="label">Nuevo grupo</label><select><option>OPERACIONES</option><option>SERVICIO AL CLIENTE</option></select></div><div class="field"><label class="label">Nueva localidad</label><select><option>01 - PRINCIPAL</option><option>60 - OFICINAS</option></select></div></div>':''}${name==='modificar'?'<div class="grid" style="margin-top:12px"><div class="field full"><label class="label">Nombre completo</label><input value="USUARIO DEMOSTRACIÓN"></div><div class="field"><label class="label">Correo</label><input type="email" value="usuario@banco.com"></div><div class="field"><label class="label">Estado</label><select><option>A - Activo</option><option>I - Inactivo</option></select></div></div>':''}${name==='reiniciar'?'<div class="note">La contraseña temporal será igual al usuario y deberá cambiarse al ingresar.</div>':''}<div class="actions"><button class="btn orange" type="submit">Confirmar operación</button></div></div></form><aside class="box"><div class="box-title"><h2>Validación</h2></div><div class="box-body"><div class="summary orange"><strong>Consulta previa</strong><span>Digite el usuario y pulse Consultar antes de confirmar.</span></div></div></aside></div>`;const form=view.querySelector('form'),input=view.querySelector('.user-code'),result=view.querySelector('.result');view.querySelector('.lookup-btn').onclick=()=>{if(!input.value.trim()){toast('Digite el código de usuario.');return}result.innerHTML=userCard(input.value.trim().toUpperCase());result.hidden=false};form.onsubmit=e=>{e.preventDefault();if(result.hidden){toast('Consulte el usuario antes de confirmar.');return}done(title,'La operación fue procesada correctamente.',`OP-${String(Date.now()).slice(-6)}`)}});
-document.getElementById('userForm').onsubmit=e=>{e.preventDefault();done('Usuario creado','La información fue validada.',`USR${String(Date.now()).slice(-5)}`);e.target.reset()};document.getElementById('groupForm').onsubmit=e=>{e.preventDefault();done('Solicitud de grupo generada','La solicitud quedó preparada.',`SOL-GRP-${String(Date.now()).slice(-5)}`)};const switches=[...document.querySelectorAll('.switch')];function count(){const n=switches.filter(x=>x.checked).length;document.getElementById('accessCount').textContent=`${n} acceso${n===1?'':'s'}`}switches.forEach(x=>x.onchange=count);count();document.getElementById('accessForm').onsubmit=e=>{e.preventDefault();done('Solicitud de accesos generada','El mantenimiento quedó preparado.',`SOL-ACC-${String(Date.now()).slice(-5)}`)};document.getElementById('consultForm').onsubmit=e=>{e.preventDefault();document.getElementById('consultResults').hidden=false;toast('Se encontraron 2 usuarios.')};let report='Acceso a programas';document.querySelectorAll('[data-report]').forEach(b=>b.onclick=()=>{document.querySelectorAll('[data-report]').forEach(x=>x.classList.remove('active'));b.classList.add('active');report=b.dataset.report});document.getElementById('generateReport').onclick=()=>{document.getElementById('reportPreview').hidden=false;toast(`${report}: reporte generado.`)};const saved=localStorage.getItem('siscardSecurityView');if(saved&&document.getElementById(`view-${saved}`))openView(saved);
-</script></body></html>
+                <a
+                    class="nav-link"
+                    href="index.html"
+                >
+                    <span class="nav-icon">
+                        ⌂
+                    </span>
+
+                    <span>
+                        Inicio
+                    </span>
+                </a>
+
+                <p class="nav-label">
+                    Conocimiento
+                </p>
+
+                <a
+                    class="nav-link"
+                    href="manuales.html"
+                >
+                    <span class="nav-icon">
+                        ▤
+                    </span>
+
+                    <span>
+                        Manuales
+                    </span>
+                </a>
+
+                <a
+                    class="nav-link"
+                    href="https://kiris25.github.io/parametros-emisor/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                >
+                    <span class="nav-icon">
+                        ⚙
+                    </span>
+
+                    <span>
+                        Parámetros
+                    </span>
+                </a>
+
+                <a
+                    class="nav-link"
+                    href="landing-ia.html"
+                >
+                    <span class="nav-icon">
+                        ✦
+                    </span>
+
+                    <span>
+                        Landing IA
+                    </span>
+                </a>
+
+                <p class="nav-label">
+                    Gestión
+                </p>
+
+                <a
+                    class="nav-link active"
+                    href="seguridad.html"
+                >
+                    <span class="nav-icon">
+                        🔐
+                    </span>
+
+                    <span>
+                        Seguridad
+                    </span>
+                </a>
+
+                <a
+                    class="nav-link"
+                    href="comunicados.html"
+                >
+                    <span class="nav-icon">
+                        ◉
+                    </span>
+
+                    <span>
+                        Comunicados
+                    </span>
+                </a>
+            </nav>
+
+            <div class="side-note">
+                <strong>
+                    Módulo de seguridad
+                </strong>
+
+                <p>
+                    Gestiones funcionales de demostración para usuarios,
+                    grupos y accesos.
+                </p>
+            </div>
+        </aside>
+
+        <div class="main-area">
+            <header class="topbar">
+                <button
+                    class="menu-button"
+                    id="menuButton"
+                    type="button"
+                    aria-label="Abrir menú"
+                >
+                    ☰
+                </button>
+
+                <div class="top-title">
+                    <strong>
+                        Seguridad Siscard+
+                    </strong>
+
+                    <small>
+                        Centro de administración
+                    </small>
+                </div>
+
+                <div class="top-actions">
+                    <button
+                        class="help-button"
+                        type="button"
+                    >
+                        Ayuda
+                    </button>
+
+                    <button
+                        class="profile-button"
+                        id="profileButton"
+                        type="button"
+                    >
+                        <span class="avatar">
+                            AD
+                        </span>
+
+                        <span class="profile-copy">
+                            <strong>
+                                Administrador
+                            </strong>
+
+                            <small>
+                                Seguridad
+                            </small>
+                        </span>
+                    </button>
+                </div>
+
+                <div
+                    class="profile-menu"
+                    id="profileMenu"
+                    hidden
+                >
+                    <button type="button">
+                        Mi perfil
+                    </button>
+                </div>
+            </header>
+
+            <main class="content">
+                <section class="security-header">
+                    <div>
+                        <span class="etiqueta">
+                            Módulo de seguridad
+                        </span>
+
+                        <h1>
+                            Administración de seguridad
+                        </h1>
+
+                        <p>
+                            Seleccione una opción para ejecutar una gestión
+                            de demostración.
+                        </p>
+                    </div>
+
+                    <div class="security-stats">
+                        <div class="security-stat">
+                            <strong>
+                                8
+                            </strong>
+
+                            <span>
+                                Gestiones
+                            </span>
+                        </div>
+
+                        <div class="security-stat">
+                            <strong>
+                                6
+                            </strong>
+
+                            <span>
+                                Reportes
+                            </span>
+                        </div>
+                    </div>
+                </section>
+
+                <nav
+                    class="security-tabs"
+                    aria-label="Vistas del módulo"
+                >
+                    <button
+                        class="security-tab active"
+                        type="button"
+                        data-view="menu"
+                    >
+                        Menú principal
+                    </button>
+
+                    <button
+                        class="security-tab"
+                        type="button"
+                        data-view="create-user"
+                    >
+                        Crear usuario
+                    </button>
+
+                    <button
+                        class="security-tab"
+                        type="button"
+                        data-view="create-group"
+                    >
+                        Crear grupo
+                    </button>
+
+                    <button
+                        class="security-tab"
+                        type="button"
+                        data-view="access"
+                    >
+                        Mantenimiento de accesos
+                    </button>
+                </nav>
+
+                <section
+                    class="security-view"
+                    id="view-menu"
+                >
+                    <div class="option-grid">
+                        <button
+                            class="security-option primary"
+                            type="button"
+                            data-open-view="create-user"
+                        >
+                            <span class="security-option-icon">
+                                ＋
+                            </span>
+
+                            <strong>
+                                Crear usuario
+                            </strong>
+
+                            <small>
+                                Registre un usuario normal, cajero,
+                                cobrador o vendedor.
+                            </small>
+
+                            <em>
+                                →
+                            </em>
+                        </button>
+
+                        <button
+                            class="security-option primary"
+                            type="button"
+                            data-open-view="create-group"
+                        >
+                            <span class="security-option-icon">
+                                👥
+                            </span>
+
+                            <strong>
+                                Crear grupo
+                            </strong>
+
+                            <small>
+                                Prepare la solicitud de un nuevo grupo.
+                            </small>
+
+                            <em>
+                                →
+                            </em>
+                        </button>
+
+                        <button
+                            class="security-option primary"
+                            type="button"
+                            data-open-view="access"
+                        >
+                            <span class="security-option-icon">
+                                🔐
+                            </span>
+
+                            <strong>
+                                Mantenimiento de accesos
+                            </strong>
+
+                            <small>
+                                Agregue, modifique o retire permisos.
+                            </small>
+
+                            <em>
+                                →
+                            </em>
+                        </button>
+
+                        <button
+                            class="security-option"
+                            type="button"
+                            data-open-view="activate"
+                        >
+                            <span class="security-option-icon">
+                                ●
+                            </span>
+
+                            <strong>
+                                Activar usuario
+                            </strong>
+
+                            <small>
+                                Reactive un usuario deshabilitado.
+                            </small>
+
+                            <em>
+                                →
+                            </em>
+                        </button>
+
+                        <button
+                            class="security-option"
+                            type="button"
+                            data-open-view="deactivate"
+                        >
+                            <span class="security-option-icon">
+                                ◐
+                            </span>
+
+                            <strong>
+                                Desactivar usuario
+                            </strong>
+
+                            <small>
+                                Inhabilite temporalmente un usuario.
+                            </small>
+
+                            <em>
+                                →
+                            </em>
+                        </button>
+
+                        <button
+                            class="security-option"
+                            type="button"
+                            data-open-view="change-assignment"
+                        >
+                            <span class="security-option-icon">
+                                ↔
+                            </span>
+
+                            <strong>
+                                Cambiar grupo o localidad
+                            </strong>
+
+                            <small>
+                                Actualice la asignación del usuario.
+                            </small>
+
+                            <em>
+                                →
+                            </em>
+                        </button>
+
+                        <button
+                            class="security-option"
+                            type="button"
+                            data-open-view="reset-user"
+                        >
+                            <span class="security-option-icon">
+                                ↻
+                            </span>
+
+                            <strong>
+                                Reiniciar usuario
+                            </strong>
+
+                            <small>
+                                Restablezca la contraseña de acceso.
+                            </small>
+
+                            <em>
+                                →
+                            </em>
+                        </button>
+
+                        <button
+                            class="security-option"
+                            type="button"
+                            data-open-view="modify-user"
+                        >
+                            <span class="security-option-icon">
+                                ✎
+                            </span>
+
+                            <strong>
+                                Modificar usuario
+                            </strong>
+
+                            <small>
+                                Actualice los datos del usuario.
+                            </small>
+
+                            <em>
+                                →
+                            </em>
+                        </button>
+
+                        <button
+                            class="security-option"
+                            type="button"
+                            data-open-view="search-users"
+                        >
+                            <span class="security-option-icon">
+                                ⌕
+                            </span>
+
+                            <strong>
+                                Consulta de usuarios
+                            </strong>
+
+                            <small>
+                                Busque usuarios por código o nombre.
+                            </small>
+
+                            <em>
+                                →
+                            </em>
+                        </button>
+
+                        <button
+                            class="security-option"
+                            type="button"
+                            data-open-view="reports"
+                        >
+                            <span class="security-option-icon">
+                                ▤
+                            </span>
+
+                            <strong>
+                                Reportes
+                            </strong>
+
+                            <small>
+                                Genere vistas previas de seguridad.
+                            </small>
+
+                            <em>
+                                →
+                            </em>
+                        </button>
+                    </div>
+                </section>
+
+                <section
+                    class="security-view"
+                    id="view-create-user"
+                    hidden
+                >
+                    <div class="security-workspace">
+                        <form
+                            class="security-panel"
+                            id="createUserForm"
+                        >
+                            <div class="security-panel-header">
+                                <div>
+                                    <h2>
+                                        Crear usuario
+                                    </h2>
+
+                                    <small>
+                                        Registro demostrativo
+                                    </small>
+                                </div>
+                            </div>
+
+                            <div class="security-panel-body">
+                                <div class="form-grid">
+                                    <div class="form-field full">
+                                        <label for="userName">
+                                            Nombre completo
+                                        </label>
+
+                                        <input
+                                            id="userName"
+                                            required
+                                            placeholder="Nombre y apellidos"
+                                        >
+                                    </div>
+
+                                    <div class="form-field">
+                                        <label for="userGroup">
+                                            Grupo
+                                        </label>
+
+                                        <select
+                                            id="userGroup"
+                                            required
+                                        >
+                                            <option value="">
+                                                Seleccione
+                                            </option>
+
+                                            <option>
+                                                OPERACIONES
+                                            </option>
+
+                                            <option>
+                                                SERVICIO AL CLIENTE
+                                            </option>
+                                        </select>
+                                    </div>
+
+                                    <div class="form-field">
+                                        <label for="userLocation">
+                                            Localidad
+                                        </label>
+
+                                        <select
+                                            id="userLocation"
+                                            required
+                                        >
+                                            <option value="">
+                                                Seleccione
+                                            </option>
+
+                                            <option>
+                                                01 - PRINCIPAL
+                                            </option>
+
+                                            <option>
+                                                60 - OFICINAS
+                                            </option>
+                                        </select>
+                                    </div>
+
+                                    <div class="form-field">
+                                        <label for="userType">
+                                            Tipo de usuario
+                                        </label>
+
+                                        <select id="userType">
+                                            <option>
+                                                Normal
+                                            </option>
+
+                                            <option>
+                                                Cajero
+                                            </option>
+
+                                            <option>
+                                                Cobrador
+                                            </option>
+
+                                            <option>
+                                                Vendedor
+                                            </option>
+                                        </select>
+                                    </div>
+
+                                    <div class="form-field">
+                                        <label for="approverLP">
+                                            Usuario aprobador LP
+                                        </label>
+
+                                        <select id="approverLP">
+                                            <option>
+                                                Sin definición
+                                            </option>
+
+                                            <option>
+                                                S - Aprobador
+                                            </option>
+
+                                            <option>
+                                                N - No aprobador
+                                            </option>
+                                        </select>
+                                    </div>
+
+                                    <div class="form-field">
+                                        <label for="userEmail">
+                                            Correo electrónico
+                                        </label>
+
+                                        <input
+                                            id="userEmail"
+                                            type="email"
+                                            required
+                                            placeholder="usuario@banco.com"
+                                        >
+                                    </div>
+
+                                    <div class="form-field">
+                                        <label for="entryStatus">
+                                            Estado de ingreso
+                                        </label>
+
+                                        <select id="entryStatus">
+                                            <option>
+                                                A - Activo
+                                            </option>
+
+                                            <option>
+                                                I - Inactivo
+                                            </option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="form-note">
+                                    Revise el indicador Usuario Aprobador LP
+                                    antes de confirmar.
+                                </div>
+
+                                <div class="form-actions">
+                                    <button
+                                        class="security-button light"
+                                        type="reset"
+                                    >
+                                        Limpiar
+                                    </button>
+
+                                    <button
+                                        class="security-button primary"
+                                        type="submit"
+                                    >
+                                        Confirmar creación
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+
+                        <aside class="security-panel">
+                            <div class="security-panel-header">
+                                <h2>
+                                    Resumen
+                                </h2>
+                            </div>
+
+                            <div class="security-panel-body">
+                                <div class="summary-card orange">
+                                    <strong>
+                                        Multifactor
+                                    </strong>
+
+                                    <span>
+                                        El correo queda preparado para recibir
+                                        el código de validación.
+                                    </span>
+                                </div>
+                            </div>
+                        </aside>
+                    </div>
+                </section>
+
+                <section
+                    class="security-view"
+                    id="view-create-group"
+                    hidden
+                >
+                    <div class="security-workspace">
+                        <form
+                            class="security-panel"
+                            id="createGroupForm"
+                        >
+                            <div class="security-panel-header">
+                                <div>
+                                    <h2>
+                                        Crear grupo
+                                    </h2>
+
+                                    <small>
+                                        Solicitud demostrativa
+                                    </small>
+                                </div>
+                            </div>
+
+                            <div class="security-panel-body">
+                                <div class="form-grid">
+                                    <div class="form-field">
+                                        <label for="groupCode">
+                                            Código propuesto
+                                        </label>
+
+                                        <input
+                                            id="groupCode"
+                                            required
+                                            maxlength="10"
+                                        >
+                                    </div>
+
+                                    <div class="form-field">
+                                        <label for="groupName">
+                                            Nombre del grupo
+                                        </label>
+
+                                        <input
+                                            id="groupName"
+                                            required
+                                        >
+                                    </div>
+
+                                    <div class="form-field">
+                                        <label for="groupLocation">
+                                            Localidad
+                                        </label>
+
+                                        <select
+                                            id="groupLocation"
+                                            required
+                                        >
+                                            <option value="">
+                                                Seleccione
+                                            </option>
+
+                                            <option>
+                                                01 - PRINCIPAL
+                                            </option>
+
+                                            <option>
+                                                60 - OFICINAS
+                                            </option>
+                                        </select>
+                                    </div>
+
+                                    <div class="form-field">
+                                        <label for="baseProfile">
+                                            Perfil base
+                                        </label>
+
+                                        <select
+                                            id="baseProfile"
+                                            required
+                                        >
+                                            <option value="">
+                                                Seleccione
+                                            </option>
+
+                                            <option>
+                                                Consulta
+                                            </option>
+
+                                            <option>
+                                                Operativo
+                                            </option>
+                                        </select>
+                                    </div>
+
+                                    <div class="form-field full">
+                                        <label for="groupReason">
+                                            Justificación
+                                        </label>
+
+                                        <textarea
+                                            id="groupReason"
+                                            rows="4"
+                                            required
+                                        ></textarea>
+                                    </div>
+                                </div>
+
+                                <div class="form-actions">
+                                    <button
+                                        class="security-button primary"
+                                        type="submit"
+                                    >
+                                        Generar solicitud
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+
+                        <aside class="security-panel">
+                            <div class="security-panel-header">
+                                <h2>
+                                    Consideraciones
+                                </h2>
+                            </div>
+
+                            <div class="security-panel-body">
+                                <div class="summary-card orange">
+                                    <strong>
+                                        Aprobación
+                                    </strong>
+
+                                    <span>
+                                        La solicitud quedará preparada para revisión.
+                                    </span>
+                                </div>
+                            </div>
+                        </aside>
+                    </div>
+                </section>
+
+                <section
+                    class="security-view"
+                    id="view-access"
+                    hidden
+                >
+                    <div class="security-workspace">
+                        <form
+                            class="security-panel"
+                            id="accessForm"
+                        >
+                            <div class="security-panel-header">
+                                <div>
+                                    <h2>
+                                        Mantenimiento de accesos
+                                    </h2>
+
+                                    <small>
+                                        Gestión por grupo
+                                    </small>
+                                </div>
+                            </div>
+
+                            <div class="security-panel-body">
+                                <div class="form-grid">
+                                    <div class="form-field">
+                                        <label for="accessGroup">
+                                            Grupo
+                                        </label>
+
+                                        <select
+                                            id="accessGroup"
+                                            required
+                                        >
+                                            <option value="">
+                                                Seleccione
+                                            </option>
+
+                                            <option>
+                                                OPERACIONES
+                                            </option>
+
+                                            <option>
+                                                SERVICIO AL CLIENTE
+                                            </option>
+                                        </select>
+                                    </div>
+
+                                    <div class="form-field">
+                                        <label for="accessType">
+                                            Tipo de mantenimiento
+                                        </label>
+
+                                        <select
+                                            id="accessType"
+                                            required
+                                        >
+                                            <option>
+                                                Agregar accesos
+                                            </option>
+
+                                            <option>
+                                                Modificar accesos
+                                            </option>
+
+                                            <option>
+                                                Eliminar accesos
+                                            </option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="table-wrapper">
+                                    <table class="security-table">
+                                        <thead>
+                                            <tr>
+                                                <th>
+                                                    Programa
+                                                </th>
+
+                                                <th>
+                                                    Categoría
+                                                </th>
+
+                                                <th>
+                                                    Asignar
+                                                </th>
+                                            </tr>
+                                        </thead>
+
+                                        <tbody>
+                                            <tr>
+                                                <td>
+                                                    Consulta de clientes
+                                                </td>
+
+                                                <td>
+                                                    Operación
+                                                </td>
+
+                                                <td>
+                                                    <input
+                                                        class="access-switch"
+                                                        type="checkbox"
+                                                        checked
+                                                    >
+                                                </td>
+                                            </tr>
+
+                                            <tr>
+                                                <td>
+                                                    Mantenimiento de tarjetas
+                                                </td>
+
+                                                <td>
+                                                    Tarjetas
+                                                </td>
+
+                                                <td>
+                                                    <input
+                                                        class="access-switch"
+                                                        type="checkbox"
+                                                    >
+                                                </td>
+                                            </tr>
+
+                                            <tr>
+                                                <td>
+                                                    Estados de cuenta
+                                                </td>
+
+                                                <td>
+                                                    Consultas
+                                                </td>
+
+                                                <td>
+                                                    <input
+                                                        class="access-switch"
+                                                        type="checkbox"
+                                                        checked
+                                                    >
+                                                </td>
+                                            </tr>
+
+                                            <tr>
+                                                <td>
+                                                    Aprobación Landing Page
+                                                </td>
+
+                                                <td>
+                                                    Landing Page
+                                                </td>
+
+                                                <td>
+                                                    <input
+                                                        class="access-switch"
+                                                        type="checkbox"
+                                                    >
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <div class="form-actions">
+                                    <button
+                                        class="security-button primary"
+                                        type="submit"
+                                    >
+                                        Generar solicitud
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+
+                        <aside class="security-panel">
+                            <div class="security-panel-header">
+                                <h2>
+                                    Selección
+                                </h2>
+                            </div>
+
+                            <div class="security-panel-body">
+                                <div class="summary-card orange">
+                                    <strong id="accessCount">
+                                        2 accesos
+                                    </strong>
+
+                                    <span>
+                                        seleccionados.
+                                    </span>
+                                </div>
+                            </div>
+                        </aside>
+                    </div>
+                </section>
+
+                <section
+                    class="security-view"
+                    id="view-activate"
+                    hidden
+                ></section>
+
+                <section
+                    class="security-view"
+                    id="view-deactivate"
+                    hidden
+                ></section>
+
+                <section
+                    class="security-view"
+                    id="view-change-assignment"
+                    hidden
+                ></section>
+
+                <section
+                    class="security-view"
+                    id="view-reset-user"
+                    hidden
+                ></section>
+
+                <section
+                    class="security-view"
+                    id="view-modify-user"
+                    hidden
+                ></section>
+
+                <section
+                    class="security-view"
+                    id="view-search-users"
+                    hidden
+                >
+                    <div class="security-panel">
+                        <div class="security-panel-header">
+                            <div>
+                                <h2>
+                                    Consulta de usuarios
+                                </h2>
+
+                                <small>
+                                    Búsqueda por código o nombre
+                                </small>
+                            </div>
+                        </div>
+
+                        <div class="security-panel-body">
+                            <form
+                                class="lookup-row"
+                                id="searchUsersForm"
+                            >
+                                <input
+                                    id="searchUsersInput"
+                                    required
+                                    placeholder="Digite código o nombre"
+                                >
+
+                                <button
+                                    class="security-button primary"
+                                    type="submit"
+                                >
+                                    Buscar
+                                </button>
+                            </form>
+
+                            <div
+                                class="table-wrapper"
+                                id="searchResults"
+                                hidden
+                            >
+                                <table class="security-table">
+                                    <thead>
+                                        <tr>
+                                            <th>
+                                                Usuario
+                                            </th>
+
+                                            <th>
+                                                Nombre
+                                            </th>
+
+                                            <th>
+                                                Grupo
+                                            </th>
+
+                                            <th>
+                                                Localidad
+                                            </th>
+
+                                            <th>
+                                                Estado
+                                            </th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                USR00125
+                                            </td>
+
+                                            <td>
+                                                USUARIO DEMOSTRACIÓN
+                                            </td>
+
+                                            <td>
+                                                OPERACIONES
+                                            </td>
+
+                                            <td>
+                                                01
+                                            </td>
+
+                                            <td>
+                                                Activo
+                                            </td>
+                                        </tr>
+
+                                        <tr>
+                                            <td>
+                                                USR00126
+                                            </td>
+
+                                            <td>
+                                                USUARIO PRUEBA
+                                            </td>
+
+                                            <td>
+                                                SERVICIO AL CLIENTE
+                                            </td>
+
+                                            <td>
+                                                60
+                                            </td>
+
+                                            <td>
+                                                Activo
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section
+                    class="security-view"
+                    id="view-reports"
+                    hidden
+                >
+                    <div class="security-panel">
+                        <div class="security-panel-header">
+                            <div>
+                                <h2>
+                                    Reportes
+                                </h2>
+
+                                <small>
+                                    Seleccione el reporte deseado
+                                </small>
+                            </div>
+                        </div>
+
+                        <div class="security-panel-body">
+                            <div class="report-grid">
+                                <button
+                                    class="report-card active"
+                                    type="button"
+                                    data-report="Acceso a programas"
+                                >
+                                    <strong>
+                                        Acceso a programas
+                                    </strong>
+
+                                    <small>
+                                        Programas asignados por grupo.
+                                    </small>
+                                </button>
+
+                                <button
+                                    class="report-card"
+                                    type="button"
+                                    data-report="Control de cambios"
+                                >
+                                    <strong>
+                                        Control de cambios
+                                    </strong>
+
+                                    <small>
+                                        Modificaciones realizadas.
+                                    </small>
+                                </button>
+
+                                <button
+                                    class="report-card"
+                                    type="button"
+                                    data-report="Usuarios"
+                                >
+                                    <strong>
+                                        Usuarios
+                                    </strong>
+
+                                    <small>
+                                        Detalle de usuarios.
+                                    </small>
+                                </button>
+
+                                <button
+                                    class="report-card"
+                                    type="button"
+                                    data-report="Usuarios a una fecha"
+                                >
+                                    <strong>
+                                        Usuarios a una fecha
+                                    </strong>
+
+                                    <small>
+                                        Consulta por fecha de corte.
+                                    </small>
+                                </button>
+
+                                <button
+                                    class="report-card"
+                                    type="button"
+                                    data-report="Usuarios por localidad"
+                                >
+                                    <strong>
+                                        Usuarios por localidad
+                                    </strong>
+
+                                    <small>
+                                        Distribución por localidad.
+                                    </small>
+                                </button>
+
+                                <button
+                                    class="report-card"
+                                    type="button"
+                                    data-report="Aprobadores LP"
+                                >
+                                    <strong>
+                                        Aprobadores LP
+                                    </strong>
+
+                                    <small>
+                                        Usuarios con perfil de aprobación.
+                                    </small>
+                                </button>
+                            </div>
+
+                            <div class="form-actions">
+                                <button
+                                    class="security-button primary"
+                                    id="generateReportButton"
+                                    type="button"
+                                >
+                                    Generar reporte
+                                </button>
+                            </div>
+
+                            <div
+                                class="table-wrapper"
+                                id="reportPreview"
+                                hidden
+                            >
+                                <table class="security-table">
+                                    <thead>
+                                        <tr>
+                                            <th>
+                                                Usuario
+                                            </th>
+
+                                            <th>
+                                                Nombre
+                                            </th>
+
+                                            <th>
+                                                Grupo
+                                            </th>
+
+                                            <th>
+                                                Localidad
+                                            </th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                USR00125
+                                            </td>
+
+                                            <td>
+                                                USUARIO DEMOSTRACIÓN
+                                            </td>
+
+                                            <td>
+                                                OPERACIONES
+                                            </td>
+
+                                            <td>
+                                                01
+                                            </td>
+                                        </tr>
+
+                                        <tr>
+                                            <td>
+                                                USR00126
+                                            </td>
+
+                                            <td>
+                                                USUARIO PRUEBA
+                                            </td>
+
+                                            <td>
+                                                SERVICIO AL CLIENTE
+                                            </td>
+
+                                            <td>
+                                                60
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </main>
+
+            <footer class="footer">
+                <span>
+                    <strong>
+                        Landing Siscard+
+                    </strong>
+                    · Seguridad
+                </span>
+
+                <span>
+                    Demostración funcional
+                </span>
+            </footer>
+        </div>
+    </div>
+
+    <div
+        class="modal-backdrop"
+        id="operationModal"
+        hidden
+    >
+        <section
+            class="modal-card"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="modalTitle"
+        >
+            <header class="modal-header">
+                <h3 id="modalTitle">
+                    Operación completada
+                </h3>
+
+                <button
+                    id="closeModalButton"
+                    type="button"
+                    aria-label="Cerrar"
+                >
+                    ×
+                </button>
+            </header>
+
+            <div
+                class="modal-body"
+                id="modalBody"
+            ></div>
+        </section>
+    </div>
+
+    <div
+        class="toast"
+        id="toast"
+        role="status"
+        aria-live="polite"
+    ></div>
+
+    <script src="js/app.js"></script>
+
+    <script>
+        "use strict";
+
+        const securityTabs = Array.from(
+            document.querySelectorAll(".security-tab")
+        );
+
+        const securityViews = Array.from(
+            document.querySelectorAll(".security-view")
+        );
+
+        const operationModal =
+            document.getElementById("operationModal");
+
+        const modalTitle =
+            document.getElementById("modalTitle");
+
+        const modalBody =
+            document.getElementById("modalBody");
+
+        const accessSwitches = Array.from(
+            document.querySelectorAll(".access-switch")
+        );
+
+        const operationDefinitions =
+        {
+            activate:
+            {
+                title: "Activar usuario",
+                description:
+                    "Reactive un usuario deshabilitado temporalmente.",
+                action: "Usuario activado",
+                button: "Activar usuario"
+            },
+
+            deactivate:
+            {
+                title: "Desactivar usuario",
+                description:
+                    "Inhabilite temporalmente un usuario.",
+                action: "Usuario desactivado",
+                button: "Desactivar usuario",
+                requiresReason: true
+            },
+
+            "change-assignment":
+            {
+                title: "Cambiar grupo o localidad",
+                description:
+                    "Actualice el grupo o la localidad del usuario.",
+                action: "Asignación actualizada",
+                button: "Guardar cambios",
+                requiresAssignment: true
+            },
+
+            "reset-user":
+            {
+                title: "Reiniciar usuario",
+                description:
+                    "Restablezca la contraseña temporal del usuario.",
+                action: "Usuario reiniciado",
+                button: "Reiniciar usuario",
+                resetNotice: true
+            },
+
+            "modify-user":
+            {
+                title: "Modificar usuario",
+                description:
+                    "Actualice los datos principales del usuario.",
+                action: "Usuario modificado",
+                button: "Guardar cambios",
+                requiresModification: true
+            }
+        };
+
+        function showToast(message)
+        {
+            const toast = document.getElementById("toast");
+
+            toast.textContent = message;
+
+            toast.classList.add("show");
+
+            window.setTimeout(
+                function()
+                {
+                    toast.classList.remove("show");
+                },
+                2800
+            );
+        }
+
+        function openSecurityView(viewName)
+        {
+            securityTabs.forEach(
+                function(tab)
+                {
+                    tab.classList.toggle(
+                        "active",
+                        tab.dataset.view === viewName
+                    );
+                }
+            );
+
+            securityViews.forEach(
+                function(view)
+                {
+                    view.hidden =
+                        view.id !== `view-${viewName}`;
+                }
+            );
+
+            localStorage.setItem(
+                "siscardSecurityView",
+                viewName
+            );
+
+            window.scrollTo(
+                {
+                    top: 0,
+                    behavior: "smooth"
+                }
+            );
+        }
+
+        function createUserResult(userCode)
+        {
+            return `
+                <div>
+                    <span>
+                        Usuario
+                    </span>
+
+                    <strong>
+                        ${userCode}
+                    </strong>
+                </div>
+
+                <div>
+                    <span>
+                        Nombre
+                    </span>
+
+                    <strong>
+                        USUARIO DEMOSTRACIÓN
+                    </strong>
+                </div>
+
+                <div>
+                    <span>
+                        Estado
+                    </span>
+
+                    <strong>
+                        Activo
+                    </strong>
+                </div>
+
+                <div>
+                    <span>
+                        Grupo
+                    </span>
+
+                    <strong>
+                        OPERACIONES
+                    </strong>
+                </div>
+
+                <div>
+                    <span>
+                        Localidad
+                    </span>
+
+                    <strong>
+                        01 - PRINCIPAL
+                    </strong>
+                </div>
+
+                <div>
+                    <span>
+                        Correo
+                    </span>
+
+                    <strong>
+                        usuario@banco.com
+                    </strong>
+                </div>
+            `;
+        }
+
+        function openOperationModal(title, description, code)
+        {
+            modalTitle.textContent = title;
+
+            modalBody.innerHTML = `
+                <p>
+                    ${description}
+                </p>
+
+                <div class="operation-code">
+                    ${code}
+                </div>
+
+                <div class="form-actions">
+                    <button
+                        class="security-button primary"
+                        id="continueModalButton"
+                        type="button"
+                    >
+                        Continuar
+                    </button>
+                </div>
+            `;
+
+            operationModal.hidden = false;
+
+            document
+                .getElementById("continueModalButton")
+                .addEventListener(
+                    "click",
+                    function()
+                    {
+                        operationModal.hidden = true;
+                    }
+                );
+        }
+
+        function buildOperationView(viewName, definition)
+        {
+            const view = document.getElementById(
+                `view-${viewName}`
+            );
+
+            let additionalFields = "";
+
+            if (definition.requiresReason)
+            {
+                additionalFields = `
+                    <div
+                        class="form-field"
+                        style="margin-top: 12px;"
+                    >
+                        <label>
+                            Motivo
+                        </label>
+
+                        <textarea
+                            rows="3"
+                            required
+                        ></textarea>
+                    </div>
+
+                    <div class="form-note warning">
+                        Esta acción desactiva temporalmente el usuario.
+                    </div>
+                `;
+            }
+
+            if (definition.requiresAssignment)
+            {
+                additionalFields = `
+                    <div
+                        class="form-grid"
+                        style="margin-top: 12px;"
+                    >
+                        <div class="form-field">
+                            <label>
+                                Nuevo grupo
+                            </label>
+
+                            <select>
+                                <option>
+                                    OPERACIONES
+                                </option>
+
+                                <option>
+                                    SERVICIO AL CLIENTE
+                                </option>
+                            </select>
+                        </div>
+
+                        <div class="form-field">
+                            <label>
+                                Nueva localidad
+                            </label>
+
+                            <select>
+                                <option>
+                                    01 - PRINCIPAL
+                                </option>
+
+                                <option>
+                                    60 - OFICINAS
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                `;
+            }
+
+            if (definition.requiresModification)
+            {
+                additionalFields = `
+                    <div
+                        class="form-grid"
+                        style="margin-top: 12px;"
+                    >
+                        <div class="form-field full">
+                            <label>
+                                Nombre completo
+                            </label>
+
+                            <input
+                                value="USUARIO DEMOSTRACIÓN"
+                            >
+                        </div>
+
+                        <div class="form-field">
+                            <label>
+                                Correo electrónico
+                            </label>
+
+                            <input
+                                type="email"
+                                value="usuario@banco.com"
+                            >
+                        </div>
+
+                        <div class="form-field">
+                            <label>
+                                Estado
+                            </label>
+
+                            <select>
+                                <option>
+                                    A - Activo
+                                </option>
+
+                                <option>
+                                    I - Inactivo
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                `;
+            }
+
+            if (definition.resetNotice)
+            {
+                additionalFields = `
+                    <div class="form-note">
+                        La contraseña temporal será igual al código de usuario
+                        y deberá modificarse en el siguiente ingreso.
+                    </div>
+                `;
+            }
+
+            view.innerHTML = `
+                <div class="security-workspace">
+                    <form
+                        class="security-panel operation-form"
+                        data-operation="${definition.action}"
+                    >
+                        <div class="security-panel-header">
+                            <div>
+                                <h2>
+                                    ${definition.title}
+                                </h2>
+
+                                <small>
+                                    ${definition.description}
+                                </small>
+                            </div>
+                        </div>
+
+                        <div class="security-panel-body">
+                            <div class="form-field">
+                                <label>
+                                    Código de usuario
+                                </label>
+
+                                <div class="lookup-row">
+                                    <input
+                                        class="user-code-input"
+                                        required
+                                        placeholder="Ejemplo: USR00125"
+                                    >
+
+                                    <button
+                                        class="security-button lookup-button"
+                                        type="button"
+                                    >
+                                        Consultar
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div
+                                class="user-result"
+                                hidden
+                            ></div>
+
+                            ${additionalFields}
+
+                            <div class="form-actions">
+                                <button
+                                    class="security-button primary"
+                                    type="submit"
+                                >
+                                    ${definition.button}
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+
+                    <aside class="security-panel">
+                        <div class="security-panel-header">
+                            <h2>
+                                Validación
+                            </h2>
+                        </div>
+
+                        <div class="security-panel-body">
+                            <div class="summary-card orange">
+                                <strong>
+                                    Consulta previa
+                                </strong>
+
+                                <span>
+                                    Consulte el usuario antes de confirmar
+                                    la operación.
+                                </span>
+                            </div>
+                        </div>
+                    </aside>
+                </div>
+            `;
+
+            const form = view.querySelector(".operation-form");
+
+            const userCodeInput =
+                view.querySelector(".user-code-input");
+
+            const lookupButton =
+                view.querySelector(".lookup-button");
+
+            const userResult =
+                view.querySelector(".user-result");
+
+            lookupButton.addEventListener(
+                "click",
+                function()
+                {
+                    const userCode =
+                        userCodeInput.value.trim().toUpperCase();
+
+                    if (!userCode)
+                    {
+                        showToast(
+                            "Digite el código de usuario para consultar."
+                        );
+
+                        userCodeInput.focus();
+
+                        return;
+                    }
+
+                    userResult.innerHTML =
+                        createUserResult(userCode);
+
+                    userResult.hidden = false;
+                }
+            );
+
+            form.addEventListener(
+                "submit",
+                function(event)
+                {
+                    event.preventDefault();
+
+                    if (userResult.hidden)
+                    {
+                        showToast(
+                            "Consulte el usuario antes de confirmar."
+                        );
+
+                        return;
+                    }
+
+                    openOperationModal(
+                        definition.action,
+                        "La operación fue procesada correctamente en la demostración.",
+                        `OP-${String(Date.now()).slice(-6)}`
+                    );
+                }
+            );
+        }
+
+        securityTabs.forEach(
+            function(tab)
+            {
+                tab.addEventListener(
+                    "click",
+                    function()
+                    {
+                        openSecurityView(tab.dataset.view);
+                    }
+                );
+            }
+        );
+
+        document
+            .querySelectorAll("[data-open-view]")
+            .forEach(
+                function(button)
+                {
+                    button.addEventListener(
+                        "click",
+                        function()
+                        {
+                            openSecurityView(
+                                button.dataset.openView
+                            );
+                        }
+                    );
+                }
+            );
+
+        Object.entries(operationDefinitions).forEach(
+            function(entry)
+            {
+                const viewName = entry[0];
+
+                const definition = entry[1];
+
+                buildOperationView(
+                    viewName,
+                    definition
+                );
+            }
+        );
+
+        document
+            .getElementById("createUserForm")
+            .addEventListener(
+                "submit",
+                function(event)
+                {
+                    event.preventDefault();
+
+                    openOperationModal(
+                        "Usuario creado",
+                        "La información del usuario fue validada.",
+                        `USR${String(Date.now()).slice(-5)}`
+                    );
+
+                    event.target.reset();
+                }
+            );
+
+        document
+            .getElementById("createGroupForm")
+            .addEventListener(
+                "submit",
+                function(event)
+                {
+                    event.preventDefault();
+
+                    openOperationModal(
+                        "Solicitud de grupo generada",
+                        "La solicitud quedó preparada para revisión.",
+                        `SOL-GRP-${String(Date.now()).slice(-5)}`
+                    );
+
+                    event.target.reset();
+                }
+            );
+
+        function updateAccessCount()
+        {
+            const selectedCount = accessSwitches.filter(
+                function(accessSwitch)
+                {
+                    return accessSwitch.checked;
+                }
+            ).length;
+
+            document.getElementById("accessCount").textContent =
+                `${selectedCount} acceso${selectedCount === 1 ? "" : "s"}`;
+        }
+
+        accessSwitches.forEach(
+            function(accessSwitch)
+            {
+                accessSwitch.addEventListener(
+                    "change",
+                    updateAccessCount
+                );
+            }
+        );
+
+        document
+            .getElementById("accessForm")
+            .addEventListener(
+                "submit",
+                function(event)
+                {
+                    event.preventDefault();
+
+                    openOperationModal(
+                        "Solicitud de accesos generada",
+                        "El mantenimiento quedó preparado para revisión.",
+                        `SOL-ACC-${String(Date.now()).slice(-5)}`
+                    );
+                }
+            );
+
+        document
+            .getElementById("searchUsersForm")
+            .addEventListener(
+                "submit",
+                function(event)
+                {
+                    event.preventDefault();
+
+                    document.getElementById("searchResults").hidden = false;
+
+                    showToast(
+                        "Se encontraron 2 usuarios de demostración."
+                    );
+                }
+            );
+
+        let selectedReport = "Acceso a programas";
+
+        document
+            .querySelectorAll("[data-report]")
+            .forEach(
+                function(reportCard)
+                {
+                    reportCard.addEventListener(
+                        "click",
+                        function()
+                        {
+                            document
+                                .querySelectorAll("[data-report]")
+                                .forEach(
+                                    function(card)
+                                    {
+                                        card.classList.remove("active");
+                                    }
+                                );
+
+                            reportCard.classList.add("active");
+
+                            selectedReport =
+                                reportCard.dataset.report;
+                        }
+                    );
+                }
+            );
+
+        document
+            .getElementById("generateReportButton")
+            .addEventListener(
+                "click",
+                function()
+                {
+                    document.getElementById("reportPreview").hidden = false;
+
+                    showToast(
+                        `${selectedReport}: reporte generado.`
+                    );
+                }
+            );
+
+        document
+            .getElementById("closeModalButton")
+            .addEventListener(
+                "click",
+                function()
+                {
+                    operationModal.hidden = true;
+                }
+            );
+
+        operationModal.addEventListener(
+            "click",
+            function(event)
+            {
+                if (event.target === operationModal)
+                {
+                    operationModal.hidden = true;
+                }
+            }
+        );
+
+        document.addEventListener(
+            "keydown",
+            function(event)
+            {
+                if (event.key === "Escape")
+                {
+                    operationModal.hidden = true;
+                }
+            }
+        );
+
+        const savedView = localStorage.getItem(
+            "siscardSecurityView"
+        );
+
+        if (
+            savedView &&
+            document.getElementById(`view-${savedView}`)
+        )
+        {
+            openSecurityView(savedView);
+        }
+
+        updateAccessCount();
+    </script>
+</body>
+
+</html>
