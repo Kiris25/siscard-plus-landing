@@ -1,1 +1,1237 @@
+<!DOCTYPE html>
+<html lang="es">
 
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="description"
+        content="Asistente demostrativo del portal Siscard+"
+    >
+
+    <title>
+        Landing IA | Siscard+
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="css/styles.css"
+    >
+
+    <style>
+        :root
+        {
+            --naranja: #ff6c0c;
+            --gris: #4f4f4f;
+            --fondo: #f2f2f2;
+            --borde: #d9d9d9;
+            --azul: #2457a7;
+        }
+
+        body
+        {
+            background: var(--fondo);
+        }
+
+        .ia-encabezado,
+        .ia-panel
+        {
+            background: #ffffff;
+            border: 1px solid var(--borde);
+            box-shadow: 0 2px 7px #00000012;
+        }
+
+        .ia-encabezado
+        {
+            display: grid;
+            grid-template-columns: minmax(0, 1.3fr) minmax(250px, 0.7fr);
+            gap: 22px;
+            align-items: center;
+            padding: 26px;
+        }
+
+        .ia-etiqueta
+        {
+            display: block;
+            color: #444444;
+            font-size: 11px;
+            font-weight: 850;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+
+        .ia-encabezado h1
+        {
+            margin: 6px 0 10px;
+            color: var(--naranja);
+            font-size: clamp(34px, 4vw, 50px);
+            font-weight: 300;
+        }
+
+        .ia-encabezado p
+        {
+            margin: 0;
+            color: #666666;
+            line-height: 1.55;
+        }
+
+        .ia-orbe
+        {
+            display: grid;
+            place-items: center;
+            width: 118px;
+            height: 118px;
+            margin: auto;
+            border: 1px solid #ffd1ad;
+            border-radius: 50%;
+            background: radial-gradient(
+                circle at 35% 30%,
+                #ffb27d,
+                var(--naranja) 58%,
+                #c94800
+            );
+            color: #ffffff;
+            font-size: 46px;
+            box-shadow: 0 12px 27px #ff6c0c35;
+        }
+
+        .ia-contenido
+        {
+            display: grid;
+            grid-template-columns: minmax(0, 1.45fr) minmax(300px, 0.55fr);
+            gap: 14px;
+            margin-top: 15px;
+        }
+
+        .ia-panel
+        {
+            min-width: 0;
+        }
+
+        .ia-panel-encabezado
+        {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            padding: 13px 16px;
+            border-bottom: 1px solid var(--borde);
+        }
+
+        .ia-panel-encabezado h2
+        {
+            margin: 0;
+            color: var(--naranja);
+            font-size: 25px;
+            font-weight: 300;
+        }
+
+        .ia-panel-encabezado small
+        {
+            color: #666666;
+        }
+
+        .ia-panel-cuerpo
+        {
+            padding: 16px;
+        }
+
+        .chat
+        {
+            height: 410px;
+            overflow-y: auto;
+            padding: 12px;
+            border: 1px solid var(--borde);
+            background: #fafafa;
+        }
+
+        .mensaje
+        {
+            display: flex;
+            gap: 10px;
+            margin: 12px 0;
+        }
+
+        .mensaje.usuario
+        {
+            justify-content: flex-end;
+        }
+
+        .mensaje-icono
+        {
+            display: grid;
+            place-items: center;
+            flex: 0 0 auto;
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: var(--gris);
+            color: #ffffff;
+            font-weight: 800;
+        }
+
+        .mensaje.usuario .mensaje-icono
+        {
+            order: 2;
+            background: var(--naranja);
+        }
+
+        .burbuja
+        {
+            max-width: 82%;
+            padding: 11px 13px;
+            border: 1px solid var(--borde);
+            border-radius: 12px;
+            background: #ffffff;
+            line-height: 1.5;
+        }
+
+        .mensaje.usuario .burbuja
+        {
+            border-color: #ffd1ad;
+            background: #fff5ec;
+        }
+
+        .burbuja strong
+        {
+            color: var(--naranja);
+        }
+
+        .enlace-resultado
+        {
+            display: block;
+            margin-top: 8px;
+            padding: 9px;
+            border: 1px solid #ffd1ad;
+            border-radius: 8px;
+            background: #ffffff;
+            color: var(--gris);
+            font-weight: 750;
+        }
+
+        .enlace-resultado:hover
+        {
+            background: #fff5ec;
+        }
+
+        .compositor
+        {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .compositor textarea
+        {
+            width: 100%;
+            min-height: 68px;
+            padding: 11px;
+            border: 1px solid var(--borde);
+            border-radius: 8px;
+            resize: vertical;
+        }
+
+        .compositor textarea:focus
+        {
+            outline: 3px solid #ff6c0c20;
+            border-color: var(--naranja);
+        }
+
+        .boton-ia
+        {
+            padding: 9px 14px;
+            border: 0;
+            border-radius: 8px;
+            background: var(--gris);
+            color: #ffffff;
+            font-weight: 800;
+            cursor: pointer;
+        }
+
+        .boton-ia.naranja
+        {
+            background: var(--naranja);
+        }
+
+        .boton-ia.claro
+        {
+            border: 1px solid var(--borde);
+            background: #ffffff;
+            color: var(--gris);
+        }
+
+        .sugerencias
+        {
+            display: grid;
+            gap: 8px;
+        }
+
+        .sugerencia
+        {
+            padding: 12px;
+            border: 1px solid var(--borde);
+            border-left: 4px solid #bbbbbb;
+            background: #fafafa;
+            color: var(--gris);
+            text-align: left;
+            cursor: pointer;
+        }
+
+        .sugerencia:hover
+        {
+            border-left-color: var(--naranja);
+            background: #fff5ec;
+        }
+
+        .sugerencia strong,
+        .sugerencia small
+        {
+            display: block;
+        }
+
+        .sugerencia small
+        {
+            margin-top: 4px;
+            color: #666666;
+        }
+
+        .historial-item
+        {
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            gap: 9px;
+            align-items: center;
+            padding: 11px 0;
+            border-bottom: 1px solid var(--borde);
+        }
+
+        .historial-item:last-child
+        {
+            border-bottom: 0;
+        }
+
+        .historial-icono
+        {
+            display: grid;
+            place-items: center;
+            width: 34px;
+            height: 34px;
+            border-radius: 8px;
+            background: #fff5ec;
+            color: var(--naranja);
+        }
+
+        .historial-item strong,
+        .historial-item small
+        {
+            display: block;
+        }
+
+        .historial-item small
+        {
+            margin-top: 3px;
+            color: #666666;
+        }
+
+        .historial-eliminar
+        {
+            border: 0;
+            background: transparent;
+            color: #777777;
+            font-size: 17px;
+            cursor: pointer;
+        }
+
+        .aviso-ia
+        {
+            margin-top: 10px;
+            padding: 10px;
+            border-left: 4px solid var(--naranja);
+            background: #fff5ec;
+            color: #555555;
+            font-size: 12px;
+            line-height: 1.45;
+        }
+
+        @media (max-width: 1050px)
+        {
+            .ia-encabezado,
+            .ia-contenido
+            {
+                grid-template-columns: 1fr;
+            }
+
+            .ia-orbe
+            {
+                display: none;
+            }
+        }
+
+        @media (max-width: 720px)
+        {
+            .compositor
+            {
+                grid-template-columns: 1fr;
+            }
+
+            .compositor .boton-ia
+            {
+                width: 100%;
+            }
+
+            .chat
+            {
+                height: 360px;
+            }
+
+            .burbuja
+            {
+                max-width: 90%;
+            }
+
+            .ia-encabezado
+            {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app-shell">
+        <aside
+            class="sidebar"
+            id="sidebar"
+        >
+            <div class="brand">
+                <div class="brand-mark"></div>
+
+                <div class="brand-copy">
+                    <strong>
+                        Landing
+                        <span>
+                            Siscard+
+                        </span>
+                    </strong>
+
+                    <small>
+                        Autogestión digital
+                    </small>
+                </div>
+            </div>
+
+            <nav class="side-nav">
+                <p class="nav-label">
+                    Principal
+                </p>
+
+                <a
+                    class="nav-link"
+                    href="index.html"
+                >
+                    <span class="nav-icon">
+                        ⌂
+                    </span>
+
+                    <span>
+                        Inicio
+                    </span>
+                </a>
+
+                <p class="nav-label">
+                    Conocimiento
+                </p>
+
+                <a
+                    class="nav-link"
+                    href="manuales.html"
+                >
+                    <span class="nav-icon">
+                        ▤
+                    </span>
+
+                    <span>
+                        Manuales
+                    </span>
+                </a>
+
+                <a
+                    class="nav-link"
+                    href="#"
+                    data-coming-soon="Parámetros Siscard"
+                >
+                    <span class="nav-icon">
+                        ⚙
+                    </span>
+
+                    <span>
+                        Parámetros
+                    </span>
+                </a>
+
+                <a
+                    class="nav-link active"
+                    href="landing-ia.html"
+                >
+                    <span class="nav-icon">
+                        ✦
+                    </span>
+
+                    <span>
+                        Landing IA
+                    </span>
+                </a>
+
+                <p class="nav-label">
+                    Gestión
+                </p>
+
+                <a
+                    class="nav-link"
+                    href="seguridad.html"
+                >
+                    <span class="nav-icon">
+                        🔐
+                    </span>
+
+                    <span>
+                        Seguridad
+                    </span>
+                </a>
+
+                <a
+                    class="nav-link"
+                    href="comunicados.html"
+                >
+                    <span class="nav-icon">
+                        ◉
+                    </span>
+
+                    <span>
+                        Comunicados
+                    </span>
+                </a>
+            </nav>
+
+            <div class="side-note">
+                <strong>
+                    Asistente del portal
+                </strong>
+
+                <p>
+                    Localice servicios y contenido disponible en la demostración.
+                </p>
+            </div>
+        </aside>
+
+        <div class="main-area">
+            <header class="topbar">
+                <button
+                    class="menu-button"
+                    id="menuButton"
+                    type="button"
+                    aria-label="Abrir menú"
+                >
+                    ☰
+                </button>
+
+                <div class="top-title">
+                    <strong>
+                        Landing IA
+                    </strong>
+
+                    <small>
+                        Asistente de conocimiento
+                    </small>
+                </div>
+
+                <div class="top-actions">
+                    <button
+                        class="help-button"
+                        type="button"
+                        data-coming-soon="Centro de ayuda"
+                    >
+                        Ayuda
+                    </button>
+
+                    <button
+                        class="profile-button"
+                        id="profileButton"
+                        type="button"
+                    >
+                        <span class="avatar">
+                            CL
+                        </span>
+
+                        <span class="profile-copy">
+                            <strong>
+                                Cliente Siscard+
+                            </strong>
+
+                            <small>
+                                Portal de servicios
+                            </small>
+                        </span>
+                    </button>
+                </div>
+
+                <div
+                    class="profile-menu"
+                    id="profileMenu"
+                    hidden
+                >
+                    <button type="button">
+                        Mi perfil
+                    </button>
+                </div>
+            </header>
+
+            <main class="content">
+                <section class="ia-encabezado">
+                    <div>
+                        <span class="ia-etiqueta">
+                            Asistente de conocimiento
+                        </span>
+
+                        <h1>
+                            ¿En qué puedo ayudar?
+                        </h1>
+
+                        <p>
+                            Realice consultas sobre manuales, parámetros,
+                            seguridad, solicitudes y servicios disponibles
+                            en el portal Siscard+.
+                        </p>
+                    </div>
+
+                    <div class="ia-orbe">
+                        ✦
+                    </div>
+                </section>
+
+                <section class="ia-contenido">
+                    <div class="ia-panel">
+                        <div class="ia-panel-encabezado">
+                            <div>
+                                <h2>
+                                    Conversación
+                                </h2>
+
+                                <small>
+                                    Experiencia funcional de demostración
+                                </small>
+                            </div>
+
+                            <button
+                                class="boton-ia claro"
+                                id="nuevaConversacion"
+                                type="button"
+                            >
+                                Nueva conversación
+                            </button>
+                        </div>
+
+                        <div class="ia-panel-cuerpo">
+                            <div
+                                class="chat"
+                                id="chat"
+                                aria-live="polite"
+                            >
+                                <div class="mensaje">
+                                    <span class="mensaje-icono">
+                                        ✦
+                                    </span>
+
+                                    <div class="burbuja">
+                                        Hola. Puedo orientar la consulta hacia
+                                        los módulos disponibles. Pruebe con
+                                        <strong>buscar un manual</strong>,
+                                        <strong>crear un usuario</strong>,
+                                        <strong>consultar parámetros</strong>
+                                        o <strong>ver comunicados</strong>.
+                                    </div>
+                                </div>
+                            </div>
+
+                            <form
+                                class="compositor"
+                                id="formularioChat"
+                            >
+                                <textarea
+                                    id="entradaChat"
+                                    required
+                                    placeholder="Escriba una consulta..."
+                                ></textarea>
+
+                                <button
+                                    class="boton-ia naranja"
+                                    type="submit"
+                                >
+                                    Enviar
+                                </button>
+                            </form>
+
+                            <div class="aviso-ia">
+                                Las respuestas de esta versión se calculan
+                                localmente con contenido demostrativo. No se
+                                envían datos a un servicio externo.
+                            </div>
+                        </div>
+                    </div>
+
+                    <aside>
+                        <div class="ia-panel">
+                            <div class="ia-panel-encabezado">
+                                <div>
+                                    <h2>
+                                        Sugerencias
+                                    </h2>
+
+                                    <small>
+                                        Consultas frecuentes
+                                    </small>
+                                </div>
+                            </div>
+
+                            <div class="ia-panel-cuerpo">
+                                <div class="sugerencias">
+                                    <button
+                                        class="sugerencia"
+                                        type="button"
+                                        data-question="Quiero buscar un manual"
+                                    >
+                                        <strong>
+                                            Buscar un manual
+                                        </strong>
+
+                                        <small>
+                                            Consultar el centro documental.
+                                        </small>
+                                    </button>
+
+                                    <button
+                                        class="sugerencia"
+                                        type="button"
+                                        data-question="¿Dónde consulto los parámetros?"
+                                    >
+                                        <strong>
+                                            Consultar parámetros
+                                        </strong>
+
+                                        <small>
+                                            Abrir el repositorio correspondiente.
+                                        </small>
+                                    </button>
+
+                                    <button
+                                        class="sugerencia"
+                                        type="button"
+                                        data-question="Quiero crear un usuario"
+                                    >
+                                        <strong>
+                                            Crear un usuario
+                                        </strong>
+
+                                        <small>
+                                            Ir al módulo de seguridad.
+                                        </small>
+                                    </button>
+
+                                    <button
+                                        class="sugerencia"
+                                        type="button"
+                                        data-question="Quiero ver los comunicados"
+                                    >
+                                        <strong>
+                                            Ver comunicados
+                                        </strong>
+
+                                        <small>
+                                            Consultar novedades del portal.
+                                        </small>
+                                    </button>
+
+                                    <button
+                                        class="sugerencia"
+                                        type="button"
+                                        data-question="Necesito mantenimiento de accesos"
+                                    >
+                                        <strong>
+                                            Mantenimiento de accesos
+                                        </strong>
+
+                                        <small>
+                                            Preparar una gestión de seguridad.
+                                        </small>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div
+                            class="ia-panel"
+                            style="margin-top: 14px;"
+                        >
+                            <div class="ia-panel-encabezado">
+                                <div>
+                                    <h2>
+                                        Historial
+                                    </h2>
+
+                                    <small>
+                                        Guardado en este navegador
+                                    </small>
+                                </div>
+                            </div>
+
+                            <div
+                                class="ia-panel-cuerpo"
+                                id="historial"
+                            ></div>
+                        </div>
+                    </aside>
+                </section>
+            </main>
+
+            <footer class="footer">
+                <span>
+                    <strong>
+                        Landing Siscard+
+                    </strong>
+                    · Landing IA
+                </span>
+
+                <span>
+                    Asistente funcional de demostración
+                </span>
+            </footer>
+        </div>
+    </div>
+
+    <div
+        class="toast"
+        id="toast"
+        role="status"
+        aria-live="polite"
+    ></div>
+
+    <script src="js/app.js"></script>
+
+    <script>
+        "use strict";
+
+        const chat = document.getElementById("chat");
+
+        const formularioChat = document.getElementById("formularioChat");
+
+        const entradaChat = document.getElementById("entradaChat");
+
+        const historial = document.getElementById("historial");
+
+        const rutas =
+        [
+            {
+                claves:
+                [
+                    "manual",
+                    "documento",
+                    "guia"
+                ],
+
+                respuesta:
+                    "El Centro Documental permite buscar por título, producto o palabra clave.",
+
+                etiqueta:
+                    "Abrir Manuales",
+
+                url:
+                    "manuales.html"
+            },
+
+            {
+                claves:
+                [
+                    "parametro",
+                    "trt",
+                    "emisor"
+                ],
+
+                respuesta:
+                    "Los parámetros se consultan desde el repositorio de Parámetros Siscard.",
+
+                etiqueta:
+                    "Abrir Parámetros",
+
+                url:
+                    "#"
+            },
+
+            {
+                claves:
+                [
+                    "usuario",
+                    "grupo",
+                    "acceso",
+                    "seguridad",
+                    "reiniciar"
+                ],
+
+                respuesta:
+                    "El módulo de Seguridad incluye creación de usuarios y grupos, mantenimiento de accesos y otras gestiones.",
+
+                etiqueta:
+                    "Abrir Seguridad",
+
+                url:
+                    "seguridad.html"
+            },
+
+            {
+                claves:
+                [
+                    "comunicado",
+                    "noticia",
+                    "novedad"
+                ],
+
+                respuesta:
+                    "La sección de Comunicados reúne anuncios y novedades del portal.",
+
+                etiqueta:
+                    "Abrir Comunicados",
+
+                url:
+                    "comunicados.html"
+            },
+
+            {
+                claves:
+                [
+                    "solicitud",
+                    "aprobacion",
+                    "formulario"
+                ],
+
+                respuesta:
+                    "Las solicitudes y aprobaciones se presentan en la página principal del portal.",
+
+                etiqueta:
+                    "Ver Solicitudes",
+
+                url:
+                    "index.html#solicitudes"
+            }
+        ];
+
+        function normalizarTexto(valor)
+        {
+            return valor
+                .toLowerCase()
+                .normalize("NFD")
+                .replace(/[\u0300-\u036f]/g, "");
+        }
+
+        function escaparHTML(valor)
+        {
+            const contenedor = document.createElement("div");
+
+            contenedor.textContent = valor;
+
+            return contenedor.innerHTML;
+        }
+
+        function agregarMensaje(tipo, contenido)
+        {
+            const mensaje = document.createElement("div");
+
+            mensaje.className = `mensaje ${tipo}`;
+
+            if (tipo === "usuario")
+            {
+                mensaje.innerHTML = `
+                    <div class="burbuja"></div>
+
+                    <span class="mensaje-icono">
+                        CL
+                    </span>
+                `;
+            }
+            else
+            {
+                mensaje.innerHTML = `
+                    <span class="mensaje-icono">
+                        ✦
+                    </span>
+
+                    <div class="burbuja"></div>
+                `;
+            }
+
+            mensaje
+                .querySelector(".burbuja")
+                .append(contenido);
+
+            chat.append(mensaje);
+
+            chat.scrollTop = chat.scrollHeight;
+        }
+
+        function mostrarAviso(mensaje)
+        {
+            const toast = document.getElementById("toast");
+
+            toast.textContent = mensaje;
+
+            toast.classList.add("show");
+
+            window.setTimeout(
+                function()
+                {
+                    toast.classList.remove("show");
+                },
+                2800
+            );
+        }
+
+        function responder(pregunta)
+        {
+            const consulta = normalizarTexto(pregunta);
+
+            const coincidencia = rutas.find(
+                function(ruta)
+                {
+                    return ruta.claves.some(
+                        function(clave)
+                        {
+                            return consulta.includes(clave);
+                        }
+                    );
+                }
+            );
+
+            const respuesta = document.createElement("div");
+
+            if (coincidencia)
+            {
+                respuesta.append(
+                    document.createTextNode(coincidencia.respuesta)
+                );
+
+                const enlace = document.createElement("a");
+
+                enlace.className = "enlace-resultado";
+
+                enlace.href = coincidencia.url;
+
+                enlace.textContent = `${coincidencia.etiqueta} →`;
+
+                if (coincidencia.url === "#")
+                {
+                    enlace.addEventListener(
+                        "click",
+                        function(evento)
+                        {
+                            evento.preventDefault();
+
+                            mostrarAviso(
+                                "La URL del repositorio de Parámetros se conectará en la siguiente integración."
+                            );
+                        }
+                    );
+                }
+
+                respuesta.append(enlace);
+            }
+            else
+            {
+                respuesta.textContent =
+                    "No encontré una coincidencia directa. Puede intentar con manuales, parámetros, usuarios, accesos, solicitudes o comunicados.";
+            }
+
+            window.setTimeout(
+                function()
+                {
+                    agregarMensaje("asistente", respuesta);
+                },
+                250
+            );
+        }
+
+        function guardarHistorial(pregunta)
+        {
+            const elementos = JSON.parse(
+                localStorage.getItem("siscardIaHistory") || "[]"
+            );
+
+            elementos.unshift(
+                {
+                    pregunta: pregunta,
+
+                    fecha: new Date().toLocaleString("es-CR")
+                }
+            );
+
+            localStorage.setItem(
+                "siscardIaHistory",
+                JSON.stringify(elementos.slice(0, 8))
+            );
+
+            renderizarHistorial();
+        }
+
+        function renderizarHistorial()
+        {
+            const elementos = JSON.parse(
+                localStorage.getItem("siscardIaHistory") || "[]"
+            );
+
+            if (!elementos.length)
+            {
+                historial.innerHTML = `
+                    <p style="color: #666666; margin: 0;">
+                        Todavía no hay consultas guardadas.
+                    </p>
+                `;
+
+                return;
+            }
+
+            historial.innerHTML = elementos
+                .map(
+                    function(elemento, indice)
+                    {
+                        return `
+                            <div class="historial-item">
+                                <span class="historial-icono">
+                                    ⌕
+                                </span>
+
+                                <div>
+                                    <strong>
+                                        ${escaparHTML(elemento.pregunta)}
+                                    </strong>
+
+                                    <small>
+                                        ${elemento.fecha}
+                                    </small>
+                                </div>
+
+                                <button
+                                    class="historial-eliminar"
+                                    type="button"
+                                    data-delete="${indice}"
+                                    title="Eliminar"
+                                >
+                                    ×
+                                </button>
+                            </div>
+                        `;
+                    }
+                )
+                .join("");
+
+            historial
+                .querySelectorAll("[data-delete]")
+                .forEach(
+                    function(boton)
+                    {
+                        boton.addEventListener(
+                            "click",
+                            function()
+                            {
+                                elementos.splice(
+                                    Number(boton.dataset.delete),
+                                    1
+                                );
+
+                                localStorage.setItem(
+                                    "siscardIaHistory",
+                                    JSON.stringify(elementos)
+                                );
+
+                                renderizarHistorial();
+                            }
+                        );
+                    }
+                );
+        }
+
+        formularioChat.addEventListener(
+            "submit",
+            function(evento)
+            {
+                evento.preventDefault();
+
+                const pregunta = entradaChat.value.trim();
+
+                if (!pregunta)
+                {
+                    return;
+                }
+
+                agregarMensaje(
+                    "usuario",
+                    document.createTextNode(pregunta)
+                );
+
+                guardarHistorial(pregunta);
+
+                responder(pregunta);
+
+                entradaChat.value = "";
+
+                entradaChat.focus();
+            }
+        );
+
+        document
+            .querySelectorAll("[data-question]")
+            .forEach(
+                function(boton)
+                {
+                    boton.addEventListener(
+                        "click",
+                        function()
+                        {
+                            entradaChat.value = boton.dataset.question;
+
+                            formularioChat.requestSubmit();
+                        }
+                    );
+                }
+            );
+
+        document
+            .getElementById("nuevaConversacion")
+            .addEventListener(
+                "click",
+                function()
+                {
+                    chat.innerHTML = `
+                        <div class="mensaje">
+                            <span class="mensaje-icono">
+                                ✦
+                            </span>
+
+                            <div class="burbuja">
+                                Nueva conversación iniciada.
+                                ¿Qué información desea consultar?
+                            </div>
+                        </div>
+                    `;
+
+                    entradaChat.focus();
+                }
+            );
+
+        renderizarHistorial();
+    </script>
+</body>
+
+</html>
