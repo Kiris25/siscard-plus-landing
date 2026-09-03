@@ -1,83 +1,242 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
-
     <meta charset="UTF-8">
-
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Portal de experiencia y autogestión Siscard+">
+    <meta name="theme-color" content="#25292c">
     <title>Landing Siscard+</title>
-
-    <link rel="stylesheet"
-          href="css/styles.css">
-
+    <link rel="stylesheet" href="css/styles.css">
 </head>
-
 <body>
-
-    <div class="app">
-
-        <aside class="sidebar">
-
-            <divss="brand-mark"></div>
-
-                <div>
-
-                    <h2>
-                        Siscard+
-                    </h2>
-
-                    <small>
-                        Centro de Experiencia Digital
-                    </small>
-
+    <div class="app-shell">
+        <aside class="sidebar" id="sidebar" aria-label="Navegación principal">
+            <div class="brand">
+                <div class="brand-mark" aria-hidden="true"></div>
+                <div class="brand-copy">
+                    <strong>Landing <span>Siscard+</span></strong>
+                    <small>Autogestión digital</small>
                 </div>
-
             </div>
-
-            <nav>
-
-                <a class="active"
-                   href="index.html">
-                    🏠 Inicio
+ 
+            <nav class="side-nav">
+                <p class="nav-label">Principal</p>
+                <a class="nav-link active" href="index.html" data-page="inicio">
+                    <span class="nav-icon">⌂</span>
+                    <span>Inicio</span>
                 </a>
-
-                manuales.html
-                    📚 Manuales
+ 
+                <p class="nav-label">Conocimiento</p>
+                <a class="nav-link" href="manuales.html">
+                    <span class="nav-icon">▤</span>
+                    <span>Manuales</span>
                 </a>
-
-                #
-                    ⚙️ Parámetros
+                <a class="nav-link" href="#" data-coming-soon="Parámetros Siscard">
+                    <span class="nav-icon">⚙</span>
+                    <span>Parámetros</span>
                 </a>
-
-                seguridad.html
-                    🔐 Seguridad
+                <a class="nav-link" href="#" data-coming-soon="Formularios">
+                    <span class="nav-icon">▧</span>
+                    <span>Formularios</span>
                 </a>
-
-                #
-                    📋 Formularios
+                <a class="nav-link" href="landing-ia.html">
+                    <span class="nav-icon">✦</span>
+                    <span>Landing IA</span>
                 </a>
-
-                #
-                    ✅ Aprobaciones
+ 
+                <p class="nav-label">Gestión</p>
+                <a class="nav-link" href="seguridad.html">
+                    <span class="nav-icon">🔐</span>
+                    <span>Seguridad</span>
                 </a>
-
-                comunicados.html
-                    📢 Comunicados
+                <a class="nav-link" href="#solicitudes">
+                    <span class="nav-icon">✓</span>
+                    <span>Aprobaciones</span>
                 </a>
-
-                landing-ia.html
-                    ✨ Landing IA
+                <a class="nav-link" href="#solicitudes">
+                    <span class="nav-icon">◷</span>
+                    <span>Mis solicitudes</span>
                 </a>
-
+                <a class="nav-link" href="comunicados.html">
+                    <span class="nav-icon">◉</span>
+                    <span>Comunicados</span>
+                </a>
             </nav>
-
+ 
+            <div class="side-note">
+                <strong>Experiencia centralizada</strong>
+                <p>Un único punto de acceso para consultar información y gestionar servicios Siscard+.</p>
+            </div>
         </aside>
-
-        <main class="main">
-
+ 
+        <div class="main-area">
             <header class="topbar">
-
-                <
+                <button class="menu-button" id="menuButton" type="button" aria-label="Abrir menú" aria-controls="sidebar" aria-expanded="false">☰</button>
+                <div class="top-title">
+                    <strong>Centro de Experiencia y Autogestión</strong>
+                    <small>Portal Siscard+</small>
+                </div>
+                <div class="top-actions">
+                    <button class="icon-button" type="button" data-coming-soon="Notificaciones" aria-label="Notificaciones">🔔<span class="notification-dot">3</span></button>
+                    <button class="help-button" type="button" data-coming-soon="Centro de ayuda">Ayuda</button>
+                    <button class="profile-button" id="profileButton" type="button" aria-expanded="false">
+                        <span class="avatar">CL</span>
+                        <span class="profile-copy"><strong>Cliente Siscard+</strong><small>Portal de servicios</small></span>
+                        <span>⌄</span>
+                    </button>
+                </div>
+                <div class="profile-menu" id="profileMenu" hidden>
+                    <button type="button" data-coming-soon="Mi perfil">Mi perfil</button>
+                    <button type="button" data-coming-soon="Preferencias">Preferencias</button>
+                    <button type="button" data-coming-soon="Cerrar sesión">Cerrar sesión</button>
+                </div>
+            </header>
+ 
+            <main class="content" id="inicio">
+                <section class="hero">
+                    <div class="hero-content">
+                        <span class="eyebrow">Portal de servicios Siscard+</span>
+                        <h1>Todo el ecosistema Siscard+ en un solo lugar</h1>
+                        <p>Consulte manuales, parámetros, comunicados y solicitudes. Acceda además a herramientas de seguridad y autogestión desde una experiencia centralizada.</p>
+                        <form class="global-search" id="globalSearch" role="search">
+                            <span aria-hidden="true">⌕</span>
+                            <input id="searchInput" type="search" placeholder="Buscar manual, parámetro, formulario o proceso..." autocomplete="off" aria-label="Buscar en el portal">
+                            <button class="primary-button" type="submit">Buscar</button>
+                        </form>
+                        <p class="search-feedback" id="searchFeedback" aria-live="polite"></p>
+                    </div>
+                    <div class="hero-card">
+                        <span class="hero-card-label">Acceso centralizado</span>
+                        <strong>24/7</strong>
+                        <p>Información y servicios disponibles desde un único punto de consulta.</p>
+                        <div class="availability"><span></span> Portal disponible</div>
+                    </div>
+                </section>
+ 
+                <section class="quick-bar" aria-label="Acciones rápidas">
+                    <strong>¿Qué desea hacer hoy?</strong>
+                    <a href="manuales.html">▤ Consultar manual</a>
+                    <a href="#" data-coming-soon="Consulta de parámetros">⚙ Consultar parámetro</a>
+                    <a href="seguridad.html">🔐 Gestionar accesos</a>
+                    <a href="#solicitudes">＋ Nueva solicitud</a>
+                    <a href="landing-ia.html">✦ Consultar Landing IA</a>
+                </section>
+ 
+                <section class="section" aria-labelledby="summaryTitle">
+                    <div class="section-heading">
+                        <div>
+                            <span class="section-kicker">Vista general</span>
+                            <h2 id="summaryTitle">Resumen del portal</h2>
+                            <p>Accesos directos e indicadores demostrativos para la presentación de la experiencia.</p>
+                        </div>
+                        <div class="filters">
+                            <label>País
+                                <select id="countryFilter">
+                                    <option value="Costa Rica">Costa Rica</option>
+                                    <option value="Panamá">Panamá</option>
+                                    <option value="Honduras">Honduras</option>
+                                    <option value="República Dominicana">República Dominicana</option>
+                                </select>
+                            </label>
+                            <label>Producto
+                                <select id="productFilter">
+                                    <option value="Todos">Todos los productos</option>
+                                    <option value="Crédito">Crédito</option>
+                                    <option value="Débito">Débito</option>
+                                    <option value="Prepago">Prepago</option>
+                                </select>
+                            </label>
+                        </div>
+                    </div>
+ 
+                    <div class="metrics-grid">
+                        <article class="metric-card"><div><strong>165</strong><span>Manuales disponibles</span></div><div class="metric-icon blue">▤</div></article>
+                        <article class="metric-card"><div><strong>82</strong><span>Parámetros documentados</span></div><div class="metric-icon orange">⚙</div></article>
+                        <article class="metric-card"><div><strong>12</strong><span>Servicios digitales</span></div><div class="metric-icon teal">◇</div></article>
+                        <article class="metric-card"><div><strong>5</strong><span>Gestiones pendientes</span></div><div class="metric-icon gold">✓</div></article>
+                    </div>
+                </section>
+ 
+                <section class="section dashboard-grid" id="servicios">
+                    <div class="panel">
+                        <div class="panel-heading"><div><span class="section-kicker">Catálogo</span><h2>Servicios principales</h2></div><button type="button" class="text-button" data-coming-soon="Catálogo completo">Ver catálogo</button></div>
+                        <div class="services-grid" id="serviceGrid">
+                            <a class="service-card" href="manuales.html" data-search="manuales documentación guías funcional operativa técnica">
+                                <span class="service-icon blue">📚</span><strong>Manuales</strong><small>Documentación funcional, operativa y técnica centralizada.</small><em>→</em>
+                            </a>
+                            <a class="service-card" href="#" data-coming-soon="Parámetros Siscard" data-search="parámetros siscard trtt1sno trtt2sno trt08sn0 emisor">
+                                <span class="service-icon orange">⚙️</span><strong>Parámetros Siscard</strong><small>Consulta del repositorio de parámetros documentados.</small><em>→</em>
+                            </a>
+                            <a class="service-card" href="#" data-coming-soon="Formularios" data-search="formularios solicitudes gestiones digitales">
+                                <span class="service-icon teal">📋</span><strong>Formularios</strong><small>Solicitudes y gestiones digitales guiadas.</small><em>→</em>
+                            </a>
+                            <a class="service-card" href="seguridad.html" data-search="usuarios seguridad crear usuario accesos">
+                                <span class="service-icon purple">👤</span><strong>Usuarios</strong><small>Creación, mantenimiento y consulta de usuarios.</small><em>→</em>
+                            </a>
+                            <a class="service-card" href="seguridad.html#grupos" data-search="grupos seguridad roles permisos">
+                                <span class="service-icon green">👥</span><strong>Grupos</strong><small>Administración de grupos, roles y permisos.</small><em>→</em>
+                            </a>
+                            <a class="service-card" href="#solicitudes" data-search="aprobaciones solicitudes firma validación">
+                                <span class="service-icon gold">✅</span><strong>Aprobaciones</strong><small>Seguimiento y validación de gestiones.</small><em>→</em>
+                            </a>
+                        </div>
+                    </div>
+ 
+                    <aside class="panel ai-panel">
+                        <div class="ai-heading"><span class="ai-orb">✦</span><div><h2>Landing IA</h2><p>Asistente del portal</p></div></div>
+                        <p class="ai-description">Plantee una consulta para localizar información o identificar el servicio adecuado.</p>
+                        <form id="aiForm">
+                            <textarea id="aiInput" placeholder="Ejemplo: ¿Dónde encuentro los parámetros del emisor?" aria-label="Consulta para Landing IA"></textarea>
+                            <div class="suggestion-list">
+                                <button type="button">Buscar un manual</button>
+                                <button type="button">Consultar un parámetro</button>
+                                <button type="button">Solicitar acceso</button>
+                            </div>
+                            <button class="primary-button full" type="submit">Consultar</button>
+                        </form>
+                    </aside>
+                </section>
+ 
+                <section class="section two-column" id="solicitudes">
+                    <div class="panel">
+                        <div class="panel-heading"><div><span class="section-kicker">Gestión</span><h2>Solicitudes recientes</h2></div><button type="button" class="text-button" data-coming-soon="Listado de solicitudes">Ver todas</button></div>
+                        <div class="request-list">
+                            <article class="request-item"><span class="request-icon">👤</span><div><strong>SOL-2026-124 · Alta de usuario</strong><small>Seguridad · Banco demostrativo</small></div><span class="status pending">Pendiente</span></article>
+                            <article class="request-item"><span class="request-icon">⚙</span><div><strong>SOL-2026-125 · Consulta TRT08SN0</strong><small>Parámetros · Operaciones</small></div><span class="status approved">Aprobada</span></article>
+                            <article class="request-item"><span class="request-icon">👥</span><div><strong>SOL-2026-126 · Creación de grupo</strong><small>Seguridad · Cliente interno</small></div><span class="status review">En revisión</span></article>
+                        </div>
+                    </div>
+ 
+                    <div class="panel">
+                        <div class="panel-heading"><div><span class="section-kicker">Novedades</span><h2>Comunicados destacados</h2></div><a class="text-button" href="comunicados.html">Ver todos</a></div>
+                        <div class="news-list">
+                            <article class="news-item"><span>Parámetros</span><strong>Contenido organizado por país y producto</strong><small>Consulte la información según el contexto operativo requerido.</small></article>
+                            <article class="news-item"><span>Seguridad</span><strong>Gestión digital de usuarios, grupos y accesos</strong><small>Nuevos puntos de entrada para las gestiones de seguridad.</small></article>
+                            <article class="news-item"><span>Documentación</span><strong>Manuales y guías centralizadas</strong><small>Acceso simplificado a la documentación publicada.</small></article>
+                        </div>
+                    </div>
+                </section>
+ 
+                <section class="section">
+                    <div class="section-heading compact"><div><span class="section-kicker">Proceso</span><h2>Flujo digital de la solicitud</h2><p>Secuencia demostrativa para presentar la experiencia de principio a fin.</p></div></div>
+                    <div class="process-flow">
+                        <article><span>📝</span><strong>Solicitud</strong><small>Registro de datos</small></article>
+                        <article><span>🔎</span><strong>Validación</strong><small>Revisión inicial</small></article>
+                        <article><span>✅</span><strong>Aprobación</strong><small>Visto bueno</small></article>
+                        <article><span>📄</span><strong>Documento final</strong><small>Generación</small></article>
+                        <article><span>📤</span><strong>Entrega</strong><small>Notificación</small></article>
+                    </div>
+                </section>
+            </main>
+ 
+            <footer class="footer">
+                <span><strong>Landing Siscard+</strong> · Portal de experiencia y autogestión</span>
+                <span id="footerContext">Costa Rica · Todos los productos</span>
+            </footer>
+        </div>
+    </div>
+ 
+    <div class="toast" id="toast" role="status" aria-live="polite" aria-hidden="true"></div>
+    <script src="js/app.js"></script>
+</body>
+</html>
