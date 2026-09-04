@@ -177,6 +177,25 @@
             color: #ffffff;
         }
 
+        .parameter-search {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: 8px;
+            margin: 14px 0 0;
+            padding: 12px;
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+            background: #ffffff;
+            box-shadow: var(--shadow-small);
+        }
+
+        .parameter-search input {
+            width: 100%;
+            min-height: 42px;
+            padding: 9px 12px;
+            border-radius: var(--radius);
+        }
+
         .parameters-toolbar {
             margin: 15px 0 11px;
             padding: 12px 15px;
@@ -292,11 +311,10 @@
 
         .parameter-grid {
             display: grid;
-            grid-template-columns: minmax(230px, 0.7fr) minmax(260px, 1fr);
+            grid-template-columns: 1fr;
             gap: 12px;
         }
 
-        .parameter-meta,
         .parameter-entry {
             padding: 12px;
             border: 1px solid var(--line);
@@ -305,7 +323,6 @@
             background: var(--surface-soft);
         }
 
-        .parameter-meta strong,
         .parameter-entry label {
             display: block;
             margin-bottom: 7px;
@@ -360,8 +377,8 @@
         .parameter-tooltip {
             position: fixed;
             z-index: 250;
-            width: min(340px, calc(100vw - 28px));
-            max-height: min(390px, calc(100vh - 28px));
+            width: min(365px, calc(100vw - 28px));
+            max-height: min(520px, calc(100vh - 28px));
             overflow-y: auto;
             padding: 14px;
             border: 1px solid var(--line);
@@ -378,14 +395,14 @@
         .parameter-tooltip h3 {
             margin: 4px 0 8px;
             color: var(--sidebar);
-            font-size: 17px;
+            font-size: 16px;
         }
 
         .parameter-tooltip p {
             margin: 0;
             color: var(--muted);
-            font-size: 12px;
-            line-height: 1.4;
+            font-size: 11px;
+            line-height: 1.35;
         }
 
         .tooltip-values {
@@ -599,6 +616,15 @@
                     <nav class="options-menu" id="optionsMenu"></nav>
                 </section>
 
+                <form class="parameter-search" id="parameterSearchForm">
+                    <input
+                        id="parameterSearchInput"
+                        type="search"
+                        placeholder="Buscar por nombre, descripción, producto, valores o dependencias"
+                    >
+                    <button class="primary-button" type="submit">Buscar</button>
+                </form>
+
                 <section class="parameters-toolbar">
                     <div>
                         <strong id="recordCount">Cargando parámetros...</strong>
@@ -716,29 +742,82 @@
             return temporary.innerHTML;
         }
 
-        function allowedValues(record) {
-            const original =
+        function rawAllowedValues(record) {
+            return plainText(
                 record.valoresPermitidos ??
                 record.valores ??
                 record.opciones ??
                 record.allowedValues ??
-                "";
+                ""
+            );
+        }
 
-            if (Array.isArray(original)) {
-                return original.map((item) =>
-                    typeof item === "string"
-                        ? item.trim()
-                        : field(item, ["valor", "codigo", "nombre", "descripcion", "label"])
-                ).filter(Boolean);
+        function parseEnumeratedValues(record) {
+            const raw = rawAllowedValues(record).trim();
+            if (!raw) return [];
+
+            const codedPairs = [];
+            const pairPattern = /(?:^|[\/|;,\n])\s*([A-Za-z0-9]{1,4})\s*=\s*([^\/|;,\n]+)/g;
+            let match;
+
+            while ((match = pairPattern.exec(raw)) !== null) {
+                codedPairs.push(`${match[1].trim()} = ${match[2].trim()}`);
             }
 
-            const text = plainText(original);
-            if (!text) return [];
+            if (codedPairs.length >= 2) return codedPairs;
 
-            return text
-                .split(/\r?\n|;|\|/)
+            const explicitChoiceWords =
+                /(visa|mastercard|amex|american express|local|internacional|credito|crédito|debito|débito|prepago|corporativo)/i;
+
+            if (explicitChoiceWords.test(raw) && /[,;|\n]/.test(raw)) {
+                return raw
+                    .split(/\r?\n|;|\| |,(?=\s*[A-Za-zÁÉÍÓÚáéíóú])/)
+                    .map((item) => item.trim())
+                    .filter(Boolean);
+            }
+
+            const slashChoices = raw
+                .split(/\s+\/\s+/)
                 .map((item) => item.trim())
                 .filter(Boolean);
+
+            if (
+                slashChoices.length >= 2 &&
+                slashChoices.length <= 12 &&
+                slashChoices.every((item) => item.length <= 55)
+            ) {
+                return slashChoices;
+            }
+
+            return [];
+        }
+
+        function inputKind(parameter) {
+            const name = normalize(parameter.name);
+
+            if (/porcentaje|porc|tasa/.test(name)) {
+                return { type: "number", min: "0", max: "100", step: "0.01", reason: "Ingrese un porcentaje entre 0 y 100." };
+            }
+
+            if (/dias|dia|maximo de dias|cantidad de dias/.test(name)) {
+                return { type: "number", min: "0", step: "1", reason: "Ingrese una cantidad de días igual o mayor que 0." };
+            }
+
+            return { type: "text", reason: "Ingrese un valor compatible con la ficha del parámetro." };
+        }
+
+        function productFilteredChoices(parameter) {
+            const selectedProduct = document.getElementById("productFilter").value;
+            if (selectedProduct === "Todos") return parameter.values;
+
+            const selected = normalize(selectedProduct);
+            const productChoices = parameter.values.filter((value) => {
+                const normalizedValue = normalize(value);
+                const mentionsProduct = /(credito|debito|prepago|corporativo)/.test(normalizedValue);
+                return !mentionsProduct || normalizedValue.includes(selected);
+            });
+
+            return productChoices.length ? productChoices : parameter.values;
         }
 
         function adaptRecord(record, index) {
@@ -753,7 +832,8 @@
                 number: index + 1,
                 name: field(record, FIELD_NAMES.name, `Parámetro ${index + 1}`),
                 product: field(record, FIELD_NAMES.product, "Todos"),
-                values: allowedValues(record),
+                values: parseEnumeratedValues(record),
+                rawValues: rawAllowedValues(record),
                 description: field(record, FIELD_NAMES.description),
                 operation: field(record, FIELD_NAMES.operation),
                 dependencies: field(record, FIELD_NAMES.dependencies),
@@ -794,11 +874,13 @@
         }
 
         function buildInput(parameter) {
-            if (parameter.values.length) {
+            const choices = productFilteredChoices(parameter);
+
+            if (choices.length) {
                 return `
                     <select data-entry-id="${escapeHtml(parameter.id)}">
                         <option value="">Seleccione un valor</option>
-                        ${parameter.values.map((value) => `
+                        ${choices.map((value) => `
                             <option value="${escapeHtml(value)}">${escapeHtml(value)}</option>
                         `).join("")}
                     </select>
@@ -806,9 +888,19 @@
                 `;
             }
 
+            const kind = inputKind(parameter);
+            const attributes = [
+                `type="${kind.type}"`,
+                kind.min !== undefined ? `min="${kind.min}"` : "",
+                kind.max !== undefined ? `max="${kind.max}"` : "",
+                kind.step !== undefined ? `step="${kind.step}"` : ""
+            ].filter(Boolean).join(" ");
+
             return `
                 <input
+                    ${attributes}
                     data-entry-id="${escapeHtml(parameter.id)}"
+                    data-validation-reason="${escapeHtml(kind.reason)}"
                     placeholder="Digite el valor solicitado"
                 >
                 <small class="validation-message"></small>
@@ -818,9 +910,24 @@
         function renderParameters() {
             const selectedProduct = document.getElementById("productFilter").value;
 
-            visibleParameters = allParameters.filter((parameter) =>
-                productApplies(parameter.product, selectedProduct)
+            const searchQuery = normalize(
+                document.getElementById("parameterSearchInput").value
             );
+
+            visibleParameters = allParameters.filter((parameter) => {
+                const productMatches = productApplies(parameter.product, selectedProduct);
+                const searchableText = normalize([
+                    parameter.name,
+                    parameter.product,
+                    parameter.rawValues,
+                    parameter.description,
+                    parameter.operation,
+                    parameter.dependencies,
+                    parameter.notes
+                ].join(" "));
+                const searchMatches = !searchQuery || searchableText.includes(searchQuery);
+                return productMatches && searchMatches;
+            });
 
             document.getElementById("recordCount").textContent =
                 `${visibleParameters.length} parámetro${visibleParameters.length === 1 ? "" : "s"} disponibles`;
@@ -849,12 +956,6 @@
             parameterContainer.innerHTML = visibleParameters
                 .map((parameter) => {
                     const collapsed = collapsedCards.has(parameter.id);
-                    const chips = parameter.values.length
-                        ? parameter.values.slice(0, 12).map((value) =>
-                            `<span class="value-chip">${escapeHtml(value)}</span>`
-                        ).join("")
-                        : `<span class="value-chip">Entrada manual</span>`;
-
                     return `
                         <article
                             class="parameter-card ${collapsed ? "collapsed" : ""}"
@@ -880,11 +981,6 @@
 
                             <div class="parameter-body">
                                 <div class="parameter-grid">
-                                    <div class="parameter-meta">
-                                        <strong>Valores permitidos</strong>
-                                        <div class="value-chips">${chips}</div>
-                                    </div>
-
                                     <div class="parameter-entry">
                                         <label>Valor solicitado</label>
                                         ${buildInput(parameter)}
@@ -914,9 +1010,24 @@
             parameter.value = value;
             if (!value) return;
 
-            if (parameter.values.length && !parameter.values.includes(value)) {
+            const choices = productFilteredChoices(parameter);
+
+            if (choices.length && !choices.includes(value)) {
                 control.classList.add("invalid");
-                message.textContent = "El valor no se encuentra entre los valores permitidos.";
+                control.value = "";
+                parameter.value = "";
+                message.textContent =
+                    "Valor rechazado: seleccione uno de los valores permitidos para el producto elegido.";
+                return;
+            }
+
+            if (!control.checkValidity()) {
+                control.classList.add("invalid");
+                control.value = "";
+                parameter.value = "";
+                message.textContent =
+                    control.dataset.validationReason ||
+                    "El valor no cumple las reglas del parámetro.";
                 return;
             }
 
@@ -959,12 +1070,7 @@
         function showTooltip(button, parameter) {
             if (!parameter) return;
 
-            const values = parameter.values.length
-                ? parameter.values.slice(0, 10).map((value) =>
-                    `<span>${escapeHtml(value)}</span>`
-                ).join("")
-                : `<span>Entrada manual</span>`;
-
+            const allValues = parameter.rawValues || "Entrada manual";
             const url = new URL("https://kiris25.github.io/parametros-emisor/");
             url.searchParams.set("modo", "ficha");
             url.searchParams.set("idioma", "es");
@@ -972,21 +1078,34 @@
             url.searchParams.set("opcion", currentOption);
             url.searchParams.set("id", parameter.id);
 
+            const row = (label, value) => value ? `
+                <div style="margin-top:8px;padding-top:7px;border-top:1px solid #e6e6e6;">
+                    <strong style="display:block;font-size:10px;text-transform:uppercase;color:#58595b;">
+                        ${escapeHtml(label)}
+                    </strong>
+                    <p>${escapeHtml(value)}</p>
+                </div>
+            ` : "";
+
             parameterTooltip.innerHTML = `
                 <span class="section-kicker">Opción ${currentOption}</span>
                 <h3>${escapeHtml(parameter.name)}</h3>
-                <p>${escapeHtml(parameter.description || "Consulte los valores permitidos antes de completar el campo.")}</p>
-                <div class="tooltip-values">${values}</div>
+                ${row("Producto", parameter.product)}
+                ${row("Valores permitidos", allValues)}
+                ${row("¿Qué hace?", parameter.description)}
+                ${row("¿Cómo funciona?", parameter.operation)}
+                ${row("Dependencias / Reglas", parameter.dependencies)}
+                ${row("Notas", parameter.notes)}
                 <a class="tooltip-link" href="${url.href}">Abrir ficha completa →</a>
             `;
 
             const rect = button.getBoundingClientRect();
-            const width = Math.min(340, window.innerWidth - 28);
+            const width = Math.min(365, window.innerWidth - 28);
             let left = rect.right + 10;
             if (left + width > window.innerWidth - 14) left = rect.left - width - 10;
 
             parameterTooltip.style.left = `${Math.max(14, left)}px`;
-            parameterTooltip.style.top = `${Math.max(14, Math.min(rect.top, window.innerHeight - 300))}px`;
+            parameterTooltip.style.top = `${Math.max(14, Math.min(rect.top, window.innerHeight - 480))}px`;
             parameterTooltip.hidden = false;
         }
 
@@ -1194,6 +1313,15 @@
         });
 
         document.getElementById("productFilter").addEventListener("change", renderParameters);
+        document.getElementById("parameterSearchInput").addEventListener("input", renderParameters);
+        document.getElementById("parameterSearchForm").addEventListener("submit", (event) => {
+            event.preventDefault();
+            renderParameters();
+            document.querySelector(".parameter-card")?.scrollIntoView({
+                behavior: "smooth",
+                block: "center"
+            });
+        });
         document.getElementById("hideAllButton").addEventListener("click", () => {
             visibleParameters.forEach((parameter) => collapsedCards.add(parameter.id));
             renderParameters();
