@@ -480,6 +480,20 @@
                 grid-template-columns: repeat(3, minmax(0, 1fr));
             }
         }
+
+        mark { padding: 0 2px; background: #fff176; color: #000; }
+        @media print {
+            @page { size: A4 landscape; margin: 10mm; }
+            body { background: #fff; }
+            .sidebar,.topbar,.options-area,.parameter-search,.parameters-toolbar,
+            .parameter-help,.footer,.toast,.parameter-tooltip { display:none !important; }
+            .app-shell { display:block; }
+            .main-area,.content { width:100%; margin:0; padding:0; }
+            .form-document,.parameters-panel { border:1px solid #999; border-radius:0; box-shadow:none; }
+            .parameter-card { break-inside:avoid; }
+            .parameter-card.collapsed .parameter-body { display:block; }
+            .parameter-body { padding-left:0; }
+        }
     </style>
 </head>
 <body>
@@ -742,6 +756,17 @@
             return temporary.innerHTML;
         }
 
+        function highlightSearch(value) {
+            const escaped = escapeHtml(value);
+            const query = document.getElementById("parameterSearchInput").value.trim();
+            if (!query) return escaped;
+            const terms = query.split(/\s+/).filter(Boolean).sort((a,b)=>b.length-a.length)
+                .map(term => term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
+            return terms.length
+                ? escaped.replace(new RegExp(`(${terms.join("|")})`, "gi"), "<mark>$1</mark>")
+                : escaped;
+        }
+
         function rawAllowedValues(record) {
             return plainText(
                 record.valoresPermitidos ??
@@ -752,46 +777,25 @@
             );
         }
 
+        function cleanAllowedValuesText(value) {
+            return String(value || "")
+                .replace(/^\s*(?:c[oó]digos?\s+de\s+producto(?:s)?(?:\s+como)?|c[oó]digos?\s+permitidos?(?:\s+como)?|valores?\s+permitidos?(?:\s+como)?|opciones?(?:\s+como)?)\s*[:\-]?\s*/i, "")
+                .trim();
+        }
         function parseEnumeratedValues(record) {
-            const raw = rawAllowedValues(record).trim();
+            const raw = cleanAllowedValuesText(rawAllowedValues(record));
             if (!raw) return [];
-
-            const codedPairs = [];
-            const pairPattern = /(?:^|[\/|;,\n])\s*([A-Za-z0-9]{1,4})\s*=\s*([^\/|;,\n]+)/g;
             let match;
-
-            while ((match = pairPattern.exec(raw)) !== null) {
-                codedPairs.push(`${match[1].trim()} = ${match[2].trim()}`);
-            }
-
-            if (codedPairs.length >= 2) return codedPairs;
-
-            const explicitChoiceWords =
-                /(visa|mastercard|amex|american express|local|internacional|credito|crédito|debito|débito|prepago|corporativo)/i;
-
-            if (explicitChoiceWords.test(raw) && /[,;|\n]/.test(raw)) {
-                return raw
-                    .split(/\r?\n|;|\| |,(?=\s*[A-Za-zÁÉÍÓÚáéíóú])/)
-                    .map((item) => item.trim())
-                    .filter(Boolean);
-            }
-
-            const slashChoices = raw
-                .split(/\s+\/\s+/)
-                .map((item) => item.trim())
-                .filter(Boolean);
-
-            if (
-                slashChoices.length >= 2 &&
-                slashChoices.length <= 12 &&
-                slashChoices.every((item) => item.length <= 55)
-            ) {
-                return slashChoices;
-            }
-
+            const pairs=[];
+            const pairPattern=/(?:^|[\/|;,\n])\s*([A-Za-z0-9]{1,5})\s*=\s*([^\/|;,\n]+)/g;
+            while ((match=pairPattern.exec(raw))!==null) pairs.push(`${match[1].trim()} = ${match[2].trim()}`);
+            if (pairs.length>=2) return pairs;
+            const products=raw.match(/(?:visa|mastercard|american express|amex|local|internacional)\s+(?:cr[eé]dito|d[eé]bito|prepago|corporativo)/gi);
+            if (products?.length) return [...new Set(products.map(v=>v.trim()))];
+            if (/(visa|mastercard|amex|credito|crédito|debito|débito|prepago|corporativo)/i.test(raw) && /[,;|\n]/.test(raw))
+                return raw.split(/\r?\n|;|\||,(?=\s*[A-Za-zÁÉÍÓÚáéíóú])/).map(cleanAllowedValuesText).filter(Boolean);
             return [];
         }
-
         function inputKind(parameter) {
             const name = normalize(parameter.name);
 
@@ -875,38 +879,21 @@
 
         function buildInput(parameter) {
             const choices = productFilteredChoices(parameter);
-
             if (choices.length) {
+                const instruction = choices.length <= 3
+                    ? `Seleccione: ${choices.join(" / ")}`
+                    : `Seleccione una de ${choices.length} opciones permitidas`;
                 return `
                     <select data-entry-id="${escapeHtml(parameter.id)}">
-                        <option value="">Seleccione un valor</option>
-                        ${choices.map((value) => `
-                            <option value="${escapeHtml(value)}">${escapeHtml(value)}</option>
-                        `).join("")}
+                        <option value="">${escapeHtml(instruction)}</option>
+                        ${choices.map(value => `<option value="${escapeHtml(value)}">${escapeHtml(value)}</option>`).join("")}
                     </select>
-                    <small class="validation-message"></small>
-                `;
+                    <small class="validation-message"></small>`;
             }
-
             const kind = inputKind(parameter);
-            const attributes = [
-                `type="${kind.type}"`,
-                kind.min !== undefined ? `min="${kind.min}"` : "",
-                kind.max !== undefined ? `max="${kind.max}"` : "",
-                kind.step !== undefined ? `step="${kind.step}"` : ""
-            ].filter(Boolean).join(" ");
-
-            return `
-                <input
-                    ${attributes}
-                    data-entry-id="${escapeHtml(parameter.id)}"
-                    data-validation-reason="${escapeHtml(kind.reason)}"
-                    placeholder="Digite el valor solicitado"
-                >
-                <small class="validation-message"></small>
-            `;
+            const attributes = [`type="${kind.type}"`, kind.min!==undefined?`min="${kind.min}"`:"", kind.max!==undefined?`max="${kind.max}"`:"", kind.step!==undefined?`step="${kind.step}"`:""].filter(Boolean).join(" ");
+            return `<input ${attributes} data-entry-id="${escapeHtml(parameter.id)}" data-validation-reason="${escapeHtml(kind.reason)}" placeholder="Digite el valor solicitado"><small class="validation-message"></small>`;
         }
-
         function renderParameters() {
             const selectedProduct = document.getElementById("productFilter").value;
 
@@ -966,9 +953,9 @@
                                 <div class="parameter-name">
                                     <strong>
                                         <span class="collapse-indicator">${collapsed ? "▶" : "▼"}</span>
-                                        ${escapeHtml(parameter.name)}
+                                        ${highlightSearch(parameter.name)}
                                     </strong>
-                                    <small>${escapeHtml(parameter.product || "Todos")}</small>
+                                    <small>${highlightSearch(parameter.product || "Todos")}</small>
                                 </div>
                                 <button
                                     class="parameter-help"
@@ -1277,36 +1264,42 @@
         }
 
         function exportExcel() {
-            const payload = requestPayload();
-            const rows = allParameters
-                .filter((parameter) => parameter.value)
-                .map((parameter) => ({
-                    Opción: currentOption,
-                    Parámetro: parameter.name,
-                    Producto: parameter.product,
-                    Valor: parameter.value
-                }));
-
-            const workbook = XLSX.utils.book_new();
-            const headerSheet = XLSX.utils.json_to_sheet([{
-                Cliente: payload.cliente,
-                Emisor: payload.emisor,
-                Acción: payload.accion,
-                Producto: payload.producto,
-                "Fecha de solicitud": payload.fechaSolicitud,
-                "Fecha requerida": payload.fechaRequerida
-            }]);
-            const parameterSheet = XLSX.utils.json_to_sheet(rows);
-
-            XLSX.utils.book_append_sheet(workbook, headerSheet, "Solicitud");
-            XLSX.utils.book_append_sheet(workbook, parameterSheet, "Parámetros");
-            XLSX.writeFile(workbook, `${payload.id}_op${currentOption}.xlsx`);
+            if (!validateHeader()) return;
+            const payload=requestPayload();
+            const selected=allParameters.filter(parameter=>parameter.value);
+            const rows=[
+                ["EVERTEC COSTA RICA"],
+                ["Parámetros del emisor - TRT08SN0"],
+                [`OPC${currentOption} ${optionName(currentOption)}`],
+                ["OPE-PA-FO-003"],[],
+                ["Cliente",payload.cliente,"Fecha de solicitud",payload.fechaSolicitud],
+                ["Emisor",payload.emisor,"Acción por realizar",payload.accion],
+                ["Producto",payload.producto,"Fecha y hora requerida",payload.fechaRequerida||""],[],
+                ["N.º","Parámetro","Producto","Valor solicitado"],
+                ...selected.map((parameter,index)=>[index+1,parameter.name,parameter.product,parameter.value])
+            ];
+            const worksheet=XLSX.utils.aoa_to_sheet(rows);
+            worksheet["!merges"]=[0,1,2,3].map(r=>({s:{r,c:0},e:{r,c:3}}));
+            worksheet["!cols"]=[{wch:8},{wch:48},{wch:24},{wch:34}];
+            const workbook=XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook,worksheet,"Formulario");
+            XLSX.writeFile(workbook,`${payload.id}_op${currentOption}.xlsx`);
         }
-
         function exportPdf() {
+            if (!validateHeader()) return;
+            const originalTitle=document.title;
+            const payload=requestPayload();
+            const cards=Array.from(document.querySelectorAll(".parameter-card"));
+            cards.forEach(card=>{
+                const parameter=allParameters.find(item=>String(item.id)===String(card.dataset.cardId));
+                card.dataset.printHidden=card.style.display||"";
+                if (!parameter?.value) card.style.display="none";
+            });
+            document.title=`${payload.id}_OP${currentOption}`;
             window.print();
+            document.title=originalTitle;
+            cards.forEach(card=>{card.style.display=card.dataset.printHidden||"";delete card.dataset.printHidden;});
         }
-
         document.getElementById("optionsMenu").addEventListener("click", (event) => {
             const button = event.target.closest("[data-option]");
             if (button) loadOption(button.dataset.option);
