@@ -1578,6 +1578,111 @@
             );
         }
 
+
+
+        document
+            .getElementById("optionsMenu")
+            .addEventListener(
+                "click",
+                function(event) {
+                    const button = event.target.closest("[data-option]");
+
+                    if (button) {
+                        loadOption(button.dataset.option);
+                    }
+                }
+            );
+
+        document
+            .getElementById("productFilter")
+            .addEventListener(
+                "change",
+                renderParameters
+            );
+
+        document
+            .getElementById("parameterSearchInput")
+            .addEventListener(
+                "input",
+                renderParameters
+            );
+
+        document
+            .getElementById("parameterSearchForm")
+            .addEventListener(
+                "submit",
+                function(event) {
+                    event.preventDefault();
+                    renderParameters();
+
+                    document
+                        .querySelector(".parameter-card")
+                        ?.scrollIntoView(
+                            {
+                                behavior: "smooth",
+                                block: "center"
+                            }
+                        );
+                }
+            );
+
+        document
+            .getElementById("hideAllButton")
+            .addEventListener(
+                "click",
+                function() {
+                    visibleParameters.forEach(
+                        function(parameter) {
+                            collapsedCards.add(parameter.id);
+                        }
+                    );
+
+                    renderParameters();
+                }
+            );
+
+        document
+            .getElementById("showAllButton")
+            .addEventListener(
+                "click",
+                function() {
+                    collapsedCards.clear();
+                    renderParameters();
+                }
+            );
+
+        document
+            .getElementById("exportExcelButton")
+            .addEventListener(
+                "click",
+                exportExcel
+            );
+
+        document
+            .getElementById("exportPdfButton")
+            .addEventListener(
+                "click",
+                exportPdf
+            );
+
+        document
+            .getElementById("saveButton")
+            .addEventListener(
+                "click",
+                saveRequest
+            );
+
+        const now = new Date();
+
+        const localDate = new Date(
+            now.getTime() - now.getTimezoneOffset() * 60000
+        );
+
+        document.getElementById("requestDate").value =
+            localDate.toISOString().slice(0, 10);
+
+        buildOptionsMenu();
+        loadOption(currentOption);
     </script>
 </body>
 </html>
