@@ -1,1773 +1,1877 @@
-<!doctype html> 
-<html lang="es"> 
-  <head> 
-    <meta charset="UTF-8" /> 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /> 
-    <title>Parámetros del Emisor - Visor</title> 
-    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script> 
-    <style> 
-      :root { 
-        --naranja: #ff6c0c; 
-        --gris: #4f4f4f; 
-        --fondo: #f2f2f2; 
-        --borde: #d9d9d9; 
-        --azul: #2457a7; 
-      } 
- 
-      * { 
-        box-sizing: border-box; 
-      } 
- 
-      body { 
-        margin: 0; 
-        background: var(--fondo); 
-        color: #333; 
-        font-family: "Segoe UI", Arial, sans-serif; 
-      } 
- 
-      button, 
-      input, 
-      textarea, 
-      select { 
-        font: inherit; 
-      } 
- 
-      button { 
-        cursor: pointer; 
-      } 
- 
-      .encabezado { 
-        display: flex; 
-        justify-content: space-between; 
-        align-items: center; 
-        gap: 12px; 
-        flex-wrap: wrap; 
-        padding: 13px 22px; 
-        background: white; 
-        border-bottom: 1px solid var(--borde); 
-      } 
- 
-      .encabezado h1 { 
-        margin: 0; 
-        color: var(--naranja); 
-        font-size: 34px; 
-        font-weight: 300; 
-      } 
- 
-      .subtitulo { 
-        color: #666; 
-        font-size: 13px; 
-      } 
- 
-      .acciones, 
-      .pestanas { 
-        display: flex; 
-        gap: 8px; 
-        flex-wrap: wrap; 
-        align-items: center; 
-      } 
- 
-      .boton { 
-        padding: 9px 13px; 
-        border: 0; 
-        border-radius: 8px; 
-        background: var(--gris); 
-        color: white; 
-        font-weight: 750; 
-      } 
- 
-      .boton-naranja { 
-        background: var(--naranja); 
-      } 
- 
-      .selector-idioma { 
-        display: flex; 
-        overflow: hidden; 
-        border: 1px solid var(--borde); 
-        border-radius: 999px; 
-        background: white; 
-      } 
- 
-      .selector-idioma button { 
-        padding: 8px 13px; 
-        border: 0; 
-        background: transparent; 
-        color: var(--gris); 
-        font-weight: 800; 
-      } 
- 
-      .selector-idioma button.activo { 
-        background: var(--naranja); 
-        color: white; 
-      } 
- 
-      .pestanas { 
-        padding: 10px 22px; 
-        background: white; 
-        border-bottom: 1px solid var(--borde); 
-      } 
- 
-      .pestana { 
-        padding: 9px 21px; 
-        border: 1px solid #ccc; 
-        border-radius: 999px; 
-        background: white; 
-        color: var(--gris); 
-        font-weight: 800; 
-      } 
- 
-      .pestana.activa { 
-        border-color: var(--gris); 
-        background: var(--gris); 
-        color: white; 
-      } 
- 
-      .menu-opciones { 
-        display: grid; 
-        grid-template-columns: repeat(10, minmax(0, 1fr)); 
-        gap: 4px; 
-        padding: 7px 22px; 
-        background: #fafafa; 
-        border-bottom: 1px solid var(--borde); 
-      } 
- 
-      .opcion { 
-        height: 26px; 
-        overflow: hidden; 
-        padding: 3px 5px; 
-        border: 1px solid #ccc; 
-        border-radius: 14px; 
-        background: white; 
-        color: var(--gris); 
-        font-size: 9.5px; 
-        font-weight: 750; 
-        text-overflow: ellipsis; 
-        white-space: nowrap; 
-      } 
- 
-      .opcion.activa { 
-        border-color: var(--naranja); 
-        background: var(--naranja); 
-        color: white; 
-      } 
- 
-      .filtros { 
-        position: sticky; 
-        top: 0; 
-        z-index: 80; 
-        display: grid; 
-        grid-template-columns: 2fr 1fr 1fr auto auto auto; 
-        gap: 8px; 
-        padding: 12px 22px; 
-      } 
- 
-      input, 
-      textarea { 
-        width: 100%; 
-        padding: 10px; 
-        border: 1px solid var(--borde); 
-        border-radius: 8px; 
-        background: white; 
-      } 
- 
-      .estado, 
-      .titulo-opcion { 
-        padding: 5px 22px; 
-      } 
- 
-      .estado { 
-        color: #666; 
-        font-size: 13px; 
-      } 
- 
-      .estado.error { 
-        color: #b42318; 
-      } 
- 
-      .titulo-opcion { 
-        margin: 0; 
-        color: #444; 
-        font-size: 25px; 
-        font-weight: 400; 
-      } 
- 
-      .contenido { 
-        padding: 10px 22px 90px; 
-      } 
- 
-      .ficha { 
-        margin-bottom: 14px; 
-        background: white; 
-        border: 1px solid var(--borde); 
-        box-shadow: 0 2px 7px #00000012; 
-      } 
- 
-      .ficha-encabezado { 
-        display: grid; 
-        grid-template-columns: 145px 1fr; 
-        border-bottom: 1px solid var(--borde); 
-      } 
- 
-      .codigo { 
-        display: flex; 
-        align-items: center; 
-        justify-content: center; 
-        padding: 10px; 
-        background: #595959; 
-        color: white; 
-        font-weight: 800; 
-      } 
- 
-      .nombre { 
-        padding: 10px 15px; 
-        color: var(--naranja); 
-        font-size: 24px; 
-        font-weight: 300;
-        cursor: pointer;
-        user-select: none;
-      }
-      .ficha.colapsada .ficha-encabezado {
-        border-bottom: 0;
-      }
-      .ficha.colapsada .cuadricula {
-        display: none;
-      }
-      .indicador-ficha {
-        display: inline-block;
-        width: 18px;
-        color: var(--gris);
-        font-size: 15px;
-        font-weight: 800;
-      } 
- 
-      .cuadricula { 
-        display: grid; 
-        grid-template-columns: repeat(3, minmax(0, 1fr)); 
-        gap: 9px; 
-        padding: 11px; 
-      } 
- 
-      .campo { 
-        min-height: 95px; 
-        padding: 10px; 
-        background: #fafafa; 
-        border: 1px solid #e5e5e5; 
-        border-top: 4px solid #bbb; 
-      } 
- 
-      .campo.ejemplo { 
-        background: #fff5ec; 
-      } 
- 
-      .etiqueta { 
-        margin-bottom: 7px; 
-        color: #444; 
-        font-size: 11px; 
-        font-weight: 850; 
-        text-transform: uppercase; 
-      } 
- 
-      .texto { 
-        line-height: 1.38; 
-        white-space: pre-wrap; 
-      } 
- 
-      mark { 
-        padding: 0 1px; 
-        background: #fff176; 
-        color: #000; 
-      } 
- 
-      .dep-ref-inline { 
-        padding: 0 2px; 
-        border-bottom: 2px solid var(--naranja); 
-        border-radius: 3px; 
-        background: #fff0c2; 
-        color: #8a3b00; 
-        font-weight: 800; 
-        text-decoration: none; 
-      } 
- 
-      .sin-resultados { 
-        padding: 28px; 
-        background: white; 
-        border: 1px dashed var(--borde); 
-        text-align: center; 
-      } 
- 
-      .boton-preguntas { 
-        position: fixed; 
-        right: 22px; 
-        bottom: 22px; 
-        z-index: 90; 
-        padding: 12px 18px; 
-        border: 0; 
-        border-radius: 999px; 
-        background: var(--naranja); 
-        color: white; 
-        font-weight: 850; 
-        box-shadow: 0 8px 25px #0004; 
-      } 
- 
-      .panel-preguntas { 
-        position: fixed; 
-        right: 22px; 
-        bottom: 78px; 
-        z-index: 100; 
-        width: min(430px, calc(100vw - 28px)); 
-        max-height: min(650px, calc(100vh - 100px)); 
-        overflow: hidden; 
-        border: 1px solid var(--borde); 
-        border-radius: 16px; 
-        background: white; 
-        box-shadow: 0 16px 45px #0005; 
-      } 
- 
-      .panel-preguntas[hidden] { 
-        display: none; 
-      } 
- 
-      .panel-cabecera { 
-        display: flex; 
-        align-items: center; 
-        justify-content: space-between; 
-        gap: 8px; 
-        padding: 12px 14px; 
-        background: var(--naranja); 
-        color: white; 
-        cursor: move; 
-        user-select: none; 
-      } 
- 
-      .panel-cabecera h2 { 
-        margin: 0; 
-        font-size: 18px; 
-      } 
- 
-      .panel-cabecera button { 
-        border: 0; 
-        background: transparent; 
-        color: white; 
-        font-size: 22px; 
-      } 
- 
-      .panel-cuerpo { 
-        max-height: 565px; 
-        overflow-y: auto; 
-        padding: 14px; 
-      } 
- 
-      .faq-grid { 
-        display: grid; 
-        gap: 7px; 
-        margin-bottom: 13px; 
-      } 
- 
-      .faq { 
-        padding: 9px; 
-        border: 1px solid var(--borde); 
-        border-radius: 9px; 
-        background: #fafafa; 
-        color: #333; 
-        text-align: left; 
-      } 
- 
-      .respuesta { 
-        margin-top: 12px; 
-        padding: 11px; 
-        border-radius: 10px; 
-        background: #fff7f0; 
-        line-height: 1.4; 
-      } 
- 
-      .recomendacion { 
-        display: block; 
-        width: 100%; 
-        margin: 7px 0; 
-        padding: 9px; 
-        border: 1px solid #ffd1ad; 
-        border-radius: 9px; 
-        background: white; 
-        color: #333; 
-        text-align: left; 
-      } 
- 
-      .recomendacion strong { 
-        color: var(--naranja); 
-      } 
- 
-      .nota-ia { 
-        margin-top: 8px; 
-        color: #666; 
-        font-size: 11px; 
-      } 
- 
-      .tarjeta-flotante {
-        position: fixed;
-        z-index: 160;
-        display: none;
-        width: 460px;
-        max-width: calc(100vw - 24px);
-        max-height: min(460px, calc(100vh - 24px));
-        overflow: hidden;
-        padding: 0;
-        background: white;
-        border: 1px solid var(--borde);
-        border-radius: 16px;
-        box-shadow: 0 16px 42px #0005;
-        font-size: 14px;
-      }
+<!DOCTYPE html>
+<html lang="es">
 
-      .vista-previa-encabezado {
-        padding: 14px 16px 10px;
-        border-bottom: 1px solid #ececec;
-        background: white;
-      }
+<head>
+    <meta charset="UTF-8">
 
-      .tarjeta-flotante h4 {
-        margin: 0 0 5px;
-        color: var(--naranja);
-        font-size: 19px;
-        line-height: 1.2;
-      }
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
-      .vista-previa-meta {
-        margin: 0;
-        color: #666;
-        font-size: 13px;
-        line-height: 1.3;
-      }
+    <meta
+        name="description"
+        content="Centro de Servicios Siscard+"
+    >
 
-      .vista-previa-contenido {
-        max-height: 330px;
-        overflow-y: auto;
-        padding: 10px 16px;
-        scrollbar-width: thin;
-      }
+    <title>
+        Landing Siscard+
+    </title>
 
-      .vista-previa-campo {
-        padding: 2px 0;
-        border-bottom: 0;
-        line-height: 1.3;
-        white-space: pre-wrap;
-      }
+    <link
+        rel="stylesheet"
+        href="css/styles.css"
+    >
 
-      .vista-previa-campo b {
-        display: inline;
-        margin: 0;
-        color: var(--gris);
-      }
-
-      .acciones-flotantes {
-        position: sticky;
-        bottom: 0;
-        margin: 0;
-        padding: 10px 16px 14px;
-        border-top: 1px solid #ececec;
-        background: white;
-      }
-
-      .acciones-flotantes .boton {
-        padding: 9px 14px;
-      }
-
-      @media (max-width: 1050px) { 
-        .menu-opciones { 
-          grid-template-columns: repeat(8, 1fr); 
-        } 
-        .cuadricula { 
-          grid-template-columns: 1fr 1fr; 
-        } 
-      } 
- 
-      @media (max-width: 720px) { 
-        .menu-opciones { 
-          grid-template-columns: repeat(4, 1fr); 
-        } 
-        .filtros, 
-        .cuadricula { 
-          grid-template-columns: 1fr; 
-        } 
-        .ficha-encabezado { 
-          grid-template-columns: 90px 1fr; 
-        } 
-      } 
-
-
-      /* Integración visual con Landing Siscard+ */
-      .app-shell {
-        min-height: 100vh;
-        display: grid;
-        grid-template-columns: 248px minmax(0, 1fr);
-      }
-
-      .sidebar {
-        position: sticky;
-        top: 0;
-        height: 100vh;
-        overflow-y: auto;
-        padding: 18px 14px;
-        background: #58595b;
-        color: white;
-      }
-
-      .brand {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        padding: 4px 6px 18px;
-        border-bottom: 1px solid #707174;
-      }
-
-      .brand-mark {
-        width: 10px;
-        height: 46px;
-        border-radius: 999px;
-        background: var(--naranja);
-      }
-
-      .brand-copy strong,
-      .brand-copy small {
-        display: block;
-      }
-
-      .brand-copy strong {
-        font-size: 21px;
-        font-weight: 400;
-      }
-
-      .brand-copy strong span {
-        color: var(--naranja);
-      }
-
-      .brand-copy small {
-        margin-top: 3px;
-        color: #d7d7d7;
-        font-size: 11px;
-      }
-
-      .side-nav {
-        display: grid;
-        gap: 5px;
-        margin-top: 14px;
-      }
-
-      .nav-label {
-        margin: 13px 8px 5px;
-        color: #bababa;
-        font-size: 10px;
-        font-weight: 800;
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
-      }
-
-      .nav-link {
-        display: grid;
-        grid-template-columns: 30px minmax(0, 1fr);
-        gap: 7px;
-        align-items: center;
-        min-height: 42px;
-        padding: 8px 10px;
-        border-radius: 7px;
-        color: #f6f6f6;
-        font-size: 13px;
-        font-weight: 700;
-        text-decoration: none;
-      }
-
-      .nav-link:hover {
-        background: #66676a;
-      }
-
-      .nav-link.active {
-        background: var(--naranja);
-        color: white;
-      }
-
-      .nav-icon {
-        display: grid;
-        place-items: center;
-        font-size: 18px;
-      }
-
-      .side-note {
-        margin-top: 22px;
-        padding: 12px;
-        border: 1px solid #727376;
-        border-top: 4px solid var(--naranja);
-        border-radius: 7px;
-        background: #505153;
-      }
-
-      .side-note strong {
-        font-size: 12px;
-      }
-
-      .side-note p {
-        margin: 5px 0 0;
-        color: #d4d4d4;
-        font-size: 11px;
-        line-height: 1.4;
-      }
-
-      .viewer-area {
-        min-width: 0;
-      }
-
-      .portal-menu-button {
-        display: none;
-        margin-right: 10px;
-        padding: 8px 10px;
-        border: 1px solid var(--borde);
-        border-radius: 7px;
-        background: white;
-        color: var(--gris);
-      }
-
-      @media (max-width: 900px) {
-        .app-shell {
-          grid-template-columns: 1fr;
+    <style>
+        .service-hero
+        {
+            display: grid;
+            grid-template-columns: minmax(0, 1.25fr) minmax(290px, 0.75fr);
+            gap: 24px;
+            align-items: center;
+            padding: 32px;
+            border: 1px solid #4a4b4d;
+            border-radius: var(--radius-large);
+            background:
+                linear-gradient(
+                    120deg,
+                    #4f5052 0%,
+                    #58595b 62%,
+                    #694a39 100%
+                );
+            color: #ffffff;
+            box-shadow: var(--shadow-medium);
         }
 
-        .sidebar {
-          position: fixed;
-          left: -270px;
-          z-index: 300;
-          width: 248px;
-          transition: left 0.25s ease;
+        .service-hero h1
+        {
+            margin: 8px 0 12px;
+            color: #ffffff;
+            font-size: clamp(36px, 4vw, 54px);
+            font-weight: 300;
+            line-height: 1.05;
         }
 
-        .sidebar.open {
-          left: 0;
+        .service-hero p
+        {
+            max-width: 760px;
+            margin: 0;
+            color: #eeeeee;
+            line-height: 1.6;
         }
 
-        .portal-menu-button {
-          display: inline-flex;
+        .hero-actions
+        {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 9px;
+            margin-top: 20px;
         }
-      }
-    </style> 
-  </head> 
-  <body>
+
+        .hero-button
+        {
+            min-height: 40px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 9px 16px;
+            border: 1px solid #9f9f9f;
+            border-radius: var(--radius-small);
+            background: #ffffff;
+            color: #4f4f4f;
+            font-weight: 750;
+        }
+
+        .hero-button.primary
+        {
+            border-color: #e55d00;
+            background: #ff6c0c;
+            color: #ffffff;
+        }
+
+        .guide-launch-card
+        {
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.22);
+            border-top: 4px solid #ff6c0c;
+            border-radius: var(--radius);
+            background: rgba(255, 255, 255, 0.10);
+        }
+
+        .guide-launch-card span,
+        .guide-launch-card strong
+        {
+            display: block;
+        }
+
+        .guide-launch-card span
+        {
+            color: #ffd0b0;
+            font-size: 11px;
+            font-weight: 850;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .guide-launch-card strong
+        {
+            margin: 7px 0;
+            font-size: 26px;
+            font-weight: 400;
+        }
+
+        .guide-launch-card p
+        {
+            color: #eeeeee;
+            font-size: 13px;
+        }
+
+        .guide-launch-card button
+        {
+            width: 100%;
+            margin-top: 15px;
+        }
+
+        .service-toolbar
+        {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: 12px;
+            margin-top: 14px;
+            padding: 13px;
+            border: 1px solid var(--line);
+            background: #ffffff;
+            box-shadow: var(--shadow-small);
+        }
+
+        .service-search
+        {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: 8px;
+        }
+
+        .service-search input
+        {
+            width: 100%;
+            padding: 10px;
+        }
+
+        .toolbar-context
+        {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        .modules-grid
+        {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 12px;
+        }
+
+        .module-card
+        {
+            position: relative;
+            min-height: 165px;
+            padding: 17px;
+            border: 1px solid var(--line);
+            border-top: 4px solid #b7b7b7;
+            border-radius: var(--radius);
+            background: #ffffff;
+            box-shadow: var(--shadow-small);
+            transition: var(--transition);
+        }
+
+        .module-card:hover,
+        .module-card.search-match
+        {
+            border-top-color: var(--orange);
+            background: #fffdfa;
+            box-shadow: var(--shadow-medium);
+            transform: translateY(-2px);
+        }
+
+        .module-icon
+        {
+            display: grid;
+            place-items: center;
+            width: 42px;
+            height: 42px;
+            border: 1px solid #ffd1ad;
+            border-radius: var(--radius);
+            background: var(--orange-soft);
+            color: var(--orange);
+            font-size: 21px;
+        }
+
+        .module-card strong,
+        .module-card small
+        {
+            display: block;
+        }
+
+        .module-card strong
+        {
+            margin: 11px 0 5px;
+            color: var(--sidebar);
+        }
+
+        .module-card small
+        {
+            color: var(--muted);
+            line-height: 1.45;
+        }
+
+        .module-card em
+        {
+            position: absolute;
+            right: 13px;
+            bottom: 10px;
+            color: var(--orange);
+            font-style: normal;
+            font-weight: 900;
+        }
+
+        .overview-grid
+        {
+            display: grid;
+            grid-template-columns: minmax(0, 1.2fr) minmax(300px, 0.8fr);
+            gap: 14px;
+        }
+
+        .activity-row
+        {
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            gap: 10px;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--line);
+        }
+
+        .activity-row:last-child
+        {
+            border-bottom: 0;
+        }
+
+        .activity-icon
+        {
+            display: grid;
+            place-items: center;
+            width: 37px;
+            height: 37px;
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+            background: var(--orange-soft);
+            color: var(--orange);
+        }
+
+        .activity-row small
+        {
+            display: block;
+            margin-top: 3px;
+            color: var(--muted);
+        }
+
+        .status-pill
+        {
+            padding: 5px 8px;
+            border-radius: 999px;
+            background: #e1f5ec;
+            color: var(--green);
+            font-size: 10px;
+            font-weight: 850;
+        }
+
+        .quick-list
+        {
+            display: grid;
+            gap: 8px;
+        }
+
+        .quick-link
+        {
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            gap: 10px;
+            align-items: center;
+            padding: 11px;
+            border: 1px solid var(--line);
+            background: var(--surface-soft);
+        }
+
+        .quick-link:hover
+        {
+            border-color: var(--orange);
+            background: var(--orange-soft);
+        }
+
+        .quick-link span:first-child
+        {
+            color: var(--orange);
+            font-size: 19px;
+        }
+
+        .quick-link em
+        {
+            color: var(--orange);
+            font-style: normal;
+            font-weight: 900;
+        }
+
+        .tour-overlay
+        {
+            position: fixed;
+            inset: 0;
+            z-index: 9998;
+            background: rgba(28, 28, 28, 0.66);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.28s ease;
+        }
+
+        .tour-overlay.active
+        {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .tour-highlight
+        {
+            position: fixed;
+            z-index: 9999;
+            border: 3px solid #ff6c0c;
+            border-radius: 10px;
+            box-shadow:
+                0 0 0 7px rgba(255, 108, 12, 0.18),
+                0 0 24px rgba(255, 108, 12, 0.62);
+            pointer-events: none;
+            transition:
+                top 0.38s ease,
+                left 0.38s ease,
+                width 0.38s ease,
+                height 0.38s ease;
+            animation: tourPulse 1.4s infinite;
+        }
+
+        .tour-highlight[hidden]
+        {
+            display: none;
+        }
+
+        @keyframes tourPulse
+        {
+            0%,
+            100%
+            {
+                box-shadow:
+                    0 0 0 5px rgba(255, 108, 12, 0.14),
+                    0 0 18px rgba(255, 108, 12, 0.50);
+            }
+
+            50%
+            {
+                box-shadow:
+                    0 0 0 10px rgba(255, 108, 12, 0.05),
+                    0 0 30px rgba(255, 108, 12, 0.72);
+            }
+        }
+
+        .tour-card
+        {
+            position: fixed;
+            z-index: 10000;
+            width: min(390px, calc(100vw - 28px));
+            overflow: hidden;
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            background: #ffffff;
+            box-shadow: 0 18px 50px rgba(0, 0, 0, 0.32);
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(8px);
+            transition:
+                opacity 0.24s ease,
+                transform 0.24s ease,
+                top 0.38s ease,
+                left 0.38s ease;
+        }
+
+        .tour-card.active
+        {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateY(0);
+        }
+
+        .tour-card-header
+        {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 14px;
+            background: #58595b;
+            color: #ffffff;
+        }
+
+        .tour-card-header strong
+        {
+            font-weight: 650;
+        }
+
+        .tour-card-header button
+        {
+            border: 0;
+            background: transparent;
+            color: #ffffff;
+            font-size: 21px;
+        }
+
+        .tour-card-body
+        {
+            padding: 16px;
+        }
+
+        .tour-step-label
+        {
+            color: var(--orange);
+            font-size: 11px;
+            font-weight: 850;
+            text-transform: uppercase;
+        }
+
+        .tour-card h2
+        {
+            margin: 6px 0 8px;
+            color: var(--sidebar);
+            font-size: 24px;
+            font-weight: 400;
+        }
+
+        .tour-card p
+        {
+            margin: 0;
+            color: var(--muted);
+            line-height: 1.5;
+        }
+
+        .tour-progress
+        {
+            height: 6px;
+            margin: 14px 0;
+            overflow: hidden;
+            border-radius: 999px;
+            background: #e5e5e5;
+        }
+
+        .tour-progress span
+        {
+            display: block;
+            height: 100%;
+            width: 0;
+            background: var(--orange);
+            transition: width 0.35s ease;
+        }
+
+        .tour-actions
+        {
+            display: flex;
+            justify-content: space-between;
+            gap: 8px;
+        }
+
+        .tour-actions-group
+        {
+            display: flex;
+            gap: 8px;
+        }
+
+        .tour-button
+        {
+            min-height: 38px;
+            padding: 8px 13px;
+            border: 1px solid var(--line-strong);
+            border-radius: var(--radius-small);
+            background: #ffffff;
+            color: var(--ink);
+            font-weight: 750;
+        }
+
+        .tour-button.primary
+        {
+            border-color: var(--orange-dark);
+            background: var(--orange);
+            color: #ffffff;
+        }
+
+        .tour-button:disabled
+        {
+            opacity: 0.45;
+            cursor: not-allowed;
+        }
+
+        @media (max-width: 1180px)
+        {
+            .modules-grid
+            {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 900px)
+        {
+            .service-hero,
+            .overview-grid
+            {
+                grid-template-columns: 1fr;
+            }
+
+            .modules-grid
+            {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 650px)
+        {
+            .service-toolbar,
+            .service-search,
+            .modules-grid
+            {
+                grid-template-columns: 1fr;
+            }
+
+            .toolbar-context
+            {
+                justify-content: flex-start;
+            }
+
+            .tour-card
+            {
+                left: 14px !important;
+                right: 14px;
+                bottom: 14px;
+                top: auto !important;
+                width: auto;
+            }
+        }
+    </style>
+</head>
+
+<body>
     <div class="app-shell">
-      <aside
-        class="sidebar"
-        id="sidebar"
-        aria-label="Navegación principal"
-      >
-        <div class="brand">
-          <div class="brand-mark"></div>
+        <aside
+            class="sidebar"
+            id="sidebar"
+            data-tour="navigation"
+        >
+            <div class="brand">
+                <div class="brand-mark"></div>
 
-          <div class="brand-copy">
+                <div class="brand-copy">
+                    <strong>
+                        Landing
+                        <span>
+                            Siscard+
+                        </span>
+                    </strong>
+
+                    <small>
+                        Autogestión digital
+                    </small>
+                </div>
+            </div>
+
+            <nav class="side-nav">
+                <p class="nav-label">
+                    Principal
+                </p>
+
+                <a
+                    class="nav-link active"
+                    href="index.html"
+                >
+                    <span class="nav-icon">
+                        ⌂
+                    </span>
+
+                    <span>
+                        Inicio
+                    </span>
+                </a>
+
+                <p class="nav-label">
+                    Conocimiento
+                </p>
+
+                <a
+                    class="nav-link"
+                    href="manuales.html"
+                    data-tour="manuals"
+                >
+                    <span class="nav-icon">
+                        ▤
+                    </span>
+
+                    <span>
+                        Manuales
+                    </span>
+                </a>
+
+                <a
+                    class="nav-link"
+                    href="https://kiris25.github.io/parametros-emisor/"
+                    data-tour="parameters"
+                >
+                    <span class="nav-icon">
+                        ⚙
+                    </span>
+
+                    <span>
+                        Parámetros
+                    </span>
+                </a>
+
+                <a
+                    class="nav-link"
+                    href="formularios.html"
+                    data-tour="forms"
+                >
+                    <span class="nav-icon">
+                        ▧
+                    </span>
+
+                    <span>
+                        Formularios
+                    </span>
+                </a>
+
+                <a
+                    class="nav-link"
+                    href="landing-ia.html"
+                    data-tour="ai"
+                >
+                    <span class="nav-icon">
+                        ✦
+                    </span>
+
+                    <span>
+                        Landing IA
+                    </span>
+                </a>
+
+                <p class="nav-label">
+                    Gestión
+                </p>
+
+                <a
+                    class="nav-link"
+                    href="seguridad.html"
+                    data-tour="security"
+                >
+                    <span class="nav-icon">
+                        🔐
+                    </span>
+
+                    <span>
+                        Seguridad
+                    </span>
+                </a>
+
+                <a
+                    class="nav-link"
+                    href="aprobaciones.html"
+                    data-tour="approvals"
+                >
+                    <span class="nav-icon">
+                        ✓
+                    </span>
+
+                    <span>
+                        Aprobaciones
+                    </span>
+                </a>
+
+                <a
+                    class="nav-link"
+                    href="mis-solicitudes.html"
+                    data-tour="requests"
+                >
+                    <span class="nav-icon">
+                        ◷
+                    </span>
+
+                    <span>
+                        Mis solicitudes
+                    </span>
+                </a>
+
+                <a
+                    class="nav-link"
+                    href="comunicados.html"
+                    data-tour="communications"
+                >
+                    <span class="nav-icon">
+                        ◉
+                    </span>
+
+                    <span>
+                        Comunicados
+                    </span>
+                </a>
+            </nav>
+
+            <div class="side-note">
+                <strong>
+                    Centro de Servicios
+                </strong>
+
+                <p>
+                    Acceso unificado a los servicios disponibles en Siscard+.
+                </p>
+            </div>
+        </aside>
+
+        <div class="main-area">
+            <header class="topbar">
+                <button
+                    class="menu-button"
+                    id="menuButton"
+                    type="button"
+                    aria-label="Abrir menú"
+                >
+                    ☰
+                </button>
+
+                <div class="top-title">
+                    <strong>
+                        Centro de Servicios Siscard+
+                    </strong>
+
+                    <small>
+                        Acceso y autogestión
+                    </small>
+                </div>
+
+                <div class="top-actions">
+                    <button
+                        class="help-button"
+                        id="topGuideButton"
+                        type="button"
+                    >
+                        ? Ver guía rápida
+                    </button>
+
+                    <button
+                        class="profile-button"
+                        id="profileButton"
+                        type="button"
+                    >
+                        <span class="avatar">
+                            CL
+                        </span>
+
+                        <span class="profile-copy">
+                            <strong>
+                                Cliente Siscard+
+                            </strong>
+
+                            <small>
+                                Portal de servicios
+                            </small>
+                        </span>
+                    </button>
+                </div>
+
+                <div
+                    class="profile-menu"
+                    id="profileMenu"
+                    hidden
+                >
+                    <button type="button">
+                        Mi perfil
+                    </button>
+                </div>
+            </header>
+
+            <main class="content">
+                <section
+                    class="service-hero"
+                    data-tour="welcome"
+                >
+                    <div>
+                        <span class="eyebrow">
+                            Centro de Servicios Siscard+
+                        </span>
+
+                        <h1>
+                            Acceso directo a los servicios Siscard+
+                        </h1>
+
+                        <p>
+                            Consulte documentación, acceda al visor de parámetros,
+                            gestione servicios de seguridad y revise las novedades
+                            disponibles desde una única plataforma.
+                        </p>
+
+                        <div class="hero-actions">
+                            <a
+                                class="hero-button primary"
+                                href="#modules"
+                            >
+                                Explorar servicios
+                            </a>
+
+                            <button
+                                class="hero-button"
+                                id="heroGuideButton"
+                                type="button"
+                            >
+                                ▶ Iniciar guía rápida
+                            </button>
+                        </div>
+                    </div>
+
+                    <aside
+                        class="guide-launch-card"
+                        data-tour="guide-launch"
+                    >
+                        <span>
+                            Primera vez en Siscard+
+                        </span>
+
+                        <strong>
+                            Conozca el portal paso a paso
+                        </strong>
+
+                        <p>
+                            Reproduzca el recorrido que se mostrará automáticamente
+                            durante el primer ingreso de un cliente.
+                        </p>
+
+                        <button
+                            class="primary-button"
+                            id="cardGuideButton"
+                            type="button"
+                        >
+                            Iniciar recorrido
+                        </button>
+                    </aside>
+                </section>
+
+                <section class="service-toolbar">
+                    <form
+                        class="service-search"
+                        id="serviceSearchForm"
+                    >
+                        <input
+                            id="serviceSearchInput"
+                            type="search"
+                            placeholder="Buscar un servicio..."
+                        >
+
+                        <button
+                            class="primary-button"
+                            type="submit"
+                        >
+                            Buscar
+                        </button>
+                    </form>
+
+                    <div class="toolbar-context">
+                        <span>
+                            Estado:
+                        </span>
+
+                        <strong>
+                            Portal disponible
+                        </strong>
+                    </div>
+                </section>
+
+                <section
+                    class="section"
+                    id="modules"
+                    data-tour="modules"
+                >
+                    <div class="section-heading">
+                        <div>
+                            <span class="section-kicker">
+                                Servicios
+                            </span>
+
+                            <h2>
+                                Módulos disponibles
+                            </h2>
+
+                            <p>
+                                Seleccione el servicio que desea utilizar.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="modules-grid">
+                        <a
+                            class="module-card"
+                            href="manuales.html"
+                            data-search="manuales documentos guías documentación"
+                        >
+                            <span class="module-icon">
+                                ▤
+                            </span>
+
+                            <strong>
+                                Manuales
+                            </strong>
+
+                            <small>
+                                Consulte documentación funcional, operativa y técnica.
+                            </small>
+
+                            <em>
+                                →
+                            </em>
+                        </a>
+
+                        <a
+                            class="module-card"
+                            href="https://kiris25.github.io/parametros-emisor/"
+                            data-search="parámetros emisor visor configuraciones"
+                        >
+                            <span class="module-icon">
+                                ⚙
+                            </span>
+
+                            <strong>
+                                Parámetros
+                            </strong>
+
+                            <small>
+                                Acceda al visor real de Parámetros del Emisor.
+                            </small>
+
+                            <em>
+                                →
+                            </em>
+                        </a>
+
+                        <a
+                            class="module-card"
+                            href="formularios.html"
+                            data-search="formularios parámetros solicitudes gestión"
+                        >
+                            <span class="module-icon">
+                                ▧
+                            </span>
+
+                            <strong>
+                                Formularios
+                            </strong>
+
+                            <small>
+                                Complete formularios basados en las opciones de parámetros.
+                            </small>
+
+                            <em>
+                                →
+                            </em>
+                        </a>
+
+                        <a
+                            class="module-card"
+                            href="seguridad.html"
+                            data-search="seguridad usuarios grupos accesos"
+                        >
+                            <span class="module-icon">
+                                🔐
+                            </span>
+
+                            <strong>
+                                Seguridad
+                            </strong>
+
+                            <small>
+                                Gestione usuarios, grupos y mantenimiento de accesos.
+                            </small>
+
+                            <em>
+                                →
+                            </em>
+                        </a>
+
+                        <a
+                            class="module-card"
+                            href="aprobaciones.html"
+                            data-search="aprobaciones revisión solicitudes formularios"
+                        >
+                            <span class="module-icon">
+                                ✓
+                            </span>
+
+                            <strong>
+                                Aprobaciones
+                            </strong>
+
+                            <small>
+                                Revise formularios y solicitudes pendientes de aprobación.
+                            </small>
+
+                            <em>
+                                →
+                            </em>
+                        </a>
+
+                        <a
+                            class="module-card"
+                            href="mis-solicitudes.html"
+                            data-search="mis solicitudes seguimiento estados formularios usuarios"
+                        >
+                            <span class="module-icon">
+                                ◷
+                            </span>
+
+                            <strong>
+                                Mis solicitudes
+                            </strong>
+
+                            <small>
+                                Consulte el estado de formularios y gestiones registradas.
+                            </small>
+
+                            <em>
+                                →
+                            </em>
+                        </a>
+
+                        <a
+                            class="module-card"
+                            href="landing-ia.html"
+                            data-search="landing ia asistente consultas ayuda"
+                        >
+                            <span class="module-icon">
+                                ✦
+                            </span>
+
+                            <strong>
+                                Landing IA
+                            </strong>
+
+                            <small>
+                                Realice consultas y localice servicios relacionados.
+                            </small>
+
+                            <em>
+                                →
+                            </em>
+                        </a>
+
+                        <a
+                            class="module-card"
+                            href="comunicados.html"
+                            data-search="comunicados noticias avisos novedades"
+                        >
+                            <span class="module-icon">
+                                ◉
+                            </span>
+
+                            <strong>
+                                Comunicados
+                            </strong>
+
+                            <small>
+                                Revise avisos, novedades y actualizaciones publicadas.
+                            </small>
+
+                            <em>
+                                →
+                            </em>
+                        </a>
+                    </div>
+                </section>
+
+                <section class="section overview-grid">
+                    <div class="panel">
+                        <div class="panel-heading">
+                            <div>
+                                <span class="section-kicker">
+                                    Actividad
+                                </span>
+
+                                <h2>
+                                    Novedades recientes
+                                </h2>
+                            </div>
+                        </div>
+
+                        <article class="activity-row">
+                            <span class="activity-icon">
+                                ▤
+                            </span>
+
+                            <div>
+                                <strong>
+                                    Centro Documental disponible
+                                </strong>
+
+                                <small>
+                                    Manuales organizados por categoría y producto.
+                                </small>
+                            </div>
+
+                            <span class="status-pill">
+                                Disponible
+                            </span>
+                        </article>
+
+                        <article class="activity-row">
+                            <span class="activity-icon">
+                                ⚙
+                            </span>
+
+                            <div>
+                                <strong>
+                                    Visor de Parámetros conectado
+                                </strong>
+
+                                <small>
+                                    Acceso directo al repositorio de Parámetros del Emisor.
+                                </small>
+                            </div>
+
+                            <span class="status-pill">
+                                Activo
+                            </span>
+                        </article>
+
+                        <article class="activity-row">
+                            <span class="activity-icon">
+                                ◉
+                            </span>
+
+                            <div>
+                                <strong>
+                                    Comunicados actualizados
+                                </strong>
+
+                                <small>
+                                    Nueva vista con filtros y búsqueda.
+                                </small>
+                            </div>
+
+                            <span class="status-pill">
+                                Nuevo
+                            </span>
+                        </article>
+                    </div>
+
+                    <aside class="panel">
+                        <div class="panel-heading">
+                            <div>
+                                <span class="section-kicker">
+                                    Accesos rápidos
+                                </span>
+
+                                <h2>
+                                    ¿Qué desea hacer?
+                                </h2>
+                            </div>
+                        </div>
+
+                        <div class="quick-list">
+                            <a
+                                class="quick-link"
+                                href="manuales.html"
+                            >
+                                <span>
+                                    ▤
+                                </span>
+
+                                <strong>
+                                    Consultar un manual
+                                </strong>
+
+                                <em>
+                                    →
+                                </em>
+                            </a>
+
+                            <a
+                                class="quick-link"
+                                href="https://kiris25.github.io/parametros-emisor/"
+                            >
+                                <span>
+                                    ⚙
+                                </span>
+
+                                <strong>
+                                    Buscar un parámetro
+                                </strong>
+
+                                <em>
+                                    →
+                                </em>
+                            </a>
+
+                            <a
+                                class="quick-link"
+                                href="seguridad.html"
+                            >
+                                <span>
+                                    🔐
+                                </span>
+
+                                <strong>
+                                    Gestionar seguridad
+                                </strong>
+
+                                <em>
+                                    →
+                                </em>
+                            </a>
+
+                            <a
+                                class="quick-link"
+                                href="formularios.html"
+                            >
+                                <span>
+                                    ▧
+                                </span>
+
+                                <strong>
+                                    Abrir formularios
+                                </strong>
+
+                                <em>
+                                    →
+                                </em>
+                            </a>
+
+                            <a
+                                class="quick-link"
+                                href="aprobaciones.html"
+                            >
+                                <span>
+                                    ✓
+                                </span>
+
+                                <strong>
+                                    Revisar aprobaciones
+                                </strong>
+
+                                <em>
+                                    →
+                                </em>
+                            </a>
+
+                            <a
+                                class="quick-link"
+                                href="mis-solicitudes.html"
+                            >
+                                <span>
+                                    ◷
+                                </span>
+
+                                <strong>
+                                    Consultar mis solicitudes
+                                </strong>
+
+                                <em>
+                                    →
+                                </em>
+                            </a>
+
+                            <button
+                                class="quick-link"
+                                id="quickGuideButton"
+                                type="button"
+                            >
+                                <span>
+                                    ▶
+                                </span>
+
+                                <strong>
+                                    Reproducir guía rápida
+                                </strong>
+
+                                <em>
+                                    →
+                                </em>
+                            </button>
+                        </div>
+                    </aside>
+                </section>
+            </main>
+
+            <footer class="footer">
+                <span>
+                    <strong>
+                        Landing Siscard+
+                    </strong>
+                    · Centro de Servicios
+                </span>
+
+                <span>
+                    Versión demostrativa para desarrolladores
+                </span>
+            </footer>
+        </div>
+    </div>
+
+    <div
+        class="tour-overlay"
+        id="tourOverlay"
+        aria-hidden="true"
+    ></div>
+
+    <div
+        class="tour-highlight"
+        id="tourHighlight"
+        hidden
+    ></div>
+
+    <section
+        class="tour-card"
+        id="tourCard"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="tourTitle"
+    >
+        <header class="tour-card-header">
             <strong>
-              Landing
-              <span>Siscard+</span>
+                Guía rápida Siscard+
             </strong>
 
-            <small>Autogestión digital</small>
-          </div>
-        </div>
-
-        <nav class="side-nav">
-          <p class="nav-label">Principal</p>
-
-          <a
-            class="nav-link"
-            href="https://kiris25.github.io/siscard-plus-landing/"
-          >
-            <span class="nav-icon">⌂</span>
-            <span>Inicio</span>
-          </a>
-
-          <p class="nav-label">Conocimiento</p>
-
-          <a
-            class="nav-link"
-            href="https://kiris25.github.io/siscard-plus-landing/manuales.html"
-          >
-            <span class="nav-icon">▤</span>
-            <span>Manuales</span>
-          </a>
-
-          <a
-            class="nav-link active"
-            href="./"
-            aria-current="page"
-          >
-            <span class="nav-icon">⚙</span>
-            <span>Parámetros</span>
-          </a>
-
-          <a
-            class="nav-link"
-            href="https://kiris25.github.io/siscard-plus-landing/formularios.html"
-          >
-            <span class="nav-icon">▧</span>
-            <span>Formularios</span>
-          </a>
-
-          <a
-            class="nav-link"
-            href="https://kiris25.github.io/siscard-plus-landing/landing-ia.html"
-          >
-            <span class="nav-icon">✦</span>
-            <span>Landing IA</span>
-          </a>
-
-          <p class="nav-label">Gestión</p>
-
-          <a
-            class="nav-link"
-            href="https://kiris25.github.io/siscard-plus-landing/seguridad.html"
-          >
-            <span class="nav-icon">🔐</span>
-            <span>Seguridad</span>
-          </a>
-
-          <a
-            class="nav-link"
-            href="https://kiris25.github.io/siscard-plus-landing/aprobaciones.html"
-          >
-            <span class="nav-icon">✓</span>
-            <span>Aprobaciones</span>
-          </a>
-
-          <a
-            class="nav-link"
-            href="https://kiris25.github.io/siscard-plus-landing/mis-solicitudes.html"
-          >
-            <span class="nav-icon">◷</span>
-            <span>Mis solicitudes</span>
-          </a>
-
-          <a
-            class="nav-link"
-            href="https://kiris25.github.io/siscard-plus-landing/comunicados.html"
-          >
-            <span class="nav-icon">◉</span>
-            <span>Comunicados</span>
-          </a>
-        </nav>
-
-        <div class="side-note">
-          <strong>Parámetros del Emisor</strong>
-          <p>Consulta funcional integrada al Centro de Servicios Siscard+.</p>
-        </div>
-      </aside>
-
-      <div class="viewer-area">
- 
-    <header class="encabezado"> 
-      <div style="display: flex; align-items: center;"> 
-        <button
-          class="portal-menu-button"
-          id="portalMenuButton"
-          type="button"
-          aria-label="Abrir menú"
-        >
-          ☰
-        </button>
-
-        <div> 
-        <h1 id="tituloSistema">Parámetros del Emisor</h1> 
-        <div id="subtituloSistema" class="subtitulo"> 
-          Consulta de parámetros funcionales 
-        </div> 
-        </div>
-      </div> 
-      <div class="acciones"> 
-        <button id="botonExportar" class="boton" onclick="exportarExcel()"> 
-          Exportar Excel 
-        </button> 
-        <div class="selector-idioma"> 
-          <button id="idiomaES" class="activo" onclick="cambiarIdioma('es')"> 
-            Español 
-          </button> 
-          <button id="idiomaEN" onclick="cambiarIdioma('en')">English</button> 
-        </div> 
-      </div> 
-    </header> 
- 
-    <section class="pestanas"> 
-      <button 
-        id="externo" 
-        class="pestana activa" 
-        onclick="cambiarAmbito('externo')" 
-      > 
-        Externo 
-      </button> 
-      <button id="interno" class="pestana" onclick="cambiarAmbito('interno')"> 
-        Interno 
-      </button> 
-    </section> 
- 
-    <nav id="menuOpciones" class="menu-opciones"></nav> 
- 
-    <section class="filtros"> 
-      <input 
-        id="buscar" 
-        placeholder="Buscar por palabra clave en todas las opciones" 
-      /> 
-      <input id="filtrarProducto" placeholder="Filtrar producto" /> 
-      <input id="filtrarPais" placeholder="Filtrar país" /> 
-      <button id="botonLimpiar" class="boton" onclick="limpiarFiltros()"> 
-        Limpiar filtros 
-      </button>
-      <button id="botonEsconderTodos" class="boton" onclick="esconderTodasLasFichas()">
-        Esconder todos
-      </button>
-      <button id="botonMostrarTodos" class="boton boton-naranja" onclick="mostrarTodasLasFichas()">
-        Mostrar todos
-      </button> 
-    </section> 
- 
-    <div id="estado" class="estado"></div> 
-    <h2 id="tituloOpcion" class="titulo-opcion"></h2> 
-    <main id="contenido" class="contenido"></main> 
- 
-    <button 
-      id="botonPreguntas" 
-      class="boton-preguntas" 
-      onclick="alternarPreguntas()" 
-    > 
-      ¿Preguntas? 
-    </button> 
- 
-    <aside id="panelPreguntas" class="panel-preguntas" hidden> 
-      <div id="panelCabecera" class="panel-cabecera"> 
-        <h2 id="tituloPreguntas">¿Preguntas?</h2> 
-        <button onclick="alternarPreguntas()">×</button> 
-      </div> 
-      <div class="panel-cuerpo"> 
-        <div id="textoFAQ"><strong>Preguntas frecuentes</strong></div> 
-        <div id="faqLista" class="faq-grid"></div> 
-        <label id="etiquetaPregunta" for="preguntaLibre" 
-          ><strong>¿Qué desea hacer?</strong></label 
-        > 
-        <textarea 
-          id="preguntaLibre" 
-          rows="4" 
-          placeholder="Ejemplo: Quiero configurar una tarjeta corporativa con renovación" 
-        ></textarea> 
-        <button 
-          id="botonAnalizar" 
-          class="boton boton-naranja" 
-          onclick="analizarPregunta()" 
-        > 
-          Buscar parámetros útiles 
-        </button> 
-        <div id="respuestaIA" class="respuesta" hidden></div> 
-        <div id="notaIA" class="nota-ia"> 
-          Las recomendaciones se calculan localmente con el contenido 
-          disponible. Revise las fichas antes de aplicar una configuración. 
-        </div> 
-      </div> 
-    </aside> 
-    <div id="tarjetaDependencia" class="tarjeta-flotante"></div> 
- 
-    <script> 
-      "use strict"; 
- 
-      const OPCIONES = [ 
-        ["05", "Consultar"], 
-        ["12", "Trabajar con"], 
-        ["13", "Moneda"], 
-        ["14", "Clasificación"], 
-        ["15", "Membresías"], 
-        ["16", "Cargos Auto"], 
-        ["17", "Ciclos"], 
-        ["18", "Tipo Cliente"], 
-        ["19", "Renovación"], 
-        ["20", "Pólizas"], 
-        ["21", "Mensajes"], 
-        ["22", "Sorteos"], 
-        ["23", "Estados"], 
-        ["24", "Clases"], 
-        ["25", "Trasiego"], 
-        ["26", "Cargos I.V."], 
-        ["27", "Corporativo"], 
-        ["28", "Skip Pay"], 
-        ["29", "Diseño"], 
-        ["30", "Extrafin."], 
-        ["31", "Limpiar"], 
-        ["32", "Tipo Cta."], 
-        ["33", "Costos"], 
-        ["34", "Estados Cta."], 
-        ["35", "Excepciones"], 
-        ["36", "Origen"], 
-        ["38", "No Intereses"], 
-        ["39", "Excep."], 
-        ["40", "Documentos"], 
-        ["42", "Prepago"], 
-        ["44", "Reducc."], 
-        ["45", "Vence Pago"], 
-        ["46", "Copia"], 
-        ["47", "Deterioro"], 
-        ["48", "Prospecto"], 
-        ["49", "Renov. Tarj."], 
-        ["50", "Renov. Emisor"], 
-        ["52", "Rangos"], 
-        ["53", "Tecnología"], 
-      ]; 
- 
-      const TEXTOS = { 
-        es: { 
-          titulo: "Parámetros del Emisor", 
-          subtitulo: "Consulta de parámetros funcionales", 
-          externo: "Externo", 
-          interno: "Interno", 
-          exportar: "Exportar Excel", 
-          limpiar: "Limpiar filtros", 
-          buscar: "Buscar por nombre de parámetro o palabra clave", 
-          nombre: "Filtrar nombre", 
-          producto: "Buscar por producto", 
-          pais: "Buscar por país", 
-          preguntas: "¿Preguntas?", 
-          faq: "Preguntas frecuentes", 
-          desea: "¿Qué desea hacer?", 
-          placeholderPregunta: 
-            "Ejemplo: Quiero configurar una tarjeta corporativa con renovación", 
-          analizar: "Buscar parámetros útiles", 
-          nota: "Las recomendaciones se calculan localmente con el contenido disponible. Revise las fichas antes de aplicar una configuración.", 
-          todas: "Todas", 
-          mostrando: "Mostrando", 
-          registros: "registro(s)", 
-          noResultados: "No hay registros para mostrar.", 
-          productoCampo: "Producto", 
-          paisCampo: "País", 
-          valores: "Valores Permitidos", 
-          que: "¿Qué hace?", 
-          como: "¿Cómo funciona?", 
-          dependencias: "Dependencias / Reglas", 
-          cuando: "¿Cuándo aplica?", 
-          ejemplo: "Ejemplo Funcional", 
-          notas: "Notas Visibles al Cliente", 
-          recomendados: "Parámetros recomendados", 
-          sinSugerencias: 
-            "No encontré coincidencias suficientes. Pruebe con términos más específicos.", 
-          abrir: "Abrir ficha",
-          esconderTodos: "Esconder todos",
-          mostrarTodos: "Mostrar todos",
-          mostrarFicha: "Mostrar ficha",
-          esconderFicha: "Esconder ficha",
-        }, 
-        en: { 
-          titulo: "Issuer Parameters", 
-          subtitulo: "Functional parameter reference", 
-          externo: "External", 
-          interno: "Internal", 
-          exportar: "Export to Excel", 
-          limpiar: "Clear filters", 
-          buscar: "Search by parameter name or keyword", 
-          nombre: "Filter by name", 
-          producto: "Search by product", 
-          pais: "Search by country", 
-          preguntas: "Questions?", 
-          faq: "Frequently asked questions", 
-          desea: "What do you want to do?", 
-          placeholderPregunta: 
-            "Example: I want to configure a corporate card with renewal", 
-          analizar: "Find useful parameters", 
-          nota: "Recommendations are calculated locally from the available content. Review the parameter cards before applying a configuration.", 
-          todas: "All", 
-          mostrando: "Showing", 
-          registros: "record(s)", 
-          noResultados: "No records to display.", 
-          productoCampo: "Product", 
-          paisCampo: "Country", 
-          valores: "Allowed Values", 
-          que: "What does it do?", 
-          como: "How does it work?", 
-          dependencias: "Dependencies / Rules", 
-          cuando: "When does it apply?", 
-          ejemplo: "Functional Example", 
-          notas: "Customer-visible Notes", 
-          recomendados: "Recommended parameters", 
-          sinSugerencias: 
-            "I did not find enough matches. Try more specific terms.", 
-          abrir: "Open card",
-          esconderTodos: "Hide all",
-          mostrarTodos: "Show all",
-          mostrarFicha: "Show card",
-          esconderFicha: "Hide card",
-        }, 
-      }; 
- 
-      const FAQ = { 
-        es: [ 
-          "¿Qué parámetros intervienen en una renovación?", 
-          "¿Qué parámetros están relacionados con productos corporativos?", 
-          "¿Qué debo revisar para configurar una tarjeta?", 
-        ], 
-        en: [ 
-          "Which parameters are involved in renewal?", 
-          "Which parameters relate to corporate products?", 
-          "What should I review to configure a card?", 
-        ], 
-      }; 
- 
-      const CAMPOS = [ 
-        "nombre", 
-        "producto", 
-        "pais", 
-        "valores", 
-        "que", 
-        "como", 
-        "dependencias", 
-        "cuando", 
-        "ejemplo", 
-        "notas", 
-      ]; 
-      const $ = (id) => document.getElementById(id); 
- 
-      let idioma = "es"; 
-      let modoFicha = false; 
-      let fichaSolicitada = ""; 
-      function claveFicha(registro) { 
-        return registro.id || 
-          `op${registro.__opcion || registro.codigo}-${normalizar(registro.nombre).replaceAll(" ", "-")}`; 
-      } 
-      function prepararModoFicha() { 
-        const parametros = new URLSearchParams(location.search); 
-        if (parametros.get("modo") !== "ficha") return; 
-        modoFicha = true; 
-        idioma = parametros.get("idioma") === "en" ? "en" : "es"; 
-        ambito = parametros.get("ambito") === "interno" ? "interno" : "externo"; 
-        opcion = parametros.get("opcion") || "05"; 
-        fichaSolicitada = parametros.get("id") || ""; 
-      } 
-      function aplicarModoFicha() { 
-        if (!modoFicha) return; 
-        document.querySelector(".encabezado")?.setAttribute("hidden", ""); 
-        document.querySelector(".pestanas")?.setAttribute("hidden", ""); 
-        $("menuOpciones")?.setAttribute("hidden", ""); 
-        document.querySelector(".filtros")?.setAttribute("hidden", ""); 
-        $("estado")?.setAttribute("hidden", ""); 
-        $("tituloOpcion")?.setAttribute("hidden", ""); 
-        $("botonPreguntas")?.setAttribute("hidden", ""); 
-      } 
-      function abrirFichaURL(registro) { 
-        const url = new URL(location.href); 
-        url.search = ""; 
-        url.hash = ""; 
-        url.searchParams.set("modo", "ficha"); 
-        url.searchParams.set("idioma", idioma); 
-        url.searchParams.set("ambito", ambito); 
-        url.searchParams.set("opcion", registro.__opcion || registro.codigo || opcion); 
-        url.searchParams.set("id", claveFicha(registro)); 
-        window.location.href = url.href; 
-      } 
-      function encontrarRelacionado(id) { 
-        return todosLosRegistros().find((registro) => 
-          registro.id === id || claveFicha(registro) === id || 
-          `op${registro.__opcion}-${normalizar(registro.nombre).replaceAll(" ", "-")}` === id 
-        ); 
-      } 
- 
-      let etiquetasPersonalizadas = {}; 
-      let ambito = "externo"; 
-      let opcion = "05"; 
-      let datos = {};
-      let colapsoPorContexto = cargarColapsoPorContexto();
-      const excepcionesPorContexto = {};
-
-      function cargarColapsoPorContexto() {
-        try {
-          return JSON.parse(localStorage.getItem("peVisorColapsoPorContexto") || "{}") || {};
-        } catch (error) {
-          console.warn(error);
-          return {};
-        }
-      }
-
-      function guardarColapsoPorContexto() {
-        localStorage.setItem(
-          "peVisorColapsoPorContexto",
-          JSON.stringify(colapsoPorContexto),
-        );
-      }
-
-      function claveContextoActual() {
-        const pestana = opcion === "todas" ? "todas" : `op${opcion}`;
-        return `${idioma}|${ambito}|${pestana}`;
-      }
-
-      function excepcionesActuales() {
-        const clave = claveContextoActual();
-        excepcionesPorContexto[clave] ||= new Set();
-        return excepcionesPorContexto[clave];
-      } 
- 
-      function normalizar(valor) { 
-        return String(valor ?? "") 
-          .toLowerCase() 
-          .normalize("NFD") 
-          .replace(/[\u0300-\u036f]/g, "") 
-          .replace(/[^a-z0-9]+/g, " ") 
-          .replace(/\s+/g, " ") 
-          .trim(); 
-      } 
- 
-      function escapar(valor) { 
-        return String(valor ?? "") 
-          .replaceAll("&", "&amp;") 
-          .replaceAll("<", "&lt;") 
-          .replaceAll(">", "&gt;") 
-          .replaceAll('"', "&quot;") 
-          .replaceAll("'", "&#039;"); 
-      } 
- 
-      function textoPlano(valor) { 
-        const temporal = document.createElement("div"); 
-        temporal.innerHTML = String(valor ?? ""); 
-        return temporal.textContent || ""; 
-      } 
- 
-      function nombreOpcion(codigo) { 
-        return OPCIONES.find((item) => item[0] === codigo)?.[1] || ""; 
-      } 
- 
-      function baseIdioma() { 
-        if (idioma === "es") { 
-          return "./"; 
-        } 
- 
-        if (location.hostname.endsWith(".github.io")) { 
-          const usuario = location.hostname.split(".")[0]; 
-          return `https://${usuario}.github.io/parametros-emisor-en/`; 
-        } 
- 
-        return "../parametros-emisor-en/"; 
-      } 
- 
-      function ruta(codigo) { 
-        return `${baseIdioma()}data/${ambito}/op${codigo}.json`; 
-      } 
- 
-      function todosLosRegistros() { 
-        return OPCIONES.flatMap(([codigo]) => 
-          (datos[codigo] || []).map((registro) => ({ 
-            ...registro, 
-            __opcion: codigo, 
-          })), 
-        ); 
-      } 
- 
-      async function leerOpcion(codigo) { 
-        try { 
-          const respuesta = await fetch(`${ruta(codigo)}?v=${Date.now()}`, { 
-            cache: "no-store", 
-          }); 
-          if (respuesta.status === 404) return []; 
-          if (!respuesta.ok) 
-            throw new Error(`${ruta(codigo)} (${respuesta.status})`); 
-          const contenido = await respuesta.json(); 
-          return Array.isArray(contenido) ? contenido : []; 
-        } catch (error) { 
-          console.warn(error); 
-          return []; 
-        } 
-      } 
- 
-      async function cargarDatos() { 
-        const t = textosActivos(); 
-        $("estado").className = "estado"; 
-        $("estado").textContent = 
-          idioma === "es" ? "Cargando datos..." : "Loading data..."; 
- 
-        const pares = await Promise.all( 
-          OPCIONES.map(async ([codigo]) => [codigo, await leerOpcion(codigo)]), 
-        ); 
- 
-        datos = Object.fromEntries(pares); 
-        construirMenu(); 
-        renderizar(); 
-        $("estado").textContent = 
-          `${t.mostrando} ${todosLosRegistros().length} ${t.registros}.`; 
-      } 
- 
-      async function cargarEtiquetasPersonalizadas() { 
-        etiquetasPersonalizadas = {}; 
-        if (idioma !== "en") return; 
-        try { 
-          const respuesta = await fetch( 
-            `${baseIdioma()}data/config/labels.json?v=${Date.now()}`, 
-            { cache: "no-store" }, 
-          ); 
-          if (respuesta.ok) etiquetasPersonalizadas = await respuesta.json(); 
-        } catch (error) { 
-          console.warn("No se pudieron cargar etiquetas personalizadas", error); 
-        } 
-      } 
- 
-      function textosActivos() { 
-        return idioma === "en" 
-          ? { ...TEXTOS.en, ...etiquetasPersonalizadas } 
-          : TEXTOS.es; 
-      } 
- 
-      async function cambiarIdioma(nuevoIdioma) { 
-        idioma = nuevoIdioma; 
-        $("idiomaES").classList.toggle("activo", idioma === "es"); 
-        $("idiomaEN").classList.toggle("activo", idioma === "en"); 
-        await cargarEtiquetasPersonalizadas(); 
-        aplicarTextos(); 
-        await cargarDatos(); 
-      } 
- 
-      function aplicarTextos() { 
-        const t = textosActivos(); 
-        document.documentElement.lang = idioma; 
-        document.title = `${t.titulo} - Visor`; 
-        $("tituloSistema").textContent = t.titulo; 
-        $("subtituloSistema").textContent = t.subtitulo; 
-        $("externo").textContent = t.externo; 
-        $("interno").textContent = t.interno; 
-        $("botonExportar").textContent = t.exportar; 
-        $("botonLimpiar").textContent = t.limpiar;
-        $("botonEsconderTodos").textContent = t.esconderTodos;
-        $("botonMostrarTodos").textContent = t.mostrarTodos;
-        $("buscar").placeholder = t.buscar; 
-        $("filtrarProducto").placeholder = t.producto; 
-        $("filtrarPais").placeholder = t.pais; 
-        $("botonPreguntas").textContent = t.preguntas; 
-        $("tituloPreguntas").textContent = t.preguntas; 
-        $("textoFAQ").innerHTML = `<strong>${t.faq}</strong>`; 
-        $("etiquetaPregunta").innerHTML = `<strong>${t.desea}</strong>`; 
-        $("preguntaLibre").placeholder = t.placeholderPregunta; 
-        $("botonAnalizar").textContent = t.analizar; 
-        $("notaIA").textContent = t.nota; 
-        construirFAQ(); 
-      } 
- 
-      function cambiarAmbito(nuevoAmbito) { 
-        ambito = nuevoAmbito; 
-        $("externo").classList.toggle("activa", ambito === "externo"); 
-        $("interno").classList.toggle("activa", ambito === "interno"); 
-        cargarDatos(); 
-      } 
- 
-      function construirMenu() { 
-        const t = textosActivos(); 
-        $("menuOpciones").innerHTML = 
-          ` 
-                <button class="opcion ${opcion === "todas" ? "activa" : ""}" data-opcion="todas"> 
-                    ${t.todas} 
-                </button> 
-            ` + 
-          OPCIONES.map( 
-            ([codigo, nombre]) => ` 
-                <button 
-                    class="opcion ${opcion === codigo ? "activa" : ""}" 
-                    data-opcion="${codigo}" 
-                    title="Op. ${codigo} · ${escapar(nombre)}"> 
-                    Op. ${codigo} · ${escapar(nombre)} 
-                </button> 
-            `, 
-          ).join(""); 
-      } 
- 
-      $("menuOpciones").addEventListener("click", (evento) => { 
-        const boton = evento.target.closest("[data-opcion]"); 
-        if (!boton) return; 
-        opcion = boton.dataset.opcion; 
-        construirMenu(); 
-        renderizar(); 
-      }); 
- 
-      function registrosVisibles() { 
-        if (modoFicha) { 
-          return todosLosRegistros().filter((registro) => claveFicha(registro) === fichaSolicitada); 
-        } 
-        const general = normalizar($("buscar").value); 
-        const producto = normalizar($("filtrarProducto").value); 
-        const pais = normalizar($("filtrarPais").value); 
-        const base =
-          opcion === "todas"
-            ? todosLosRegistros()
-            : (datos[opcion] || []).map((registro) => ({
-                ...registro,
-                __opcion: opcion,
-              })); 
- 
-        return base.filter((registro) => { 
-          const texto = normalizar( 
-            CAMPOS.map((campo) => textoPlano(registro[campo])).join(" "), 
-          ); 
-          return ( 
-            (!general || texto.includes(general)) && 
-            (!producto || normalizar(registro.producto).includes(producto)) && 
-            (!pais || normalizar(registro.pais).includes(pais)) 
-          ); 
-        }); 
-      } 
- 
-      function resaltar(valor) { 
-        let contenido = escapar(textoPlano(valor) || "—"); 
-        const consulta = $("buscar").value.trim(); 
-        if (!consulta) return contenido; 
-        const partes = consulta 
-          .split(/\s+/) 
-          .filter(Boolean) 
-          .map((parte) => parte.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")); 
-        return partes.length 
-          ? contenido.replace( 
-              new RegExp(`(${partes.join("|")})`, "gi"), 
-              "<mark>$1</mark>", 
-            ) 
-          : contenido; 
-      } 
- 
-      function resaltarHTML(valor) { 
-        const contenedor = document.createElement("div"); 
-        contenedor.innerHTML = String(valor || "—"); 
-        const consulta = $("buscar").value.trim(); 
-        if (!consulta) return contenedor.innerHTML; 
-        const partes = consulta 
-          .split(/\s+/) 
-          .filter(Boolean) 
-          .sort((a, b) => b.length - a.length) 
-          .map((parte) => parte.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")); 
-        if (!partes.length) return contenedor.innerHTML; 
-        const expresion = new RegExp(`(${partes.join("|")})`, "gi"); 
-        const caminante = document.createTreeWalker( 
-          contenedor, 
-          NodeFilter.SHOW_TEXT, 
-        ); 
-        const nodos = []; 
-        while (caminante.nextNode()) nodos.push(caminante.currentNode); 
-        nodos.forEach((nodo) => { 
-          const texto = nodo.nodeValue || ""; 
-          expresion.lastIndex = 0; 
-          if (!expresion.test(texto)) return; 
-          expresion.lastIndex = 0; 
-          const fragmento = document.createDocumentFragment(); 
-          let ultimo = 0; 
-          texto.replace(expresion, (coincidencia, _grupo, indice) => { 
-            fragmento.appendChild( 
-              document.createTextNode(texto.slice(ultimo, indice)), 
-            ); 
-            const marca = document.createElement("mark"); 
-            marca.textContent = coincidencia; 
-            fragmento.appendChild(marca); 
-            ultimo = indice + coincidencia.length; 
-            return coincidencia; 
-          }); 
-          fragmento.appendChild(document.createTextNode(texto.slice(ultimo))); 
-          nodo.replaceWith(fragmento); 
-        }); 
-        return contenedor.innerHTML; 
-      } 
-      function campo(etiqueta, valor, clase = "", dependencia = false) { 
-        return ` 
-                <div class="campo ${clase}"> 
-                    <div class="etiqueta">${etiqueta}</div> 
-                    <div class="texto">${dependencia ? resaltarHTML(valor) : resaltar(valor)}</div> 
-                </div> 
-            `; 
-      } 
- 
-      function claveRegistro(registro) { 
-        return registro.id || normalizar(registro.nombre).replaceAll(" ", "-"); 
-      } 
- 
-      function idFicha(registro) { 
-        return `ficha-${registro.__opcion}-${claveRegistro(registro)}`; 
-      } 
- 
-      function estaFichaColapsada(registro) {
-        const contexto = claveContextoActual();
-        const modoColapsado = Boolean(colapsoPorContexto[contexto]);
-        const esExcepcion = excepcionesActuales().has(idFicha(registro));
-        return modoColapsado ? !esExcepcion : esExcepcion;
-      }
-
-      function esconderTodasLasFichas() {
-        colapsoPorContexto[claveContextoActual()] = true;
-        excepcionesActuales().clear();
-        guardarColapsoPorContexto();
-        renderizar();
-      }
-
-      function mostrarTodasLasFichas() {
-        colapsoPorContexto[claveContextoActual()] = false;
-        excepcionesActuales().clear();
-        guardarColapsoPorContexto();
-        renderizar();
-      }
-
-      function alternarFicha(registroId) {
-        const excepciones = excepcionesActuales();
-        if (excepciones.has(registroId)) excepciones.delete(registroId);
-        else excepciones.add(registroId);
-        renderizar();
-      }
-
-      function renderizar() { 
-        const t = textosActivos(); 
-        const registros = registrosVisibles(); 
-        $("tituloOpcion").textContent = 
-          opcion === "todas" 
-            ? t.todas 
-            : `Op. ${opcion} · ${nombreOpcion(opcion)}`; 
- 
-        $("contenido").innerHTML = registros.length 
-          ? registros 
-              .map( 
-                (registro) => ` 
-                    <article id="${escapar(idFicha(registro))}" class="ficha ${estaFichaColapsada(registro) ? "colapsada" : ""}" data-id="${escapar(claveRegistro(registro))}"> 
-                        <div class="ficha-encabezado"> 
-                            <div class="codigo">Op. ${registro.__opcion}</div> 
-                            <div
-                              class="nombre"
-                              data-alternar-ficha="${escapar(idFicha(registro))}"
-                              title="${estaFichaColapsada(registro) ? t.mostrarFicha : t.esconderFicha}"
-                            ><span class="indicador-ficha">${estaFichaColapsada(registro) ? "▶" : "▼"}</span>${resaltar(registro.nombre)}</div> 
-                        </div> 
-                        <div class="cuadricula"> 
-                            ${campo(t.productoCampo, registro.producto)} 
-                            ${campo(t.paisCampo, registro.pais)} 
-                            ${campo(t.valores, registro.valores)} 
-                            ${campo(t.que, registro.que || registro.descripcion)} 
-                            ${campo(t.como, registro.como)} 
-                            ${campo(t.dependencias, registro.dependencias || registro.dep, "", true)} 
-                            ${campo(t.cuando, registro.cuando)} 
-                            ${campo(t.ejemplo, registro.ejemplo, "ejemplo")} 
-                            ${campo(t.notas, registro.notas)} 
-                        </div> 
-                    </article> 
-                `, 
-              ) 
-              .join("") 
-          : `<div class="sin-resultados">${t.noResultados}</div>`; 
- 
-        $("estado").textContent = 
-          `${t.mostrando} ${registros.length} ${t.registros}.`; 
-      } 
- 
-      $("contenido").addEventListener("click", (evento) => {
-        const tituloFicha = evento.target.closest("[data-alternar-ficha]");
-        if (!tituloFicha) return;
-        evento.preventDefault();
-        alternarFicha(tituloFicha.dataset.alternarFicha);
-      });
-
-      ["buscar", "filtrarProducto", "filtrarPais"].forEach( 
-        (id) => { 
-          $(id).addEventListener("input", renderizar); 
-        }, 
-      ); 
- 
-      function limpiarFiltros() { 
-        ["buscar", "filtrarProducto", "filtrarPais"].forEach( 
-          (id) => { 
-            $(id).value = ""; 
-          }, 
-        ); 
-        renderizar(); 
-      } 
- 
-      function exportarExcel() { 
-        const registros = registrosVisibles(); 
-        if (!registros.length) return; 
- 
-        const filas = registros.map((registro) => ({ 
-          Opción: registro.__opcion, 
-          "Nombre del Parámetro": registro.nombre || "", 
-          Producto: registro.producto || "", 
-          País: registro.pais || "", 
-          "Valores Permitidos": registro.valores || "", 
-          "¿Qué hace?": registro.que || registro.descripcion || "", 
-          "¿Cómo funciona?": registro.como || "", 
-          "Dependencias / Reglas": textoPlano( 
-            registro.dependencias || registro.dep || "", 
-          ), 
-          "¿Cuándo aplica?": registro.cuando || "", 
-          "Ejemplo Funcional": registro.ejemplo || "", 
-          "Notas Visibles al Cliente": registro.notas || "", 
-        })); 
- 
-        const hoja = XLSX.utils.json_to_sheet(filas); 
-        const libro = XLSX.utils.book_new(); 
-        XLSX.utils.book_append_sheet(libro, hoja, "Parámetros"); 
-        XLSX.writeFile(libro, `${idioma}_${ambito}_${opcion}_parametros.xlsx`); 
-      } 
- 
-      function construirFAQ() { 
-        $("faqLista").innerHTML = FAQ[idioma] 
-          .map( 
-            (pregunta) => ` 
-                <button class="faq" data-faq="${escapar(pregunta)}">${escapar(pregunta)}</button> 
-            `, 
-          ) 
-          .join(""); 
-      } 
- 
-      $("faqLista").addEventListener("click", (evento) => { 
-        const boton = evento.target.closest("[data-faq]"); 
-        if (!boton) return; 
-        $("preguntaLibre").value = boton.dataset.faq; 
-        analizarPregunta(); 
-      }); 
- 
-      function puntuarPregunta(pregunta, registro) { 
-        const palabras = normalizar(pregunta) 
-          .split(" ") 
-          .filter((palabra) => palabra.length > 2); 
-        const secciones = { 
-          nombre: normalizar(registro.nombre), 
-          contenido: normalizar( 
-            [ 
-              registro.producto, 
-              registro.pais, 
-              registro.valores, 
-              registro.que, 
-              registro.como, 
-              textoPlano(registro.dependencias), 
-              registro.cuando, 
-              registro.ejemplo, 
-              registro.notas, 
-            ].join(" "), 
-          ), 
-        }; 
- 
-        return palabras.reduce((total, palabra) => { 
-          if (secciones.nombre.includes(palabra)) return total + 5; 
-          if (secciones.contenido.includes(palabra)) return total + 2; 
-          return total; 
-        }, 0); 
-      } 
- 
-      function analizarPregunta() { 
-        const t = textosActivos(); 
-        const pregunta = $("preguntaLibre").value.trim(); 
-        if (!pregunta) return; 
- 
-        const sugerencias = todosLosRegistros() 
-          .map((registro) => ({ 
-            registro, 
-            puntos: puntuarPregunta(pregunta, registro), 
-          })) 
-          .filter((item) => item.puntos > 0) 
-          .sort((a, b) => b.puntos - a.puntos) 
-          .slice(0, 6); 
- 
-        $("respuestaIA").hidden = false; 
-        $("respuestaIA").innerHTML = sugerencias.length 
-          ? `<strong>${t.recomendados}</strong>` + 
-            sugerencias 
-              .map( 
-                ({ registro }) => ` 
-                    <button class="recomendacion" data-recomendacion="${registro.__opcion}|${escapar(claveRegistro(registro))}"> 
-                        <strong>Op. ${registro.__opcion} · ${escapar(registro.nombre || "")}</strong><br> 
-                        <small>${escapar(registro.que || registro.como || registro.notas || "")}</small> 
-                    </button> 
-                `, 
-              ) 
-              .join("") 
-          : t.sinSugerencias; 
-      } 
- 
-      $("respuestaIA").addEventListener("click", (evento) => { 
-        const boton = evento.target.closest("[data-recomendacion]"); 
-        if (!boton) return; 
-        const separador = boton.dataset.recomendacion.indexOf("|"); 
-        if (separador < 0) return; 
-        const codigo = boton.dataset.recomendacion.slice(0, separador); 
-        const identificador = boton.dataset.recomendacion.slice(separador + 1); 
-        const registro = (datos[codigo] || []).find((item) => claveRegistro(item) === identificador); 
-        if (!registro) return; 
-        abrirFichaURL({ ...registro, __opcion: codigo }); 
-      }); 
- 
-      function mostrarVistaPrevia(enlace) {
-        const registro = encontrarRelacionado(enlace.dataset.target);
-
-        if (!registro) {
-          return;
-        }
-
-        const t = textosActivos();
-        const panel = $("tarjetaDependencia");
-        const rect = enlace.getBoundingClientRect();
-
-        const fila = (etiqueta, valor) =>           `<div class="vista-previa-campo">
-            <b>${escapar(etiqueta)}:</b>
-            ${escapar(textoPlano(valor) || "—")}
-          </div>`;
-
-        panel.innerHTML =           `<div class="vista-previa-encabezado">
-            <h4>${escapar(registro.nombre || "")}</h4>
-            <p class="vista-previa-meta">
-              Op. ${escapar(registro.__opcion || registro.codigo || "")}
-              · ${escapar(nombreOpcion(registro.__opcion || registro.codigo || ""))}
-              · ${escapar(textoPlano(registro.producto) || "—")}
-              · ${escapar(textoPlano(registro.pais) || "—")}
-            </p>
-          </div>
-
-          <div class="vista-previa-contenido">
-            ${fila(t.productoCampo, registro.producto)}
-            ${fila(t.paisCampo, registro.pais)}
-            ${fila(t.valores, registro.valores)}
-            ${fila(t.que, registro.que || registro.descripcion)}
-            ${fila(t.como, registro.como)}
-            ${fila(t.dependencias, registro.dependencias || registro.dep)}
-            ${fila(t.cuando, registro.cuando)}
-            ${fila(t.ejemplo, registro.ejemplo)}
-            ${fila(t.notas, registro.notas)}
-          </div>
-
-          <div class="acciones-flotantes">
             <button
-              class="boton boton-naranja"
-              data-abrir-relacion="${escapar(claveFicha(registro))}">
-              ${idioma === "en"
-                ? "Open card"
-                : "Abrir ficha"}
+                id="closeTourButton"
+                type="button"
+                aria-label="Cerrar guía"
+            >
+                ×
             </button>
-          </div>`;
+        </header>
 
-        panel.style.display = "block";
+        <div class="tour-card-body">
+            <span
+                class="tour-step-label"
+                id="tourStepLabel"
+            >
+                Paso 1 de 11
+            </span>
 
-        const ancho = panel.offsetWidth;
-        const alto = panel.offsetHeight;
-        const espacioDerecha = window.innerWidth - rect.right;
-        const espacioIzquierda = rect.left;
+            <h2 id="tourTitle">
+                Bienvenida
+            </h2>
 
-        let izquierda;
+            <p id="tourText"></p>
 
-        if (espacioDerecha >= ancho + 12) {
-          izquierda = rect.right + 8;
-        } else if (espacioIzquierda >= ancho + 12) {
-          izquierda = rect.left - ancho - 8;
-        } else {
-          izquierda = Math.max(
-            6,
-            Math.min(rect.left, window.innerWidth - ancho - 12)
-          );
+            <div class="tour-progress">
+                <span id="tourProgressBar"></span>
+            </div>
+
+            <div class="tour-actions">
+                <button
+                    class="tour-button"
+                    id="skipTourButton"
+                    type="button"
+                >
+                    Omitir guía
+                </button>
+
+                <div class="tour-actions-group">
+                    <button
+                        class="tour-button"
+                        id="previousTourButton"
+                        type="button"
+                    >
+                        Anterior
+                    </button>
+
+                    <button
+                        class="tour-button primary"
+                        id="nextTourButton"
+                        type="button"
+                    >
+                        Siguiente
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div
+        class="toast"
+        id="toast"
+        role="status"
+        aria-live="polite"
+    ></div>
+
+    <script src="js/app.js"></script>
+
+    <script>
+        "use strict";
+
+        const tourOverlay =
+            document.getElementById("tourOverlay");
+
+        const tourHighlight =
+            document.getElementById("tourHighlight");
+
+        const tourCard =
+            document.getElementById("tourCard");
+
+        const tourStepLabel =
+            document.getElementById("tourStepLabel");
+
+        const tourTitle =
+            document.getElementById("tourTitle");
+
+        const tourText =
+            document.getElementById("tourText");
+
+        const tourProgressBar =
+            document.getElementById("tourProgressBar");
+
+        const previousTourButton =
+            document.getElementById("previousTourButton");
+
+        const nextTourButton =
+            document.getElementById("nextTourButton");
+
+        const moduleCards = Array.from(
+            document.querySelectorAll(".module-card")
+        );
+
+        let currentTourStep = 0;
+
+        let tourActive = false;
+
+        const tourSteps =
+        [
+            {
+                target: "[data-tour='welcome']",
+                title: "Bienvenida a Siscard+",
+                text:
+                    "Este es el Centro de Servicios Siscard+. Desde aquí se accede a documentación, parámetros, seguridad y otras herramientas."
+            },
+
+            {
+                target: "[data-tour='navigation']",
+                title: "Navegación principal",
+                text:
+                    "La barra lateral permite cambiar entre los módulos disponibles sin perder la referencia del portal."
+            },
+
+            {
+                target: "[data-tour='manuals']",
+                title: "Centro Documental",
+                text:
+                    "Manuales permite consultar documentación funcional, operativa y técnica mediante categorías y búsqueda."
+            },
+
+            {
+                target: "[data-tour='parameters']",
+                title: "Parámetros del Emisor",
+                text:
+                    "Parámetros abre el visor real del repositorio para localizar configuraciones documentadas."
+            },
+
+            {
+                target: "[data-tour='forms']",
+                title: "Formularios",
+                text:
+                    "Formularios reúne las opciones que el cliente puede completar y enviar a revisión."
+            },
+
+            {
+                target: "[data-tour='security']",
+                title: "Seguridad",
+                text:
+                    "Seguridad reúne gestiones de usuarios, grupos, mantenimiento de accesos y reportes."
+            },
+
+            {
+                target: "[data-tour='approvals']",
+                title: "Aprobaciones",
+                text:
+                    "Aprobaciones permite revisar formularios y solicitudes enviados por los clientes."
+            },
+
+            {
+                target: "[data-tour='requests']",
+                title: "Mis solicitudes",
+                text:
+                    "Mis solicitudes muestra el seguimiento y el estado de las gestiones registradas."
+            },
+
+            {
+                target: "[data-tour='ai']",
+                title: "Landing IA",
+                text:
+                    "Landing IA orienta consultas y dirige hacia el módulo relacionado con la necesidad expresada."
+            },
+
+            {
+                target: "[data-tour='communications']",
+                title: "Comunicados",
+                text:
+                    "Comunicados permite revisar avisos, novedades y actualizaciones del ecosistema Siscard+."
+            },
+
+            {
+                target: "[data-tour='modules']",
+                title: "Portal listo para utilizarse",
+                text:
+                    "La guía ha finalizado. Seleccione cualquiera de los módulos para comenzar a trabajar."
+            }
+        ];
+
+        function getTourTarget(step)
+        {
+            return document.querySelector(step.target);
         }
 
-        let arriba = rect.top - 12;
+        function positionTourElements(target)
+        {
+            const rectangle = target.getBoundingClientRect();
 
-        if (arriba + alto > window.innerHeight - 12) {
-          arriba = window.innerHeight - alto - 12;
+            const padding = 7;
+
+            tourHighlight.style.top =
+                `${Math.max(6, rectangle.top - padding)}px`;
+
+            tourHighlight.style.left =
+                `${Math.max(6, rectangle.left - padding)}px`;
+
+            tourHighlight.style.width =
+                `${Math.min(
+                    window.innerWidth - 12,
+                    rectangle.width + padding * 2
+                )}px`;
+
+            tourHighlight.style.height =
+                `${Math.min(
+                    window.innerHeight - 12,
+                    rectangle.height + padding * 2
+                )}px`;
+
+            if (window.innerWidth <= 650)
+            {
+                return;
+            }
+
+            const cardWidth = Math.min(
+                390,
+                window.innerWidth - 28
+            );
+
+            const preferredLeft =
+                rectangle.right + 18;
+
+            const alternativeLeft =
+                rectangle.left - cardWidth - 18;
+
+            let cardLeft = preferredLeft;
+
+            if (preferredLeft + cardWidth > window.innerWidth - 14)
+            {
+                cardLeft = Math.max(14, alternativeLeft);
+            }
+
+            let cardTop = rectangle.top;
+
+            const estimatedCardHeight = 285;
+
+            if (cardTop + estimatedCardHeight > window.innerHeight - 14)
+            {
+                cardTop = window.innerHeight - estimatedCardHeight - 14;
+            }
+
+            tourCard.style.left = `${cardLeft}px`;
+
+            tourCard.style.top = `${Math.max(14, cardTop)}px`;
         }
 
-        arriba = Math.max(12, arriba);
+        function renderTourStep()
+        {
+            const step = tourSteps[currentTourStep];
 
-        panel.style.left = izquierda + "px";
-        panel.style.top = arriba + "px";
-      }
+            const target = getTourTarget(step);
 
-      document.addEventListener("mouseover", (evento) => { 
-        const enlace = evento.target.closest?.(".dep-ref-inline"); 
-        if (enlace) mostrarVistaPrevia(enlace); 
-      }); 
- 
-      document.addEventListener("click", (evento) => { 
-        const enlace = evento.target.closest?.(".dep-ref-inline"); 
-        if (enlace) { 
-          evento.preventDefault(); 
-          mostrarVistaPrevia(enlace); 
-        } 
-        const abrir = evento.target.closest?.("[data-abrir-relacion]"); 
-        if (abrir) { 
-          const registro = encontrarRelacionado(abrir.dataset.abrirRelacion); 
-          if (registro) abrirFichaURL(registro); 
-        } 
-      }); 
- 
-      document.addEventListener("pointerdown", (evento) => { 
-        const panel = $("tarjetaDependencia"); 
-        if ( 
-          panel.style.display === "block" && 
-          !panel.contains(evento.target) && 
-          !evento.target.closest?.(".dep-ref-inline") 
-        ) { 
-          panel.style.display = "none"; 
-        } 
-      }); 
- 
-      function alternarPreguntas(forzar) { 
-        const panel = $("panelPreguntas"); 
-        panel.hidden = typeof forzar === "boolean" ? !forzar : !panel.hidden; 
-      } 
- 
-      function activarArrastre() { 
-        const panel = $("panelPreguntas"); 
-        const cabecera = $("panelCabecera"); 
-        let desplazamientoX = 0; 
-        let desplazamientoY = 0; 
-        let arrastrando = false; 
- 
-        cabecera.addEventListener("pointerdown", (evento) => { 
-          if (evento.target.closest("button")) return; 
-          const rect = panel.getBoundingClientRect(); 
-          desplazamientoX = evento.clientX - rect.left; 
-          desplazamientoY = evento.clientY - rect.top; 
-          arrastrando = true; 
-          cabecera.setPointerCapture(evento.pointerId); 
-          panel.style.right = "auto"; 
-          panel.style.bottom = "auto"; 
-        }); 
- 
-        cabecera.addEventListener("pointermove", (evento) => { 
-          if (!arrastrando) return; 
-          const izquierda = Math.max( 
-            0, 
-            Math.min( 
-              window.innerWidth - panel.offsetWidth, 
-              evento.clientX - desplazamientoX, 
-            ), 
-          ); 
-          const arriba = Math.max( 
-            0, 
-            Math.min(window.innerHeight - 50, evento.clientY - desplazamientoY), 
-          ); 
-          panel.style.left = `${izquierda}px`; 
-          panel.style.top = `${arriba}px`; 
-        }); 
- 
-        cabecera.addEventListener("pointerup", () => { 
-          arrastrando = false; 
-        }); 
-      } 
- 
-      document.addEventListener("DOMContentLoaded", async () => { 
-        const portalMenuButton = $("portalMenuButton");
-        const portalSidebar = $("sidebar");
+            if (!target)
+            {
+                endTour(false);
 
-        portalMenuButton?.addEventListener("click", () => {
-          portalSidebar?.classList.toggle("open");
-        });
+                return;
+            }
 
-        document.addEventListener("click", (evento) => {
-          if (
-            window.innerWidth <= 900 &&
-            portalSidebar?.classList.contains("open") &&
-            !portalSidebar.contains(evento.target) &&
-            !portalMenuButton?.contains(evento.target)
-          ) {
-            portalSidebar.classList.remove("open");
-          }
-        });
+            target.scrollIntoView(
+                {
+                    behavior: "smooth",
+                    block: "center"
+                }
+            );
 
-        prepararModoFicha(); 
-        $("idiomaES").classList.toggle("activo", idioma === "es"); 
-        $("idiomaEN").classList.toggle("activo", idioma === "en"); 
-        $("externo").classList.toggle("activa", ambito === "externo"); 
-        $("interno").classList.toggle("activa", ambito === "interno"); 
-        await cargarEtiquetasPersonalizadas(); 
-        aplicarTextos(); 
-        construirMenu(); 
-        activarArrastre(); 
-        await cargarDatos(); 
-        aplicarModoFicha(); 
-      }); 
-    </script> 
-      </div>
-    </div>
-  </body> 
-</html> 
- 
- 
+            window.setTimeout(
+                function()
+                {
+                    positionTourElements(target);
+
+                    tourStepLabel.textContent =
+                        `Paso ${currentTourStep + 1} de ${tourSteps.length}`;
+
+                    tourTitle.textContent = step.title;
+
+                    tourText.textContent = step.text;
+
+                    tourProgressBar.style.width =
+                        `${(
+                            (currentTourStep + 1) /
+                            tourSteps.length
+                        ) * 100}%`;
+
+                    previousTourButton.disabled =
+                        currentTourStep === 0;
+
+                    nextTourButton.textContent =
+                        currentTourStep === tourSteps.length - 1
+                            ? "Finalizar"
+                            : "Siguiente";
+
+                    tourHighlight.hidden = false;
+                },
+                380
+            );
+        }
+
+        function startTour()
+        {
+            currentTourStep = 0;
+
+            tourActive = true;
+
+            document.body.style.overflow = "hidden";
+
+            tourOverlay.classList.add("active");
+
+            tourOverlay.setAttribute(
+                "aria-hidden",
+                "false"
+            );
+
+            tourCard.classList.add("active");
+
+            renderTourStep();
+        }
+
+        function endTour(markCompleted)
+        {
+            tourActive = false;
+
+            document.body.style.overflow = "";
+
+            tourOverlay.classList.remove("active");
+
+            tourOverlay.setAttribute(
+                "aria-hidden",
+                "true"
+            );
+
+            tourCard.classList.remove("active");
+
+            tourHighlight.hidden = true;
+
+            if (markCompleted)
+            {
+                localStorage.setItem(
+                    "siscardQuickGuideCompleted",
+                    "true"
+                );
+            }
+        }
+
+        function nextTourStep()
+        {
+            if (currentTourStep === tourSteps.length - 1)
+            {
+                endTour(true);
+
+                return;
+            }
+
+            currentTourStep += 1;
+
+            renderTourStep();
+        }
+
+        function previousTourStep()
+        {
+            if (currentTourStep === 0)
+            {
+                return;
+            }
+
+            currentTourStep -= 1;
+
+            renderTourStep();
+        }
+
+        document
+            .querySelectorAll(
+                "#topGuideButton, #heroGuideButton, #cardGuideButton, #quickGuideButton"
+            )
+            .forEach(
+                function(button)
+                {
+                    button.addEventListener(
+                        "click",
+                        startTour
+                    );
+                }
+            );
+
+        document
+            .getElementById("closeTourButton")
+            .addEventListener(
+                "click",
+                function()
+                {
+                    endTour(false);
+                }
+            );
+
+        document
+            .getElementById("skipTourButton")
+            .addEventListener(
+                "click",
+                function()
+                {
+                    endTour(true);
+                }
+            );
+
+        previousTourButton.addEventListener(
+            "click",
+            previousTourStep
+        );
+
+        nextTourButton.addEventListener(
+            "click",
+            nextTourStep
+        );
+
+        window.addEventListener(
+            "resize",
+            function()
+            {
+                if (!tourActive)
+                {
+                    return;
+                }
+
+                const target = getTourTarget(
+                    tourSteps[currentTourStep]
+                );
+
+                if (target)
+                {
+                    positionTourElements(target);
+                }
+            }
+        );
+
+        document.addEventListener(
+            "keydown",
+            function(event)
+            {
+                if (!tourActive)
+                {
+                    return;
+                }
+
+                if (event.key === "Escape")
+                {
+                    endTour(false);
+                }
+
+                if (event.key === "ArrowRight")
+                {
+                    nextTourStep();
+                }
+
+                if (event.key === "ArrowLeft")
+                {
+                    previousTourStep();
+                }
+            }
+        );
+
+        document
+            .getElementById("serviceSearchForm")
+            .addEventListener(
+                "submit",
+                function(event)
+                {
+                    event.preventDefault();
+
+                    const query = document
+                        .getElementById("serviceSearchInput")
+                        .value
+                        .toLowerCase()
+                        .normalize("NFD")
+                        .replace(/[\\u0300-\\u036f]/g, "")
+                        .trim();
+
+                    moduleCards.forEach(
+                        function(card)
+                        {
+                            const searchableText =
+                                `${card.textContent} ${card.dataset.search}`
+                                    .toLowerCase()
+                                    .normalize("NFD")
+                                    .replace(/[\\u0300-\\u036f]/g, "");
+
+                            card.classList.toggle(
+                                "search-match",
+                                Boolean(query) &&
+                                searchableText.includes(query)
+                            );
+                        }
+                    );
+
+                    const firstMatch = document.querySelector(
+                        ".module-card.search-match"
+                    );
+
+                    if (firstMatch)
+                    {
+                        firstMatch.scrollIntoView(
+                            {
+                                behavior: "smooth",
+                                block: "center"
+                            }
+                        );
+                    }
+                }
+            );
+
+        /*
+         * En producción podrá habilitarse la apertura automática
+         * durante el primer ingreso descomentando este bloque:
+         *
+         * if (
+         *     !localStorage.getItem("siscardQuickGuideCompleted")
+         * )
+         * {
+         *     window.setTimeout(startTour, 700);
+         * }
+         */
+    </script>
+</body>
+
+</html>
