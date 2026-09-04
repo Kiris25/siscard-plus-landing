@@ -1,242 +1,1703 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Portal de experiencia y autogestión Siscard+">
-    <meta name="theme-color" content="#25292c">
-    <title>Landing Siscard+</title>
-    <link rel="stylesheet" href="css/styles.css">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="description"
+        content="Centro de Servicios Siscard+"
+    >
+
+    <title>
+        Landing Siscard+
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="css/styles.css"
+    >
+
+    <style>
+        .service-hero
+        {
+            display: grid;
+            grid-template-columns: minmax(0, 1.25fr) minmax(290px, 0.75fr);
+            gap: 24px;
+            align-items: center;
+            padding: 32px;
+            border: 1px solid #4a4b4d;
+            border-radius: var(--radius-large);
+            background:
+                linear-gradient(
+                    120deg,
+                    #4f5052 0%,
+                    #58595b 62%,
+                    #694a39 100%
+                );
+            color: #ffffff;
+            box-shadow: var(--shadow-medium);
+        }
+
+        .service-hero h1
+        {
+            margin: 8px 0 12px;
+            color: #ffffff;
+            font-size: clamp(36px, 4vw, 54px);
+            font-weight: 300;
+            line-height: 1.05;
+        }
+
+        .service-hero p
+        {
+            max-width: 760px;
+            margin: 0;
+            color: #eeeeee;
+            line-height: 1.6;
+        }
+
+        .hero-actions
+        {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 9px;
+            margin-top: 20px;
+        }
+
+        .hero-button
+        {
+            min-height: 40px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 9px 16px;
+            border: 1px solid #9f9f9f;
+            border-radius: var(--radius-small);
+            background: #ffffff;
+            color: #4f4f4f;
+            font-weight: 750;
+        }
+
+        .hero-button.primary
+        {
+            border-color: #e55d00;
+            background: #ff6c0c;
+            color: #ffffff;
+        }
+
+        .guide-launch-card
+        {
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.22);
+            border-top: 4px solid #ff6c0c;
+            border-radius: var(--radius);
+            background: rgba(255, 255, 255, 0.10);
+        }
+
+        .guide-launch-card span,
+        .guide-launch-card strong
+        {
+            display: block;
+        }
+
+        .guide-launch-card span
+        {
+            color: #ffd0b0;
+            font-size: 11px;
+            font-weight: 850;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .guide-launch-card strong
+        {
+            margin: 7px 0;
+            font-size: 26px;
+            font-weight: 400;
+        }
+
+        .guide-launch-card p
+        {
+            color: #eeeeee;
+            font-size: 13px;
+        }
+
+        .guide-launch-card button
+        {
+            width: 100%;
+            margin-top: 15px;
+        }
+
+        .service-toolbar
+        {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: 12px;
+            margin-top: 14px;
+            padding: 13px;
+            border: 1px solid var(--line);
+            background: #ffffff;
+            box-shadow: var(--shadow-small);
+        }
+
+        .service-search
+        {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: 8px;
+        }
+
+        .service-search input
+        {
+            width: 100%;
+            padding: 10px;
+        }
+
+        .toolbar-context
+        {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        .modules-grid
+        {
+            display: grid;
+            grid-template-columns: repeat(5, minmax(0, 1fr));
+            gap: 12px;
+        }
+
+        .module-card
+        {
+            position: relative;
+            min-height: 165px;
+            padding: 17px;
+            border: 1px solid var(--line);
+            border-top: 4px solid #b7b7b7;
+            border-radius: var(--radius);
+            background: #ffffff;
+            box-shadow: var(--shadow-small);
+            transition: var(--transition);
+        }
+
+        .module-card:hover,
+        .module-card.search-match
+        {
+            border-top-color: var(--orange);
+            background: #fffdfa;
+            box-shadow: var(--shadow-medium);
+            transform: translateY(-2px);
+        }
+
+        .module-icon
+        {
+            display: grid;
+            place-items: center;
+            width: 42px;
+            height: 42px;
+            border: 1px solid #ffd1ad;
+            border-radius: var(--radius);
+            background: var(--orange-soft);
+            color: var(--orange);
+            font-size: 21px;
+        }
+
+        .module-card strong,
+        .module-card small
+        {
+            display: block;
+        }
+
+        .module-card strong
+        {
+            margin: 11px 0 5px;
+            color: var(--sidebar);
+        }
+
+        .module-card small
+        {
+            color: var(--muted);
+            line-height: 1.45;
+        }
+
+        .module-card em
+        {
+            position: absolute;
+            right: 13px;
+            bottom: 10px;
+            color: var(--orange);
+            font-style: normal;
+            font-weight: 900;
+        }
+
+        .overview-grid
+        {
+            display: grid;
+            grid-template-columns: minmax(0, 1.2fr) minmax(300px, 0.8fr);
+            gap: 14px;
+        }
+
+        .activity-row
+        {
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            gap: 10px;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--line);
+        }
+
+        .activity-row:last-child
+        {
+            border-bottom: 0;
+        }
+
+        .activity-icon
+        {
+            display: grid;
+            place-items: center;
+            width: 37px;
+            height: 37px;
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+            background: var(--orange-soft);
+            color: var(--orange);
+        }
+
+        .activity-row small
+        {
+            display: block;
+            margin-top: 3px;
+            color: var(--muted);
+        }
+
+        .status-pill
+        {
+            padding: 5px 8px;
+            border-radius: 999px;
+            background: #e1f5ec;
+            color: var(--green);
+            font-size: 10px;
+            font-weight: 850;
+        }
+
+        .quick-list
+        {
+            display: grid;
+            gap: 8px;
+        }
+
+        .quick-link
+        {
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            gap: 10px;
+            align-items: center;
+            padding: 11px;
+            border: 1px solid var(--line);
+            background: var(--surface-soft);
+        }
+
+        .quick-link:hover
+        {
+            border-color: var(--orange);
+            background: var(--orange-soft);
+        }
+
+        .quick-link span:first-child
+        {
+            color: var(--orange);
+            font-size: 19px;
+        }
+
+        .quick-link em
+        {
+            color: var(--orange);
+            font-style: normal;
+            font-weight: 900;
+        }
+
+        .tour-overlay
+        {
+            position: fixed;
+            inset: 0;
+            z-index: 9998;
+            background: rgba(28, 28, 28, 0.66);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.28s ease;
+        }
+
+        .tour-overlay.active
+        {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .tour-highlight
+        {
+            position: fixed;
+            z-index: 9999;
+            border: 3px solid #ff6c0c;
+            border-radius: 10px;
+            box-shadow:
+                0 0 0 7px rgba(255, 108, 12, 0.18),
+                0 0 24px rgba(255, 108, 12, 0.62);
+            pointer-events: none;
+            transition:
+                top 0.38s ease,
+                left 0.38s ease,
+                width 0.38s ease,
+                height 0.38s ease;
+            animation: tourPulse 1.4s infinite;
+        }
+
+        .tour-highlight[hidden]
+        {
+            display: none;
+        }
+
+        @keyframes tourPulse
+        {
+            0%,
+            100%
+            {
+                box-shadow:
+                    0 0 0 5px rgba(255, 108, 12, 0.14),
+                    0 0 18px rgba(255, 108, 12, 0.50);
+            }
+
+            50%
+            {
+                box-shadow:
+                    0 0 0 10px rgba(255, 108, 12, 0.05),
+                    0 0 30px rgba(255, 108, 12, 0.72);
+            }
+        }
+
+        .tour-card
+        {
+            position: fixed;
+            z-index: 10000;
+            width: min(390px, calc(100vw - 28px));
+            overflow: hidden;
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            background: #ffffff;
+            box-shadow: 0 18px 50px rgba(0, 0, 0, 0.32);
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(8px);
+            transition:
+                opacity 0.24s ease,
+                transform 0.24s ease,
+                top 0.38s ease,
+                left 0.38s ease;
+        }
+
+        .tour-card.active
+        {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateY(0);
+        }
+
+        .tour-card-header
+        {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 14px;
+            background: #58595b;
+            color: #ffffff;
+        }
+
+        .tour-card-header strong
+        {
+            font-weight: 650;
+        }
+
+        .tour-card-header button
+        {
+            border: 0;
+            background: transparent;
+            color: #ffffff;
+            font-size: 21px;
+        }
+
+        .tour-card-body
+        {
+            padding: 16px;
+        }
+
+        .tour-step-label
+        {
+            color: var(--orange);
+            font-size: 11px;
+            font-weight: 850;
+            text-transform: uppercase;
+        }
+
+        .tour-card h2
+        {
+            margin: 6px 0 8px;
+            color: var(--sidebar);
+            font-size: 24px;
+            font-weight: 400;
+        }
+
+        .tour-card p
+        {
+            margin: 0;
+            color: var(--muted);
+            line-height: 1.5;
+        }
+
+        .tour-progress
+        {
+            height: 6px;
+            margin: 14px 0;
+            overflow: hidden;
+            border-radius: 999px;
+            background: #e5e5e5;
+        }
+
+        .tour-progress span
+        {
+            display: block;
+            height: 100%;
+            width: 0;
+            background: var(--orange);
+            transition: width 0.35s ease;
+        }
+
+        .tour-actions
+        {
+            display: flex;
+            justify-content: space-between;
+            gap: 8px;
+        }
+
+        .tour-actions-group
+        {
+            display: flex;
+            gap: 8px;
+        }
+
+        .tour-button
+        {
+            min-height: 38px;
+            padding: 8px 13px;
+            border: 1px solid var(--line-strong);
+            border-radius: var(--radius-small);
+            background: #ffffff;
+            color: var(--ink);
+            font-weight: 750;
+        }
+
+        .tour-button.primary
+        {
+            border-color: var(--orange-dark);
+            background: var(--orange);
+            color: #ffffff;
+        }
+
+        .tour-button:disabled
+        {
+            opacity: 0.45;
+            cursor: not-allowed;
+        }
+
+        @media (max-width: 1180px)
+        {
+            .modules-grid
+            {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 900px)
+        {
+            .service-hero,
+            .overview-grid
+            {
+                grid-template-columns: 1fr;
+            }
+
+            .modules-grid
+            {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 650px)
+        {
+            .service-toolbar,
+            .service-search,
+            .modules-grid
+            {
+                grid-template-columns: 1fr;
+            }
+
+            .toolbar-context
+            {
+                justify-content: flex-start;
+            }
+
+            .tour-card
+            {
+                left: 14px !important;
+                right: 14px;
+                bottom: 14px;
+                top: auto !important;
+                width: auto;
+            }
+        }
+    </style>
 </head>
+
 <body>
     <div class="app-shell">
-        <aside class="sidebar" id="sidebar" aria-label="Navegación principal">
+        <aside
+            class="sidebar"
+            id="sidebar"
+            data-tour="navigation"
+        >
             <div class="brand">
-                <div class="brand-mark" aria-hidden="true"></div>
+                <div class="brand-mark"></div>
+
                 <div class="brand-copy">
-                    <strong>Landing <span>Siscard+</span></strong>
-                    <small>Autogestión digital</small>
+                    <strong>
+                        Landing
+                        <span>
+                            Siscard+
+                        </span>
+                    </strong>
+
+                    <small>
+                        Autogestión digital
+                    </small>
                 </div>
             </div>
- 
+
             <nav class="side-nav">
-                <p class="nav-label">Principal</p>
-                <a class="nav-link active" href="index.html" data-page="inicio">
-                    <span class="nav-icon">⌂</span>
-                    <span>Inicio</span>
+                <p class="nav-label">
+                    Principal
+                </p>
+
+                <a
+                    class="nav-link active"
+                    href="index.html"
+                >
+                    <span class="nav-icon">
+                        ⌂
+                    </span>
+
+                    <span>
+                        Inicio
+                    </span>
                 </a>
- 
-                <p class="nav-label">Conocimiento</p>
-                <a class="nav-link" href="manuales.html">
-                    <span class="nav-icon">▤</span>
-                    <span>Manuales</span>
+
+                <p class="nav-label">
+                    Conocimiento
+                </p>
+
+                <a
+                    class="nav-link"
+                    href="manuales.html"
+                    data-tour="manuals"
+                >
+                    <span class="nav-icon">
+                        ▤
+                    </span>
+
+                    <span>
+                        Manuales
+                    </span>
                 </a>
-                <a class="nav-link" href="#" data-coming-soon="Parámetros Siscard">
-                    <span class="nav-icon">⚙</span>
-                    <span>Parámetros</span>
+
+                <a
+                    class="nav-link"
+                    href="https://kiris25.github.io/parametros-emisor/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    data-tour="parameters"
+                >
+                    <span class="nav-icon">
+                        ⚙
+                    </span>
+
+                    <span>
+                        Parámetros
+                    </span>
                 </a>
-                <a class="nav-link" href="#" data-coming-soon="Formularios">
-                    <span class="nav-icon">▧</span>
-                    <span>Formularios</span>
+
+                <a
+                    class="nav-link"
+                    href="landing-ia.html"
+                    data-tour="ai"
+                >
+                    <span class="nav-icon">
+                        ✦
+                    </span>
+
+                    <span>
+                        Landing IA
+                    </span>
                 </a>
-                <a class="nav-link" href="landing-ia.html">
-                    <span class="nav-icon">✦</span>
-                    <span>Landing IA</span>
+
+                <p class="nav-label">
+                    Gestión
+                </p>
+
+                <a
+                    class="nav-link"
+                    href="seguridad.html"
+                    data-tour="security"
+                >
+                    <span class="nav-icon">
+                        🔐
+                    </span>
+
+                    <span>
+                        Seguridad
+                    </span>
                 </a>
- 
-                <p class="nav-label">Gestión</p>
-                <a class="nav-link" href="seguridad.html">
-                    <span class="nav-icon">🔐</span>
-                    <span>Seguridad</span>
-                </a>
-                <a class="nav-link" href="#solicitudes">
-                    <span class="nav-icon">✓</span>
-                    <span>Aprobaciones</span>
-                </a>
-                <a class="nav-link" href="#solicitudes">
-                    <span class="nav-icon">◷</span>
-                    <span>Mis solicitudes</span>
-                </a>
-                <a class="nav-link" href="comunicados.html">
-                    <span class="nav-icon">◉</span>
-                    <span>Comunicados</span>
+
+                <a
+                    class="nav-link"
+                    href="comunicados.html"
+                    data-tour="communications"
+                >
+                    <span class="nav-icon">
+                        ◉
+                    </span>
+
+                    <span>
+                        Comunicados
+                    </span>
                 </a>
             </nav>
- 
+
             <div class="side-note">
-                <strong>Experiencia centralizada</strong>
-                <p>Un único punto de acceso para consultar información y gestionar servicios Siscard+.</p>
+                <strong>
+                    Centro de Servicios
+                </strong>
+
+                <p>
+                    Acceso unificado a los servicios disponibles en Siscard+.
+                </p>
             </div>
         </aside>
- 
+
         <div class="main-area">
             <header class="topbar">
-                <button class="menu-button" id="menuButton" type="button" aria-label="Abrir menú" aria-controls="sidebar" aria-expanded="false">☰</button>
+                <button
+                    class="menu-button"
+                    id="menuButton"
+                    type="button"
+                    aria-label="Abrir menú"
+                >
+                    ☰
+                </button>
+
                 <div class="top-title">
-                    <strong>Centro de Experiencia y Autogestión</strong>
-                    <small>Portal Siscard+</small>
+                    <strong>
+                        Centro de Servicios Siscard+
+                    </strong>
+
+                    <small>
+                        Acceso y autogestión
+                    </small>
                 </div>
+
                 <div class="top-actions">
-                    <button class="icon-button" type="button" data-coming-soon="Notificaciones" aria-label="Notificaciones">🔔<span class="notification-dot">3</span></button>
-                    <button class="help-button" type="button" data-coming-soon="Centro de ayuda">Ayuda</button>
-                    <button class="profile-button" id="profileButton" type="button" aria-expanded="false">
-                        <span class="avatar">CL</span>
-                        <span class="profile-copy"><strong>Cliente Siscard+</strong><small>Portal de servicios</small></span>
-                        <span>⌄</span>
+                    <button
+                        class="help-button"
+                        id="topGuideButton"
+                        type="button"
+                    >
+                        ? Ver guía rápida
+                    </button>
+
+                    <button
+                        class="profile-button"
+                        id="profileButton"
+                        type="button"
+                    >
+                        <span class="avatar">
+                            CL
+                        </span>
+
+                        <span class="profile-copy">
+                            <strong>
+                                Cliente Siscard+
+                            </strong>
+
+                            <small>
+                                Portal de servicios
+                            </small>
+                        </span>
                     </button>
                 </div>
-                <div class="profile-menu" id="profileMenu" hidden>
-                    <button type="button" data-coming-soon="Mi perfil">Mi perfil</button>
-                    <button type="button" data-coming-soon="Preferencias">Preferencias</button>
-                    <button type="button" data-coming-soon="Cerrar sesión">Cerrar sesión</button>
+
+                <div
+                    class="profile-menu"
+                    id="profileMenu"
+                    hidden
+                >
+                    <button type="button">
+                        Mi perfil
+                    </button>
                 </div>
             </header>
- 
-            <main class="content" id="inicio">
-                <section class="hero">
-                    <div class="hero-content">
-                        <span class="eyebrow">Portal de servicios Siscard+</span>
-                        <h1>Todo el ecosistema Siscard+ en un solo lugar</h1>
-                        <p>Consulte manuales, parámetros, comunicados y solicitudes. Acceda además a herramientas de seguridad y autogestión desde una experiencia centralizada.</p>
-                        <form class="global-search" id="globalSearch" role="search">
-                            <span aria-hidden="true">⌕</span>
-                            <input id="searchInput" type="search" placeholder="Buscar manual, parámetro, formulario o proceso..." autocomplete="off" aria-label="Buscar en el portal">
-                            <button class="primary-button" type="submit">Buscar</button>
-                        </form>
-                        <p class="search-feedback" id="searchFeedback" aria-live="polite"></p>
-                    </div>
-                    <div class="hero-card">
-                        <span class="hero-card-label">Acceso centralizado</span>
-                        <strong>24/7</strong>
-                        <p>Información y servicios disponibles desde un único punto de consulta.</p>
-                        <div class="availability"><span></span> Portal disponible</div>
-                    </div>
-                </section>
- 
-                <section class="quick-bar" aria-label="Acciones rápidas">
-                    <strong>¿Qué desea hacer hoy?</strong>
-                    <a href="manuales.html">▤ Consultar manual</a>
-                    <a href="#" data-coming-soon="Consulta de parámetros">⚙ Consultar parámetro</a>
-                    <a href="seguridad.html">🔐 Gestionar accesos</a>
-                    <a href="#solicitudes">＋ Nueva solicitud</a>
-                    <a href="landing-ia.html">✦ Consultar Landing IA</a>
-                </section>
- 
-                <section class="section" aria-labelledby="summaryTitle">
-                    <div class="section-heading">
-                        <div>
-                            <span class="section-kicker">Vista general</span>
-                            <h2 id="summaryTitle">Resumen del portal</h2>
-                            <p>Accesos directos e indicadores demostrativos para la presentación de la experiencia.</p>
-                        </div>
-                        <div class="filters">
-                            <label>País
-                                <select id="countryFilter">
-                                    <option value="Costa Rica">Costa Rica</option>
-                                    <option value="Panamá">Panamá</option>
-                                    <option value="Honduras">Honduras</option>
-                                    <option value="República Dominicana">República Dominicana</option>
-                                </select>
-                            </label>
-                            <label>Producto
-                                <select id="productFilter">
-                                    <option value="Todos">Todos los productos</option>
-                                    <option value="Crédito">Crédito</option>
-                                    <option value="Débito">Débito</option>
-                                    <option value="Prepago">Prepago</option>
-                                </select>
-                            </label>
+
+            <main class="content">
+                <section
+                    class="service-hero"
+                    data-tour="welcome"
+                >
+                    <div>
+                        <span class="eyebrow">
+                            Centro de Servicios Siscard+
+                        </span>
+
+                        <h1>
+                            Acceso directo a los servicios Siscard+
+                        </h1>
+
+                        <p>
+                            Consulte documentación, acceda al visor de parámetros,
+                            gestione servicios de seguridad y revise las novedades
+                            disponibles desde una única plataforma.
+                        </p>
+
+                        <div class="hero-actions">
+                            <a
+                                class="hero-button primary"
+                                href="#modules"
+                            >
+                                Explorar servicios
+                            </a>
+
+                            <button
+                                class="hero-button"
+                                id="heroGuideButton"
+                                type="button"
+                            >
+                                ▶ Iniciar guía rápida
+                            </button>
                         </div>
                     </div>
- 
-                    <div class="metrics-grid">
-                        <article class="metric-card"><div><strong>165</strong><span>Manuales disponibles</span></div><div class="metric-icon blue">▤</div></article>
-                        <article class="metric-card"><div><strong>82</strong><span>Parámetros documentados</span></div><div class="metric-icon orange">⚙</div></article>
-                        <article class="metric-card"><div><strong>12</strong><span>Servicios digitales</span></div><div class="metric-icon teal">◇</div></article>
-                        <article class="metric-card"><div><strong>5</strong><span>Gestiones pendientes</span></div><div class="metric-icon gold">✓</div></article>
-                    </div>
-                </section>
- 
-                <section class="section dashboard-grid" id="servicios">
-                    <div class="panel">
-                        <div class="panel-heading"><div><span class="section-kicker">Catálogo</span><h2>Servicios principales</h2></div><button type="button" class="text-button" data-coming-soon="Catálogo completo">Ver catálogo</button></div>
-                        <div class="services-grid" id="serviceGrid">
-                            <a class="service-card" href="manuales.html" data-search="manuales documentación guías funcional operativa técnica">
-                                <span class="service-icon blue">📚</span><strong>Manuales</strong><small>Documentación funcional, operativa y técnica centralizada.</small><em>→</em>
-                            </a>
-                            <a class="service-card" href="#" data-coming-soon="Parámetros Siscard" data-search="parámetros siscard trtt1sno trtt2sno trt08sn0 emisor">
-                                <span class="service-icon orange">⚙️</span><strong>Parámetros Siscard</strong><small>Consulta del repositorio de parámetros documentados.</small><em>→</em>
-                            </a>
-                            <a class="service-card" href="#" data-coming-soon="Formularios" data-search="formularios solicitudes gestiones digitales">
-                                <span class="service-icon teal">📋</span><strong>Formularios</strong><small>Solicitudes y gestiones digitales guiadas.</small><em>→</em>
-                            </a>
-                            <a class="service-card" href="seguridad.html" data-search="usuarios seguridad crear usuario accesos">
-                                <span class="service-icon purple">👤</span><strong>Usuarios</strong><small>Creación, mantenimiento y consulta de usuarios.</small><em>→</em>
-                            </a>
-                            <a class="service-card" href="seguridad.html#grupos" data-search="grupos seguridad roles permisos">
-                                <span class="service-icon green">👥</span><strong>Grupos</strong><small>Administración de grupos, roles y permisos.</small><em>→</em>
-                            </a>
-                            <a class="service-card" href="#solicitudes" data-search="aprobaciones solicitudes firma validación">
-                                <span class="service-icon gold">✅</span><strong>Aprobaciones</strong><small>Seguimiento y validación de gestiones.</small><em>→</em>
-                            </a>
-                        </div>
-                    </div>
- 
-                    <aside class="panel ai-panel">
-                        <div class="ai-heading"><span class="ai-orb">✦</span><div><h2>Landing IA</h2><p>Asistente del portal</p></div></div>
-                        <p class="ai-description">Plantee una consulta para localizar información o identificar el servicio adecuado.</p>
-                        <form id="aiForm">
-                            <textarea id="aiInput" placeholder="Ejemplo: ¿Dónde encuentro los parámetros del emisor?" aria-label="Consulta para Landing IA"></textarea>
-                            <div class="suggestion-list">
-                                <button type="button">Buscar un manual</button>
-                                <button type="button">Consultar un parámetro</button>
-                                <button type="button">Solicitar acceso</button>
-                            </div>
-                            <button class="primary-button full" type="submit">Consultar</button>
-                        </form>
+
+                    <aside
+                        class="guide-launch-card"
+                        data-tour="guide-launch"
+                    >
+                        <span>
+                            Primera vez en Siscard+
+                        </span>
+
+                        <strong>
+                            Conozca el portal paso a paso
+                        </strong>
+
+                        <p>
+                            Reproduzca el recorrido que se mostrará automáticamente
+                            durante el primer ingreso de un cliente.
+                        </p>
+
+                        <button
+                            class="primary-button"
+                            id="cardGuideButton"
+                            type="button"
+                        >
+                            Iniciar recorrido
+                        </button>
                     </aside>
                 </section>
- 
-                <section class="section two-column" id="solicitudes">
-                    <div class="panel">
-                        <div class="panel-heading"><div><span class="section-kicker">Gestión</span><h2>Solicitudes recientes</h2></div><button type="button" class="text-button" data-coming-soon="Listado de solicitudes">Ver todas</button></div>
-                        <div class="request-list">
-                            <article class="request-item"><span class="request-icon">👤</span><div><strong>SOL-2026-124 · Alta de usuario</strong><small>Seguridad · Banco demostrativo</small></div><span class="status pending">Pendiente</span></article>
-                            <article class="request-item"><span class="request-icon">⚙</span><div><strong>SOL-2026-125 · Consulta TRT08SN0</strong><small>Parámetros · Operaciones</small></div><span class="status approved">Aprobada</span></article>
-                            <article class="request-item"><span class="request-icon">👥</span><div><strong>SOL-2026-126 · Creación de grupo</strong><small>Seguridad · Cliente interno</small></div><span class="status review">En revisión</span></article>
-                        </div>
-                    </div>
- 
-                    <div class="panel">
-                        <div class="panel-heading"><div><span class="section-kicker">Novedades</span><h2>Comunicados destacados</h2></div><a class="text-button" href="comunicados.html">Ver todos</a></div>
-                        <div class="news-list">
-                            <article class="news-item"><span>Parámetros</span><strong>Contenido organizado por país y producto</strong><small>Consulte la información según el contexto operativo requerido.</small></article>
-                            <article class="news-item"><span>Seguridad</span><strong>Gestión digital de usuarios, grupos y accesos</strong><small>Nuevos puntos de entrada para las gestiones de seguridad.</small></article>
-                            <article class="news-item"><span>Documentación</span><strong>Manuales y guías centralizadas</strong><small>Acceso simplificado a la documentación publicada.</small></article>
-                        </div>
+
+                <section class="service-toolbar">
+                    <form
+                        class="service-search"
+                        id="serviceSearchForm"
+                    >
+                        <input
+                            id="serviceSearchInput"
+                            type="search"
+                            placeholder="Buscar un servicio..."
+                        >
+
+                        <button
+                            class="primary-button"
+                            type="submit"
+                        >
+                            Buscar
+                        </button>
+                    </form>
+
+                    <div class="toolbar-context">
+                        <span>
+                            Estado:
+                        </span>
+
+                        <strong>
+                            Portal disponible
+                        </strong>
                     </div>
                 </section>
- 
-                <section class="section">
-                    <div class="section-heading compact"><div><span class="section-kicker">Proceso</span><h2>Flujo digital de la solicitud</h2><p>Secuencia demostrativa para presentar la experiencia de principio a fin.</p></div></div>
-                    <div class="process-flow">
-                        <article><span>📝</span><strong>Solicitud</strong><small>Registro de datos</small></article>
-                        <article><span>🔎</span><strong>Validación</strong><small>Revisión inicial</small></article>
-                        <article><span>✅</span><strong>Aprobación</strong><small>Visto bueno</small></article>
-                        <article><span>📄</span><strong>Documento final</strong><small>Generación</small></article>
-                        <article><span>📤</span><strong>Entrega</strong><small>Notificación</small></article>
+
+                <section
+                    class="section"
+                    id="modules"
+                    data-tour="modules"
+                >
+                    <div class="section-heading">
+                        <div>
+                            <span class="section-kicker">
+                                Servicios
+                            </span>
+
+                            <h2>
+                                Módulos disponibles
+                            </h2>
+
+                            <p>
+                                Seleccione el servicio que desea utilizar.
+                            </p>
+                        </div>
                     </div>
+
+                    <div class="modules-grid">
+                        <a
+                            class="module-card"
+                            href="manuales.html"
+                            data-search="manuales documentos guías documentación"
+                        >
+                            <span class="module-icon">
+                                ▤
+                            </span>
+
+                            <strong>
+                                Manuales
+                            </strong>
+
+                            <small>
+                                Consulte documentación funcional, operativa y técnica.
+                            </small>
+
+                            <em>
+                                →
+                            </em>
+                        </a>
+
+                        <a
+                            class="module-card"
+                            href="https://kiris25.github.io/parametros-emisor/"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            data-search="parámetros emisor visor configuraciones"
+                        >
+                            <span class="module-icon">
+                                ⚙
+                            </span>
+
+                            <strong>
+                                Parámetros
+                            </strong>
+
+                            <small>
+                                Acceda al visor real de Parámetros del Emisor.
+                            </small>
+
+                            <em>
+                                →
+                            </em>
+                        </a>
+
+                        <a
+                            class="module-card"
+                            href="seguridad.html"
+                            data-search="seguridad usuarios grupos accesos"
+                        >
+                            <span class="module-icon">
+                                🔐
+                            </span>
+
+                            <strong>
+                                Seguridad
+                            </strong>
+
+                            <small>
+                                Gestione usuarios, grupos y mantenimiento de accesos.
+                            </small>
+
+                            <em>
+                                →
+                            </em>
+                        </a>
+
+                        <a
+                            class="module-card"
+                            href="landing-ia.html"
+                            data-search="landing ia asistente consultas ayuda"
+                        >
+                            <span class="module-icon">
+                                ✦
+                            </span>
+
+                            <strong>
+                                Landing IA
+                            </strong>
+
+                            <small>
+                                Realice consultas y localice servicios relacionados.
+                            </small>
+
+                            <em>
+                                →
+                            </em>
+                        </a>
+
+                        <a
+                            class="module-card"
+                            href="comunicados.html"
+                            data-search="comunicados noticias avisos novedades"
+                        >
+                            <span class="module-icon">
+                                ◉
+                            </span>
+
+                            <strong>
+                                Comunicados
+                            </strong>
+
+                            <small>
+                                Revise avisos, novedades y actualizaciones publicadas.
+                            </small>
+
+                            <em>
+                                →
+                            </em>
+                        </a>
+                    </div>
+                </section>
+
+                <section class="section overview-grid">
+                    <div class="panel">
+                        <div class="panel-heading">
+                            <div>
+                                <span class="section-kicker">
+                                    Actividad
+                                </span>
+
+                                <h2>
+                                    Novedades recientes
+                                </h2>
+                            </div>
+                        </div>
+
+                        <article class="activity-row">
+                            <span class="activity-icon">
+                                ▤
+                            </span>
+
+                            <div>
+                                <strong>
+                                    Centro Documental disponible
+                                </strong>
+
+                                <small>
+                                    Manuales organizados por categoría y producto.
+                                </small>
+                            </div>
+
+                            <span class="status-pill">
+                                Disponible
+                            </span>
+                        </article>
+
+                        <article class="activity-row">
+                            <span class="activity-icon">
+                                ⚙
+                            </span>
+
+                            <div>
+                                <strong>
+                                    Visor de Parámetros conectado
+                                </strong>
+
+                                <small>
+                                    Acceso directo al repositorio de Parámetros del Emisor.
+                                </small>
+                            </div>
+
+                            <span class="status-pill">
+                                Activo
+                            </span>
+                        </article>
+
+                        <article class="activity-row">
+                            <span class="activity-icon">
+                                ◉
+                            </span>
+
+                            <div>
+                                <strong>
+                                    Comunicados actualizados
+                                </strong>
+
+                                <small>
+                                    Nueva vista con filtros y búsqueda.
+                                </small>
+                            </div>
+
+                            <span class="status-pill">
+                                Nuevo
+                            </span>
+                        </article>
+                    </div>
+
+                    <aside class="panel">
+                        <div class="panel-heading">
+                            <div>
+                                <span class="section-kicker">
+                                    Accesos rápidos
+                                </span>
+
+                                <h2>
+                                    ¿Qué desea hacer?
+                                </h2>
+                            </div>
+                        </div>
+
+                        <div class="quick-list">
+                            <a
+                                class="quick-link"
+                                href="manuales.html"
+                            >
+                                <span>
+                                    ▤
+                                </span>
+
+                                <strong>
+                                    Consultar un manual
+                                </strong>
+
+                                <em>
+                                    →
+                                </em>
+                            </a>
+
+                            <a
+                                class="quick-link"
+                                href="https://kiris25.github.io/parametros-emisor/"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >
+                                <span>
+                                    ⚙
+                                </span>
+
+                                <strong>
+                                    Buscar un parámetro
+                                </strong>
+
+                                <em>
+                                    →
+                                </em>
+                            </a>
+
+                            <a
+                                class="quick-link"
+                                href="seguridad.html"
+                            >
+                                <span>
+                                    🔐
+                                </span>
+
+                                <strong>
+                                    Gestionar seguridad
+                                </strong>
+
+                                <em>
+                                    →
+                                </em>
+                            </a>
+
+                            <button
+                                class="quick-link"
+                                id="quickGuideButton"
+                                type="button"
+                            >
+                                <span>
+                                    ▶
+                                </span>
+
+                                <strong>
+                                    Reproducir guía rápida
+                                </strong>
+
+                                <em>
+                                    →
+                                </em>
+                            </button>
+                        </div>
+                    </aside>
                 </section>
             </main>
- 
+
             <footer class="footer">
-                <span><strong>Landing Siscard+</strong> · Portal de experiencia y autogestión</span>
-                <span id="footerContext">Costa Rica · Todos los productos</span>
+                <span>
+                    <strong>
+                        Landing Siscard+
+                    </strong>
+                    · Centro de Servicios
+                </span>
+
+                <span>
+                    Versión demostrativa para desarrolladores
+                </span>
             </footer>
         </div>
     </div>
- 
-    <div class="toast" id="toast" role="status" aria-live="polite" aria-hidden="true"></div>
+
+    <div
+        class="tour-overlay"
+        id="tourOverlay"
+        aria-hidden="true"
+    ></div>
+
+    <div
+        class="tour-highlight"
+        id="tourHighlight"
+        hidden
+    ></div>
+
+    <section
+        class="tour-card"
+        id="tourCard"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="tourTitle"
+    >
+        <header class="tour-card-header">
+            <strong>
+                Guía rápida Siscard+
+            </strong>
+
+            <button
+                id="closeTourButton"
+                type="button"
+                aria-label="Cerrar guía"
+            >
+                ×
+            </button>
+        </header>
+
+        <div class="tour-card-body">
+            <span
+                class="tour-step-label"
+                id="tourStepLabel"
+            >
+                Paso 1 de 8
+            </span>
+
+            <h2 id="tourTitle">
+                Bienvenida
+            </h2>
+
+            <p id="tourText"></p>
+
+            <div class="tour-progress">
+                <span id="tourProgressBar"></span>
+            </div>
+
+            <div class="tour-actions">
+                <button
+                    class="tour-button"
+                    id="skipTourButton"
+                    type="button"
+                >
+                    Omitir guía
+                </button>
+
+                <div class="tour-actions-group">
+                    <button
+                        class="tour-button"
+                        id="previousTourButton"
+                        type="button"
+                    >
+                        Anterior
+                    </button>
+
+                    <button
+                        class="tour-button primary"
+                        id="nextTourButton"
+                        type="button"
+                    >
+                        Siguiente
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div
+        class="toast"
+        id="toast"
+        role="status"
+        aria-live="polite"
+    ></div>
+
     <script src="js/app.js"></script>
+
+    <script>
+        "use strict";
+
+        const tourOverlay =
+            document.getElementById("tourOverlay");
+
+        const tourHighlight =
+            document.getElementById("tourHighlight");
+
+        const tourCard =
+            document.getElementById("tourCard");
+
+        const tourStepLabel =
+            document.getElementById("tourStepLabel");
+
+        const tourTitle =
+            document.getElementById("tourTitle");
+
+        const tourText =
+            document.getElementById("tourText");
+
+        const tourProgressBar =
+            document.getElementById("tourProgressBar");
+
+        const previousTourButton =
+            document.getElementById("previousTourButton");
+
+        const nextTourButton =
+            document.getElementById("nextTourButton");
+
+        const moduleCards = Array.from(
+            document.querySelectorAll(".module-card")
+        );
+
+        let currentTourStep = 0;
+
+        let tourActive = false;
+
+        const tourSteps =
+        [
+            {
+                target: "[data-tour='welcome']",
+                title: "Bienvenida a Siscard+",
+                text:
+                    "Este es el Centro de Servicios Siscard+. Desde aquí se accede a documentación, parámetros, seguridad y otras herramientas."
+            },
+
+            {
+                target: "[data-tour='navigation']",
+                title: "Navegación principal",
+                text:
+                    "La barra lateral permite cambiar entre los módulos disponibles sin perder la referencia del portal."
+            },
+
+            {
+                target: "[data-tour='manuals']",
+                title: "Centro Documental",
+                text:
+                    "Manuales permite consultar documentación funcional, operativa y técnica mediante categorías y búsqueda."
+            },
+
+            {
+                target: "[data-tour='parameters']",
+                title: "Parámetros del Emisor",
+                text:
+                    "Parámetros abre el visor real del repositorio para localizar configuraciones documentadas."
+            },
+
+            {
+                target: "[data-tour='security']",
+                title: "Seguridad",
+                text:
+                    "Seguridad reúne gestiones de usuarios, grupos, mantenimiento de accesos y reportes."
+            },
+
+            {
+                target: "[data-tour='ai']",
+                title: "Landing IA",
+                text:
+                    "Landing IA orienta consultas y dirige hacia el módulo relacionado con la necesidad expresada."
+            },
+
+            {
+                target: "[data-tour='communications']",
+                title: "Comunicados",
+                text:
+                    "Comunicados permite revisar avisos, novedades y actualizaciones del ecosistema Siscard+."
+            },
+
+            {
+                target: "[data-tour='modules']",
+                title: "Portal listo para utilizarse",
+                text:
+                    "La guía ha finalizado. Seleccione cualquiera de los módulos para comenzar a trabajar."
+            }
+        ];
+
+        function getTourTarget(step)
+        {
+            return document.querySelector(step.target);
+        }
+
+        function positionTourElements(target)
+        {
+            const rectangle = target.getBoundingClientRect();
+
+            const padding = 7;
+
+            tourHighlight.style.top =
+                `${Math.max(6, rectangle.top - padding)}px`;
+
+            tourHighlight.style.left =
+                `${Math.max(6, rectangle.left - padding)}px`;
+
+            tourHighlight.style.width =
+                `${Math.min(
+                    window.innerWidth - 12,
+                    rectangle.width + padding * 2
+                )}px`;
+
+            tourHighlight.style.height =
+                `${Math.min(
+                    window.innerHeight - 12,
+                    rectangle.height + padding * 2
+                )}px`;
+
+            if (window.innerWidth <= 650)
+            {
+                return;
+            }
+
+            const cardWidth = Math.min(
+                390,
+                window.innerWidth - 28
+            );
+
+            const preferredLeft =
+                rectangle.right + 18;
+
+            const alternativeLeft =
+                rectangle.left - cardWidth - 18;
+
+            let cardLeft = preferredLeft;
+
+            if (preferredLeft + cardWidth > window.innerWidth - 14)
+            {
+                cardLeft = Math.max(14, alternativeLeft);
+            }
+
+            let cardTop = rectangle.top;
+
+            const estimatedCardHeight = 285;
+
+            if (cardTop + estimatedCardHeight > window.innerHeight - 14)
+            {
+                cardTop = window.innerHeight - estimatedCardHeight - 14;
+            }
+
+            tourCard.style.left = `${cardLeft}px`;
+
+            tourCard.style.top = `${Math.max(14, cardTop)}px`;
+        }
+
+        function renderTourStep()
+        {
+            const step = tourSteps[currentTourStep];
+
+            const target = getTourTarget(step);
+
+            if (!target)
+            {
+                endTour(false);
+
+                return;
+            }
+
+            target.scrollIntoView(
+                {
+                    behavior: "smooth",
+                    block: "center"
+                }
+            );
+
+            window.setTimeout(
+                function()
+                {
+                    positionTourElements(target);
+
+                    tourStepLabel.textContent =
+                        `Paso ${currentTourStep + 1} de ${tourSteps.length}`;
+
+                    tourTitle.textContent = step.title;
+
+                    tourText.textContent = step.text;
+
+                    tourProgressBar.style.width =
+                        `${(
+                            (currentTourStep + 1) /
+                            tourSteps.length
+                        ) * 100}%`;
+
+                    previousTourButton.disabled =
+                        currentTourStep === 0;
+
+                    nextTourButton.textContent =
+                        currentTourStep === tourSteps.length - 1
+                            ? "Finalizar"
+                            : "Siguiente";
+
+                    tourHighlight.hidden = false;
+                },
+                380
+            );
+        }
+
+        function startTour()
+        {
+            currentTourStep = 0;
+
+            tourActive = true;
+
+            document.body.style.overflow = "hidden";
+
+            tourOverlay.classList.add("active");
+
+            tourOverlay.setAttribute(
+                "aria-hidden",
+                "false"
+            );
+
+            tourCard.classList.add("active");
+
+            renderTourStep();
+        }
+
+        function endTour(markCompleted)
+        {
+            tourActive = false;
+
+            document.body.style.overflow = "";
+
+            tourOverlay.classList.remove("active");
+
+            tourOverlay.setAttribute(
+                "aria-hidden",
+                "true"
+            );
+
+            tourCard.classList.remove("active");
+
+            tourHighlight.hidden = true;
+
+            if (markCompleted)
+            {
+                localStorage.setItem(
+                    "siscardQuickGuideCompleted",
+                    "true"
+                );
+            }
+        }
+
+        function nextTourStep()
+        {
+            if (currentTourStep === tourSteps.length - 1)
+            {
+                endTour(true);
+
+                return;
+            }
+
+            currentTourStep += 1;
+
+            renderTourStep();
+        }
+
+        function previousTourStep()
+        {
+            if (currentTourStep === 0)
+            {
+                return;
+            }
+
+            currentTourStep -= 1;
+
+            renderTourStep();
+        }
+
+        document
+            .querySelectorAll(
+                "#topGuideButton, #heroGuideButton, #cardGuideButton, #quickGuideButton"
+            )
+            .forEach(
+                function(button)
+                {
+                    button.addEventListener(
+                        "click",
+                        startTour
+                    );
+                }
+            );
+
+        document
+            .getElementById("closeTourButton")
+            .addEventListener(
+                "click",
+                function()
+                {
+                    endTour(false);
+                }
+            );
+
+        document
+            .getElementById("skipTourButton")
+            .addEventListener(
+                "click",
+                function()
+                {
+                    endTour(true);
+                }
+            );
+
+        previousTourButton.addEventListener(
+            "click",
+            previousTourStep
+        );
+
+        nextTourButton.addEventListener(
+            "click",
+            nextTourStep
+        );
+
+        window.addEventListener(
+            "resize",
+            function()
+            {
+                if (!tourActive)
+                {
+                    return;
+                }
+
+                const target = getTourTarget(
+                    tourSteps[currentTourStep]
+                );
+
+                if (target)
+                {
+                    positionTourElements(target);
+                }
+            }
+        );
+
+        document.addEventListener(
+            "keydown",
+            function(event)
+            {
+                if (!tourActive)
+                {
+                    return;
+                }
+
+                if (event.key === "Escape")
+                {
+                    endTour(false);
+                }
+
+                if (event.key === "ArrowRight")
+                {
+                    nextTourStep();
+                }
+
+                if (event.key === "ArrowLeft")
+                {
+                    previousTourStep();
+                }
+            }
+        );
+
+        document
+            .getElementById("serviceSearchForm")
+            .addEventListener(
+                "submit",
+                function(event)
+                {
+                    event.preventDefault();
+
+                    const query = document
+                        .getElementById("serviceSearchInput")
+                        .value
+                        .toLowerCase()
+                        .normalize("NFD")
+                        .replace(/[\\u0300-\\u036f]/g, "")
+                        .trim();
+
+                    moduleCards.forEach(
+                        function(card)
+                        {
+                            const searchableText =
+                                `${card.textContent} ${card.dataset.search}`
+                                    .toLowerCase()
+                                    .normalize("NFD")
+                                    .replace(/[\\u0300-\\u036f]/g, "");
+
+                            card.classList.toggle(
+                                "search-match",
+                                Boolean(query) &&
+                                searchableText.includes(query)
+                            );
+                        }
+                    );
+
+                    const firstMatch = document.querySelector(
+                        ".module-card.search-match"
+                    );
+
+                    if (firstMatch)
+                    {
+                        firstMatch.scrollIntoView(
+                            {
+                                behavior: "smooth",
+                                block: "center"
+                            }
+                        );
+                    }
+                }
+            );
+
+        /*
+         * En producción podrá habilitarse la apertura automática
+         * durante el primer ingreso descomentando este bloque:
+         *
+         * if (
+         *     !localStorage.getItem("siscardQuickGuideCompleted")
+         * )
+         * {
+         *     window.setTimeout(startTour, 700);
+         * }
+         */
+    </script>
 </body>
+
 </html>
