@@ -171,7 +171,7 @@
         .modules-grid
         {
             display: grid;
-            grid-template-columns: repeat(5, minmax(0, 1fr));
+            grid-template-columns: repeat(4, minmax(0, 1fr));
             gap: 12px;
         }
 
@@ -627,8 +627,6 @@
                 <a
                     class="nav-link"
                     href="https://kiris25.github.io/parametros-emisor/"
-                    target="_blank"
-                    rel="noopener noreferrer"
                     data-tour="parameters"
                 >
                     <span class="nav-icon">
@@ -637,6 +635,20 @@
 
                     <span>
                         Parámetros
+                    </span>
+                </a>
+
+                <a
+                    class="nav-link"
+                    href="formularios.html"
+                    data-tour="forms"
+                >
+                    <span class="nav-icon">
+                        ▧
+                    </span>
+
+                    <span>
+                        Formularios
                     </span>
                 </a>
 
@@ -669,6 +681,34 @@
 
                     <span>
                         Seguridad
+                    </span>
+                </a>
+
+                <a
+                    class="nav-link"
+                    href="aprobaciones.html"
+                    data-tour="approvals"
+                >
+                    <span class="nav-icon">
+                        ✓
+                    </span>
+
+                    <span>
+                        Aprobaciones
+                    </span>
+                </a>
+
+                <a
+                    class="nav-link"
+                    href="mis-solicitudes.html"
+                    data-tour="requests"
+                >
+                    <span class="nav-icon">
+                        ◷
+                    </span>
+
+                    <span>
+                        Mis solicitudes
                     </span>
                 </a>
 
@@ -902,8 +942,6 @@
                         <a
                             class="module-card"
                             href="https://kiris25.github.io/parametros-emisor/"
-                            target="_blank"
-                            rel="noopener noreferrer"
                             data-search="parámetros emisor visor configuraciones"
                         >
                             <span class="module-icon">
@@ -916,6 +954,28 @@
 
                             <small>
                                 Acceda al visor real de Parámetros del Emisor.
+                            </small>
+
+                            <em>
+                                →
+                            </em>
+                        </a>
+
+                        <a
+                            class="module-card"
+                            href="formularios.html"
+                            data-search="formularios parámetros solicitudes gestión"
+                        >
+                            <span class="module-icon">
+                                ▧
+                            </span>
+
+                            <strong>
+                                Formularios
+                            </strong>
+
+                            <small>
+                                Complete formularios basados en las opciones de parámetros.
                             </small>
 
                             <em>
@@ -938,6 +998,50 @@
 
                             <small>
                                 Gestione usuarios, grupos y mantenimiento de accesos.
+                            </small>
+
+                            <em>
+                                →
+                            </em>
+                        </a>
+
+                        <a
+                            class="module-card"
+                            href="aprobaciones.html"
+                            data-search="aprobaciones revisión solicitudes formularios"
+                        >
+                            <span class="module-icon">
+                                ✓
+                            </span>
+
+                            <strong>
+                                Aprobaciones
+                            </strong>
+
+                            <small>
+                                Revise formularios y solicitudes pendientes de aprobación.
+                            </small>
+
+                            <em>
+                                →
+                            </em>
+                        </a>
+
+                        <a
+                            class="module-card"
+                            href="mis-solicitudes.html"
+                            data-search="mis solicitudes seguimiento estados formularios usuarios"
+                        >
+                            <span class="module-icon">
+                                ◷
+                            </span>
+
+                            <strong>
+                                Mis solicitudes
+                            </strong>
+
+                            <small>
+                                Consulte el estado de formularios y gestiones registradas.
                             </small>
 
                             <em>
@@ -1100,8 +1204,6 @@
                             <a
                                 class="quick-link"
                                 href="https://kiris25.github.io/parametros-emisor/"
-                                target="_blank"
-                                rel="noopener noreferrer"
                             >
                                 <span>
                                     ⚙
@@ -1126,6 +1228,57 @@
 
                                 <strong>
                                     Gestionar seguridad
+                                </strong>
+
+                                <em>
+                                    →
+                                </em>
+                            </a>
+
+                            <a
+                                class="quick-link"
+                                href="formularios.html"
+                            >
+                                <span>
+                                    ▧
+                                </span>
+
+                                <strong>
+                                    Abrir formularios
+                                </strong>
+
+                                <em>
+                                    →
+                                </em>
+                            </a>
+
+                            <a
+                                class="quick-link"
+                                href="aprobaciones.html"
+                            >
+                                <span>
+                                    ✓
+                                </span>
+
+                                <strong>
+                                    Revisar aprobaciones
+                                </strong>
+
+                                <em>
+                                    →
+                                </em>
+                            </a>
+
+                            <a
+                                class="quick-link"
+                                href="mis-solicitudes.html"
+                            >
+                                <span>
+                                    ◷
+                                </span>
+
+                                <strong>
+                                    Consultar mis solicitudes
                                 </strong>
 
                                 <em>
@@ -1208,7 +1361,7 @@
                 class="tour-step-label"
                 id="tourStepLabel"
             >
-                Paso 1 de 8
+                Paso 1 de 11
             </span>
 
             <h2 id="tourTitle">
@@ -1329,10 +1482,31 @@
             },
 
             {
+                target: "[data-tour='forms']",
+                title: "Formularios",
+                text:
+                    "Formularios reúne las opciones que el cliente puede completar y enviar a revisión."
+            },
+
+            {
                 target: "[data-tour='security']",
                 title: "Seguridad",
                 text:
                     "Seguridad reúne gestiones de usuarios, grupos, mantenimiento de accesos y reportes."
+            },
+
+            {
+                target: "[data-tour='approvals']",
+                title: "Aprobaciones",
+                text:
+                    "Aprobaciones permite revisar formularios y solicitudes enviados por los clientes."
+            },
+
+            {
+                target: "[data-tour='requests']",
+                title: "Mis solicitudes",
+                text:
+                    "Mis solicitudes muestra el seguimiento y el estado de las gestiones registradas."
             },
 
             {
