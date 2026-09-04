@@ -1,86 +1,66 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
-
-    <meta
-        name="description"
-        content="Formulario de parámetros generales del emisor"
-    >
-
-    <title>
-        Formularios | Landing Siscard+
-    </title>
-
-    <link
-        rel="stylesheet"
-        href="css/styles.css"
-    >
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Formularios de parámetros Siscard+">
+    <title>Formularios | Landing Siscard+</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <style>
+        :root {
+            --form-orange: #ff6c0c;
+            --form-gray: #58595b;
+            --form-line: #d9d9d9;
+            --form-soft: #f7f7f7;
+        }
+
         .form-document,
-        .parameters-panel
-        {
+        .parameters-panel {
+            overflow: hidden;
             border: 1px solid var(--line);
             border-radius: var(--radius-large);
             background: #ffffff;
             box-shadow: var(--shadow-small);
         }
 
-        .form-document
-        {
-            overflow: hidden;
-        }
-
-        .document-heading
-        {
+        .document-heading {
             display: grid;
-            grid-template-columns: 285px minmax(0, 1fr) 170px;
+            grid-template-columns: 270px minmax(0, 1fr) 170px;
             gap: 22px;
             align-items: center;
-            padding: 24px 26px;
+            padding: 22px 25px;
         }
 
-        .evertec-logo
-        {
+        .evertec-logo {
             display: block;
-            width: min(250px, 100%);
+            width: min(245px, 100%);
             height: auto;
         }
 
-        .document-title
-        {
+        .document-title {
             text-align: center;
         }
 
         .document-title strong,
-        .document-title span
-        {
+        .document-title span,
+        .document-code strong,
+        .document-code span {
             display: block;
         }
 
-        .document-title strong
-        {
+        .document-title strong {
             color: var(--sidebar);
             font-size: 20px;
-            font-weight: 700;
         }
 
-        .document-title span
-        {
+        .document-title span {
             margin-top: 4px;
             color: var(--muted);
             font-size: 14px;
         }
 
-        .document-code
-        {
+        .document-code {
             padding: 12px;
             border: 1px solid var(--line);
             border-top: 4px solid var(--orange);
@@ -88,26 +68,13 @@
             text-align: center;
         }
 
-        .document-code strong,
-        .document-code span
-        {
-            display: block;
-        }
-
-        .document-code strong
-        {
-            color: var(--sidebar);
-        }
-
-        .document-code span
-        {
+        .document-code span {
             margin-top: 3px;
             color: var(--muted);
             font-size: 11px;
         }
 
-        .category-band
-        {
+        .category-band {
             padding: 10px 18px;
             background: var(--orange);
             color: #ffffff;
@@ -116,172 +83,156 @@
             font-weight: 800;
         }
 
-        .request-fields
-        {
+        .request-fields {
             display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 16px;
-            padding: 22px 26px 26px;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 15px;
+            padding: 20px 25px 24px;
         }
 
-        .request-field.full
-        {
-            grid-column: 1 / -1;
+        .request-field.wide {
+            grid-column: span 2;
         }
 
-        .request-field label
-        {
+        .request-field label {
             display: block;
             margin-bottom: 6px;
-            color: var(--sidebar);
-            font-size: 12px;
-            font-weight: 800;
-        }
-
-        .request-field input,
-        .request-field select,
-        .request-field textarea
-        {
-            width: 100%;
-            min-height: 43px;
-            padding: 10px 12px;
-            border-radius: var(--radius);
-        }
-
-        .field-hint
-        {
-            display: block;
-            margin-top: 6px;
-            color: var(--muted);
-            font-size: 11px;
-            font-style: italic;
-            line-height: 1.4;
-        }
-
-        .parameters-summary
-        {
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            border-top: 1px solid var(--line);
-        }
-
-        .summary-item
-        {
-            display: grid;
-            grid-template-columns: 145px minmax(0, 1fr);
-            min-height: 48px;
-        }
-
-        .summary-item:nth-child(odd)
-        {
-            border-right: 1px solid var(--line);
-        }
-
-        .summary-label,
-        .summary-value
-        {
-            display: flex;
-            align-items: center;
-            padding: 10px 13px;
-        }
-
-        .summary-label
-        {
-            background: var(--surface-soft);
             color: var(--sidebar);
             font-size: 11px;
             font-weight: 850;
             text-transform: uppercase;
         }
 
-        .summary-value
-        {
-            color: var(--ink);
+        .request-field input,
+        .request-field select {
+            width: 100%;
+            min-height: 43px;
+            padding: 10px 12px;
+            border-radius: var(--radius);
         }
 
-        .parameters-toolbar
-        {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 12px;
-            flex-wrap: wrap;
-            margin: 18px 0 12px;
-            padding: 13px 16px;
+        .field-hint {
+            display: block;
+            margin-top: 5px;
+            color: var(--muted);
+            font-size: 11px;
+            font-style: italic;
+            line-height: 1.4;
+        }
+
+        .options-area {
+            margin-top: 17px;
+            padding: 14px;
             border: 1px solid var(--line);
             border-radius: var(--radius);
             background: #ffffff;
             box-shadow: var(--shadow-small);
         }
 
-        .parameters-toolbar strong,
-        .parameters-toolbar small
-        {
-            display: block;
-        }
-
-        .parameters-toolbar strong
-        {
-            color: var(--sidebar);
-            font-size: 18px;
-        }
-
-        .parameters-toolbar small
-        {
-            margin-top: 3px;
-            color: var(--muted);
-        }
-
-        .parameters-panel
-        {
-            overflow: hidden;
-        }
-
-        .parameters-panel-header
-        {
+        .options-heading,
+        .parameters-toolbar,
+        .parameters-panel-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             gap: 12px;
-            padding: 15px 18px;
+            flex-wrap: wrap;
+        }
+
+        .options-heading {
+            margin-bottom: 10px;
+        }
+
+        .options-heading h2,
+        .parameters-panel-header h2 {
+            margin: 0;
+            color: var(--sidebar);
+            font-weight: 400;
+        }
+
+        .options-menu {
+            display: grid;
+            grid-template-columns: repeat(10, minmax(0, 1fr));
+            gap: 5px;
+        }
+
+        .option-button {
+            min-height: 32px;
+            overflow: hidden;
+            padding: 5px 7px;
+            border: 1px solid var(--line-strong);
+            border-radius: 999px;
+            background: #ffffff;
+            color: var(--sidebar);
+            font-size: 10px;
+            font-weight: 800;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .option-button:hover,
+        .option-button.active {
+            border-color: var(--orange);
+            background: var(--orange);
+            color: #ffffff;
+        }
+
+        .parameters-toolbar {
+            margin: 15px 0 11px;
+            padding: 12px 15px;
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+            background: #ffffff;
+        }
+
+        .parameters-toolbar strong,
+        .parameters-toolbar small {
+            display: block;
+        }
+
+        .parameters-toolbar small {
+            margin-top: 3px;
+            color: var(--muted);
+        }
+
+        .toolbar-actions {
+            display: flex;
+            gap: 7px;
+            flex-wrap: wrap;
+        }
+
+        .parameters-panel-header {
+            padding: 14px 17px;
             border-bottom: 1px solid var(--line);
             background: var(--surface-soft);
         }
 
-        .parameters-panel-header h2
-        {
-            margin: 0;
-            color: var(--sidebar);
-            font-size: 22px;
-            font-weight: 400;
+        .parameter-list {
+            padding: 0 17px;
         }
 
-        .parameter-list
-        {
-            padding: 0 18px;
-        }
-
-        .parameter-row
-        {
-            display: grid;
-            grid-template-columns: 58px minmax(245px, 1fr) minmax(250px, 0.85fr) 42px;
-            gap: 12px;
-            align-items: center;
-            padding: 14px 0;
+        .parameter-card {
             border-bottom: 1px solid var(--line);
         }
 
-        .parameter-row:last-child
-        {
+        .parameter-card:last-child {
             border-bottom: 0;
         }
 
-        .parameter-number
-        {
+        .parameter-card-heading {
+            display: grid;
+            grid-template-columns: 48px minmax(0, 1fr) 38px;
+            gap: 10px;
+            align-items: center;
+            min-height: 60px;
+            cursor: pointer;
+        }
+
+        .parameter-number {
             display: grid;
             place-items: center;
-            width: 44px;
-            height: 44px;
+            width: 40px;
+            height: 40px;
             border: 1px solid var(--line);
             border-top: 3px solid var(--orange);
             border-radius: var(--radius);
@@ -290,49 +241,115 @@
             font-weight: 850;
         }
 
-        .parameter-information strong,
-        .parameter-information small
-        {
+        .parameter-name strong,
+        .parameter-name small {
             display: block;
         }
 
-        .parameter-information strong
-        {
+        .parameter-name strong {
             color: var(--sidebar);
             font-size: 15px;
         }
 
-        .parameter-information small
-        {
-            margin-top: 4px;
+        .parameter-name small {
+            margin-top: 3px;
             color: var(--muted);
         }
 
-        .parameter-control input,
-        .parameter-control select
-        {
+        .collapse-indicator {
+            display: inline-block;
+            width: 18px;
+            color: var(--orange);
+            font-weight: 900;
+        }
+
+        .parameter-help {
+            width: 32px;
+            height: 32px;
+            display: grid;
+            place-items: center;
+            border: 1px solid var(--orange);
+            border-radius: 50%;
+            background: var(--orange-soft);
+            color: var(--orange);
+            font-weight: 900;
+        }
+
+        .parameter-help:hover,
+        .parameter-help:focus {
+            background: var(--orange);
+            color: #ffffff;
+            outline: none;
+        }
+
+        .parameter-body {
+            padding: 0 0 14px 58px;
+        }
+
+        .parameter-card.collapsed .parameter-body {
+            display: none;
+        }
+
+        .parameter-grid {
+            display: grid;
+            grid-template-columns: minmax(230px, 0.7fr) minmax(260px, 1fr);
+            gap: 12px;
+        }
+
+        .parameter-meta,
+        .parameter-entry {
+            padding: 12px;
+            border: 1px solid var(--line);
+            border-top: 3px solid #b7b7b7;
+            border-radius: var(--radius);
+            background: var(--surface-soft);
+        }
+
+        .parameter-meta strong,
+        .parameter-entry label {
+            display: block;
+            margin-bottom: 7px;
+            color: var(--sidebar);
+            font-size: 11px;
+            font-weight: 850;
+            text-transform: uppercase;
+        }
+
+        .value-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+
+        .value-chip {
+            padding: 4px 7px;
+            border: 1px solid var(--line);
+            border-radius: var(--radius-small);
+            background: #ffffff;
+            font-size: 11px;
+        }
+
+        .parameter-entry input,
+        .parameter-entry select {
             width: 100%;
             min-height: 42px;
             padding: 9px 11px;
             border-radius: var(--radius);
         }
 
-        .parameter-control input.valid,
-        .parameter-control select.valid
-        {
+        .parameter-entry input.valid,
+        .parameter-entry select.valid {
             border-color: var(--green);
             background: #f3fbf7;
         }
 
-        .parameter-control input.invalid,
-        .parameter-control select.invalid
-        {
+        .parameter-entry input.invalid,
+        .parameter-entry select.invalid {
             border-color: var(--red);
             background: #fff5f5;
         }
 
-        .validation-message
-        {
+        .validation-message {
             display: block;
             min-height: 15px;
             margin-top: 4px;
@@ -340,396 +357,184 @@
             font-size: 11px;
         }
 
-        .parameter-help
-        {
-            width: 34px;
-            height: 34px;
-            display: grid;
-            place-items: center;
-            border: 1px solid var(--orange);
-            border-radius: 50%;
-            background: var(--orange-soft);
-            color: var(--orange);
-            font-size: 16px;
-            font-weight: 900;
-        }
-
-        .parameter-help:hover,
-        .parameter-help:focus
-        {
-            background: var(--orange);
-            color: #ffffff;
-            outline: none;
-        }
-
-        .parameter-tooltip
-        {
+        .parameter-tooltip {
             position: fixed;
             z-index: 250;
-            width: min(460px, calc(100vw - 28px));
-            max-height: min(540px, calc(100vh - 28px));
+            width: min(340px, calc(100vw - 28px));
+            max-height: min(390px, calc(100vh - 28px));
             overflow-y: auto;
-            padding: 16px;
+            padding: 14px;
             border: 1px solid var(--line);
             border-top: 4px solid var(--orange);
-            border-radius: var(--radius-large);
+            border-radius: var(--radius);
             background: #ffffff;
             box-shadow: var(--shadow-medium);
         }
 
-        .parameter-tooltip[hidden]
-        {
+        .parameter-tooltip[hidden] {
             display: none;
         }
 
-        .parameter-tooltip h3
-        {
-            margin: 5px 0 10px;
+        .parameter-tooltip h3 {
+            margin: 4px 0 8px;
             color: var(--sidebar);
-            font-size: 19px;
+            font-size: 17px;
         }
 
-        .tooltip-section
-        {
-            margin-top: 11px;
-            padding-top: 11px;
-            border-top: 1px solid var(--line);
-        }
-
-        .tooltip-section strong
-        {
-            display: block;
-            margin-bottom: 5px;
-            color: var(--sidebar);
-            font-size: 11px;
-            text-transform: uppercase;
-        }
-
-        .tooltip-section p
-        {
+        .parameter-tooltip p {
             margin: 0;
             color: var(--muted);
-            line-height: 1.45;
-            white-space: pre-wrap;
+            font-size: 12px;
+            line-height: 1.4;
         }
 
-        .allowed-values
-        {
+        .tooltip-values {
             display: flex;
             flex-wrap: wrap;
-            gap: 6px;
+            gap: 5px;
+            margin: 9px 0;
         }
 
-        .allowed-value
-        {
-            padding: 5px 7px;
+        .tooltip-values span {
+            padding: 4px 6px;
             border: 1px solid var(--line);
-            border-radius: var(--radius-small);
             background: var(--surface-soft);
-            font-size: 11px;
+            font-size: 10px;
         }
 
-        .empty-state
-        {
+        .tooltip-link {
+            display: inline-flex;
+            margin-top: 9px;
+            color: var(--orange-dark);
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+        .empty-state,
+        .error-state {
             padding: 34px;
-            color: var(--muted);
             text-align: center;
         }
 
-        .load-error
-        {
-            margin: 15px 0;
-            padding: 12px;
-            border-left: 4px solid var(--red);
-            background: #fff1f0;
+        .empty-state {
+            color: var(--muted);
+        }
+
+        .error-state {
             color: var(--red);
         }
 
-        .load-error[hidden]
-        {
-            display: none;
-        }
+        @media (max-width: 1180px) {
+            .options-menu {
+                grid-template-columns: repeat(6, minmax(0, 1fr));
+            }
 
-        @media (max-width: 1100px)
-        {
-            .document-heading
-            {
+            .document-heading {
                 grid-template-columns: 220px minmax(0, 1fr);
             }
 
-            .document-code
-            {
+            .document-code {
                 grid-column: 1 / -1;
-            }
-
-            .parameter-row
-            {
-                grid-template-columns: 50px minmax(0, 1fr) 40px;
-            }
-
-            .parameter-control
-            {
-                grid-column: 2 / 4;
             }
         }
 
-        @media (max-width: 760px)
-        {
-            .document-heading,
+        @media (max-width: 850px) {
             .request-fields,
-            .parameters-summary
-            {
+            .parameter-grid,
+            .document-heading {
                 grid-template-columns: 1fr;
             }
 
-            .document-heading
-            {
-                text-align: center;
-            }
-
-            .evertec-logo
-            {
-                margin: 0 auto;
-            }
-
-            .request-field.full
-            {
+            .request-field.wide {
                 grid-column: auto;
             }
 
-            .summary-item:nth-child(odd)
-            {
-                border-right: 0;
+            .evertec-logo {
+                margin: 0 auto;
             }
 
-            .summary-item
-            {
-                grid-template-columns: 120px minmax(0, 1fr);
-                border-bottom: 1px solid var(--line);
+            .parameter-body {
+                padding-left: 0;
+            }
+        }
+
+        @media (max-width: 620px) {
+            .options-menu {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
             }
         }
     </style>
 </head>
-
 <body>
     <div class="app-shell">
-        <aside
-            class="sidebar"
-            id="sidebar"
-        >
+        <aside class="sidebar" id="sidebar">
             <div class="brand">
                 <div class="brand-mark"></div>
-
                 <div class="brand-copy">
-                    <strong>
-                        Landing
-                        <span>
-                            Siscard+
-                        </span>
-                    </strong>
-
-                    <small>
-                        Autogestión digital
-                    </small>
+                    <strong>Landing <span>Siscard+</span></strong>
+                    <small>Autogestión digital</small>
                 </div>
             </div>
 
             <nav class="side-nav">
-                <p class="nav-label">
-                    Principal
-                </p>
-
-                <a
-                    class="nav-link"
-                    href="index.html"
-                >
-                    <span class="nav-icon">
-                        ⌂
-                    </span>
-
-                    <span>
-                        Inicio
-                    </span>
+                <p class="nav-label">Principal</p>
+                <a class="nav-link" href="index.html">
+                    <span class="nav-icon">⌂</span><span>Inicio</span>
                 </a>
 
-                <p class="nav-label">
-                    Conocimiento
-                </p>
-
-                <a
-                    class="nav-link"
-                    href="manuales.html"
-                >
-                    <span class="nav-icon">
-                        ▤
-                    </span>
-
-                    <span>
-                        Manuales
-                    </span>
+                <p class="nav-label">Conocimiento</p>
+                <a class="nav-link" href="manuales.html">
+                    <span class="nav-icon">▤</span><span>Manuales</span>
+                </a>
+                <a class="nav-link" href="https://kiris25.github.io/parametros-emisor/">
+                    <span class="nav-icon">⚙</span><span>Parámetros</span>
+                </a>
+                <a class="nav-link active" href="formularios.html" aria-current="page">
+                    <span class="nav-icon">▧</span><span>Formularios</span>
+                </a>
+                <a class="nav-link" href="landing-ia.html">
+                    <span class="nav-icon">✦</span><span>Landing IA</span>
                 </a>
 
-                <a
-                    class="nav-link"
-                    href="https://kiris25.github.io/parametros-emisor/"
-                >
-                    <span class="nav-icon">
-                        ⚙
-                    </span>
-
-                    <span>
-                        Parámetros
-                    </span>
+                <p class="nav-label">Gestión</p>
+                <a class="nav-link" href="seguridad.html">
+                    <span class="nav-icon">🔐</span><span>Seguridad</span>
                 </a>
-
-                <a
-                    class="nav-link active"
-                    href="formularios.html"
-                    aria-current="page"
-                >
-                    <span class="nav-icon">
-                        ▧
-                    </span>
-
-                    <span>
-                        Formularios
-                    </span>
+                <a class="nav-link" href="aprobaciones.html">
+                    <span class="nav-icon">✓</span><span>Aprobaciones</span>
                 </a>
-
-                <a
-                    class="nav-link"
-                    href="landing-ia.html"
-                >
-                    <span class="nav-icon">
-                        ✦
-                    </span>
-
-                    <span>
-                        Landing IA
-                    </span>
+                <a class="nav-link" href="mis-solicitudes.html">
+                    <span class="nav-icon">◷</span><span>Mis solicitudes</span>
                 </a>
-
-                <p class="nav-label">
-                    Gestión
-                </p>
-
-                <a
-                    class="nav-link"
-                    href="seguridad.html"
-                >
-                    <span class="nav-icon">
-                        🔐
-                    </span>
-
-                    <span>
-                        Seguridad
-                    </span>
-                </a>
-
-                <a
-                    class="nav-link"
-                    href="aprobaciones.html"
-                >
-                    <span class="nav-icon">
-                        ✓
-                    </span>
-
-                    <span>
-                        Aprobaciones
-                    </span>
-                </a>
-
-                <a
-                    class="nav-link"
-                    href="mis-solicitudes.html"
-                >
-                    <span class="nav-icon">
-                        ◷
-                    </span>
-
-                    <span>
-                        Mis solicitudes
-                    </span>
-                </a>
-
-                <a
-                    class="nav-link"
-                    href="comunicados.html"
-                >
-                    <span class="nav-icon">
-                        ◉
-                    </span>
-
-                    <span>
-                        Comunicados
-                    </span>
+                <a class="nav-link" href="comunicados.html">
+                    <span class="nav-icon">◉</span><span>Comunicados</span>
                 </a>
             </nav>
-
-            <div class="side-note">
-                <strong>
-                    Formularios Siscard+
-                </strong>
-
-                <p>
-                    Complete solicitudes basadas en los parámetros publicados.
-                </p>
-            </div>
         </aside>
 
         <div class="main-area">
             <header class="topbar">
-                <button
-                    class="menu-button"
-                    id="menuButton"
-                    type="button"
-                    aria-label="Abrir menú"
-                >
-                    ☰
-                </button>
-
+                <button class="menu-button" id="menuButton" type="button" aria-label="Abrir menú">☰</button>
                 <div class="top-title">
-                    <strong>
-                        Formularios Siscard+
-                    </strong>
-
-                    <small>
-                        Solicitud de parámetros
-                    </small>
+                    <strong>Formularios Siscard+</strong>
+                    <small>Parámetros rellenables</small>
                 </div>
             </header>
 
             <main class="content">
                 <section class="form-document">
                     <div class="document-heading">
-                        <img
-                            class="evertec-logo"
-                            src="assets/logo-evertec.png"
-                            alt="Evertec"
-                        >
+                        <img class="evertec-logo" src="assets/logo-evertec.png" alt="Evertec">
 
                         <div class="document-title">
-                            <strong>
-                                Evertec Costa Rica
-                            </strong>
-
-                            <span>
-                                Parámetros del emisor - TRT08SN0
-                            </span>
-
-                            <span>
-                                OPC5 Parámetros generales del emisor
-                            </span>
+                            <strong>Evertec Costa Rica</strong>
+                            <span>Parámetros del emisor - TRT08SN0</span>
+                            <span id="documentOptionTitle">OPC05 Parámetros generales del emisor</span>
                         </div>
 
                         <div class="document-code">
-                            <strong>
-                                OPE-PA-FO-003
-                            </strong>
-
-                            <span>
-                                Opción 5
-                            </span>
+                            <strong id="documentCode">OPE-PA-FO-003</strong>
+                            <span id="documentOptionCode">Opción 05</span>
                         </div>
                     </div>
 
@@ -737,712 +542,676 @@
                         Incluir en Categoría: CR.TRAMITES.Parametros Siscard
                     </div>
 
-                    <form
-                        class="request-fields"
-                        id="requestHeaderForm"
-                    >
+                    <form class="request-fields" id="requestForm">
                         <div class="request-field">
-                            <label for="clientName">
-                                Cliente
-                            </label>
-
-                            <input
-                                id="clientName"
-                                name="clientName"
-                                required
-                                placeholder="Nombre del cliente"
-                            >
+                            <label for="clientName">Cliente</label>
+                            <input id="clientName" required placeholder="Nombre del cliente">
                         </div>
 
                         <div class="request-field">
-                            <label for="requestDate">
-                                Fecha de solicitud
-                            </label>
-
-                            <input
-                                id="requestDate"
-                                name="requestDate"
-                                type="date"
-                                readonly
-                            >
+                            <label for="requestDate">Fecha de solicitud</label>
+                            <input id="requestDate" type="date" readonly>
                         </div>
 
                         <div class="request-field">
-                            <label for="issuerName">
-                                Emisor
-                            </label>
-
-                            <input
-                                id="issuerName"
-                                name="issuerName"
-                                required
-                                placeholder="Nombre o código del emisor"
-                            >
+                            <label for="issuerName">Emisor</label>
+                            <input id="issuerName" required placeholder="Nombre o código del emisor">
                         </div>
 
                         <div class="request-field">
-                            <label for="requestedAction">
-                                Acción por realizar
-                            </label>
-
-                            <select
-                                id="requestedAction"
-                                name="requestedAction"
-                                required
-                            >
-                                <option value="">
-                                    Seleccione una acción
-                                </option>
-
-                                <option value="agregar">
-                                    Agregar
-                                </option>
-
-                                <option value="modificar">
-                                    Modificar
-                                </option>
-
-                                <option value="eliminar">
-                                    Eliminar
-                                </option>
+                            <label for="requestedAction">Acción por realizar</label>
+                            <select id="requestedAction" required>
+                                <option value="">Seleccione una acción</option>
+                                <option value="Agregar">Agregar</option>
+                                <option value="Modificar">Modificar</option>
+                                <option value="Eliminar">Eliminar</option>
                             </select>
                         </div>
 
-                        <div class="request-field full">
-                            <label for="requiredDateTime">
-                                Fecha y hora en la que se requiere la solicitud
-                            </label>
+                        <div class="request-field">
+                            <label for="productFilter">Producto</label>
+                            <select id="productFilter">
+                                <option value="Todos">Todos</option>
+                                <option value="Credito">Crédito</option>
+                                <option value="Debito">Débito</option>
+                                <option value="Prepago">Prepago</option>
+                                <option value="Corporativo">Corporativo</option>
+                            </select>
+                        </div>
 
-                            <input
-                                id="requiredDateTime"
-                                name="requiredDateTime"
-                                type="datetime-local"
-                            >
-
+                        <div class="request-field wide">
+                            <label for="requiredDateTime">Fecha y hora en la que se requiere la solicitud</label>
+                            <input id="requiredDateTime" type="datetime-local">
                             <small class="field-hint">
-                                Se debe completar cuando se requiera que lo solicitado
-                                se realice en una fecha y hora en específico.
+                                Se debe completar cuando se requiera que lo solicitado se realice en una fecha y hora en específico.
                             </small>
                         </div>
                     </form>
-
-                    <div class="parameters-summary">
-                        <div class="summary-item">
-                            <span class="summary-label">
-                                Producto
-                            </span>
-
-                            <span class="summary-value">
-                                Débito
-                            </span>
-                        </div>
-
-                        <div class="summary-item">
-                            <span class="summary-label">
-                                Descripción
-                            </span>
-
-                            <span class="summary-value">
-                                Parámetros generales del emisor
-                            </span>
-                        </div>
-                    </div>
                 </section>
 
-                <div
-                    class="load-error"
-                    id="loadError"
-                    hidden
-                ></div>
+                <section class="options-area">
+                    <div class="options-heading">
+                        <div>
+                            <span class="section-kicker">Opciones del visor</span>
+                            <h2>Seleccione una opción</h2>
+                        </div>
+                    </div>
+                    <nav class="options-menu" id="optionsMenu"></nav>
+                </section>
 
                 <section class="parameters-toolbar">
                     <div>
-                        <strong id="recordCount">
-                            Cargando parámetros...
-                        </strong>
-
-                        <small>
-                            Complete únicamente los valores requeridos para la solicitud.
-                        </small>
+                        <strong id="recordCount">Cargando parámetros...</strong>
+                        <small id="currentOptionText">Opción 05</small>
                     </div>
 
-                    <button
-                        class="primary-button"
-                        id="reloadButton"
-                        type="button"
-                    >
-                        Recargar datos
-                    </button>
+                    <div class="toolbar-actions">
+                        <button class="tertiary-button" id="hideAllButton" type="button">Esconder todos</button>
+                        <button class="tertiary-button" id="showAllButton" type="button">Mostrar todos</button>
+                        <button class="tertiary-button" id="exportExcelButton" type="button">Exportar Excel</button>
+                        <button class="tertiary-button" id="exportPdfButton" type="button">Exportar PDF</button>
+                        <button class="primary-button" id="saveButton" type="button">Guardar</button>
+                    </div>
                 </section>
 
                 <section class="parameters-panel">
                     <header class="parameters-panel-header">
-                        <h2>
-                            Parámetros generales del emisor
-                        </h2>
+                        <h2 id="parametersTitle">Parámetros generales del emisor</h2>
                     </header>
-
-                    <div
-                        class="parameter-list"
-                        id="parameterContainer"
-                    >
-                        <div class="empty-state">
-                            Cargando parámetros...
-                        </div>
+                    <div class="parameter-list" id="parameterContainer">
+                        <div class="empty-state">Cargando parámetros...</div>
                     </div>
                 </section>
             </main>
-
-            <footer class="footer">
-                <span>
-                    <strong>
-                        Landing Siscard+
-                    </strong>
-                    · Formularios
-                </span>
-
-                <span>
-                    Opción 5 · TRT08SN0
-                </span>
-            </footer>
         </div>
     </div>
 
-    <aside
-        class="parameter-tooltip"
-        id="parameterTooltip"
-        hidden
-    ></aside>
-
-    <div
-        class="toast"
-        id="toast"
-        role="status"
-        aria-live="polite"
-    ></div>
+    <aside class="parameter-tooltip" id="parameterTooltip" hidden></aside>
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
     <script src="js/app.js"></script>
-
-    <script src="js/parametros-source.js"></script>
-
     <script>
         "use strict";
 
-        const OPTION_NUMBER = 5;
+        const PARAMETER_BASE_URL =
+            "https://kiris25.github.io/parametros-emisor/data/externo/";
 
-        const parameterContainer =
-            document.getElementById("parameterContainer");
+        const GITHUB_SETTINGS = {
+            owner: "Kiris25",
+            repository: "siscard-plus-landing",
+            branch: "main",
+            path: "data/solicitudes.json"
+        };
 
-        const parameterTooltip =
-            document.getElementById("parameterTooltip");
+        const OPTIONS = [
+            ["05", "Consultar"], ["12", "Trabajar con"],
+            ["13", "Moneda"], ["14", "Clasificación"],
+            ["15", "Membresías"], ["16", "Cargos Auto"],
+            ["17", "Ciclos"], ["18", "Tipo Cliente"],
+            ["19", "Renovación"], ["20", "Pólizas"],
+            ["21", "Mensajes"], ["22", "Sorteos"],
+            ["23", "Estados"], ["24", "Clases"],
+            ["25", "Trasiego"], ["26", "Cargos I.V."],
+            ["27", "Corporativo"], ["28", "Skip Pay"],
+            ["29", "Diseño"], ["30", "Extrafin."],
+            ["31", "Limpiar"], ["32", "Tipo Cta."],
+            ["33", "Costos"], ["34", "Estados Cta."],
+            ["35", "Excepciones"], ["36", "Origen"],
+            ["38", "No Intereses"], ["39", "Excep."],
+            ["40", "Documentos"], ["42", "Prepago"],
+            ["44", "Reducc."], ["45", "Vence Pago"],
+            ["46", "Copia"], ["47", "Deterioro"],
+            ["48", "Prospecto"], ["49", "Renov. Tarj."],
+            ["50", "Renov. Emisor"], ["52", "Rangos"],
+            ["53", "Tecnología"]
+        ];
 
-        const recordCount =
-            document.getElementById("recordCount");
+        const FIELD_NAMES = {
+            name: ["nombre", "parametro", "titulo", "name"],
+            product: ["producto", "product"],
+            values: ["valores", "valoresPermitidos", "opciones", "allowedValues"],
+            description: ["que", "descripcion", "detalle", "description"],
+            operation: ["como", "funcionamiento", "how"],
+            dependencies: ["dependencias", "dep", "reglas", "dependencies"],
+            notes: ["notas", "observaciones", "notes"]
+        };
 
-        const loadError =
-            document.getElementById("loadError");
+        let currentOption = "05";
+        let allParameters = [];
+        let visibleParameters = [];
+        let collapsedCards = new Set();
 
-        let currentParameters = [];
+        const parameterContainer = document.getElementById("parameterContainer");
+        const parameterTooltip = document.getElementById("parameterTooltip");
 
-        function escapeHtml(value)
-        {
-            const temporal = document.createElement("div");
-
-            temporal.textContent = String(value ?? "");
-
-            return temporal.innerHTML;
+        function normalize(value) {
+            return String(value ?? "")
+                .toLowerCase()
+                .normalize("NFD")
+                .replace(/[\u0300-\u036f]/g, "")
+                .replace(/[^a-z0-9]+/g, " ")
+                .replace(/\s+/g, " ")
+                .trim();
         }
 
-        function compactName(parameter)
-        {
-            const name = String(parameter.nombre || "").trim();
+        function plainText(value) {
+            const temporary = document.createElement("div");
+            temporary.innerHTML = String(value ?? "");
+            return temporary.textContent.trim();
+        }
 
-            if (!name)
-            {
-                return "Parámetro sin nombre";
+        function field(record, names, defaultValue = "") {
+            for (const name of names) {
+                const value = record?.[name];
+                if (value !== undefined && value !== null && String(value).trim() !== "") {
+                    return plainText(value);
+                }
+            }
+            return defaultValue;
+        }
+
+        function escapeHtml(value) {
+            const temporary = document.createElement("div");
+            temporary.textContent = String(value ?? "");
+            return temporary.innerHTML;
+        }
+
+        function allowedValues(record) {
+            const original =
+                record.valoresPermitidos ??
+                record.valores ??
+                record.opciones ??
+                record.allowedValues ??
+                "";
+
+            if (Array.isArray(original)) {
+                return original.map((item) =>
+                    typeof item === "string"
+                        ? item.trim()
+                        : field(item, ["valor", "codigo", "nombre", "descripcion", "label"])
+                ).filter(Boolean);
             }
 
-            const id = String(parameter.id || "").trim();
+            const text = plainText(original);
+            if (!text) return [];
 
-            if (
-                id &&
-                name.toLowerCase().startsWith(
-                    id.toLowerCase()
-                )
-            )
-            {
-                return name
-                    .slice(id.length)
-                    .replace(/^\s*[-–—:]\s*/, "")
-                    .trim() || name;
-            }
-
-            return name.replace(
-                /^[0-9a-f]{8}-[0-9a-f-]{20,}\s*[-–—:]?\s*/i,
-                ""
-            );
+            return text
+                .split(/\r?\n|;|\|/)
+                .map((item) => item.trim())
+                .filter(Boolean);
         }
 
-        function setCurrentDate()
-        {
-            const now = new Date();
-
-            const localDate = new Date(
-                now.getTime() - now.getTimezoneOffset() * 60000
+        function adaptRecord(record, index) {
+            const identifier = field(
+                record,
+                ["id", "numero", "codigo", "orden"],
+                `${currentOption}-${index + 1}`
             );
 
-            document.getElementById("requestDate").value =
-                localDate.toISOString().slice(0, 10);
+            return {
+                id: identifier,
+                number: index + 1,
+                name: field(record, FIELD_NAMES.name, `Parámetro ${index + 1}`),
+                product: field(record, FIELD_NAMES.product, "Todos"),
+                values: allowedValues(record),
+                description: field(record, FIELD_NAMES.description),
+                operation: field(record, FIELD_NAMES.operation),
+                dependencies: field(record, FIELD_NAMES.dependencies),
+                notes: field(record, FIELD_NAMES.notes),
+                value: "",
+                original: record
+            };
         }
 
-        function buildControl(parameter)
-        {
-            const allowedValues =
-                Array.isArray(parameter.valoresPermitidos)
-                    ? parameter.valoresPermitidos
-                    : [];
+        function optionName(code) {
+            return OPTIONS.find((item) => item[0] === code)?.[1] || "";
+        }
 
-            if (allowedValues.length)
-            {
-                return `
-                    <select
-                        class="parameter-select"
-                        data-parameter-id="${escapeHtml(parameter.id)}"
+        function productApplies(parameterProduct, selectedProduct) {
+            if (selectedProduct === "Todos") return true;
+
+            const product = normalize(parameterProduct);
+            const selected = normalize(selectedProduct);
+
+            if (!product || product === "todos" || product === "todo") return true;
+
+            return product.includes(selected);
+        }
+
+        function buildOptionsMenu() {
+            document.getElementById("optionsMenu").innerHTML = OPTIONS
+                .map(([code, name]) => `
+                    <button
+                        class="option-button ${currentOption === code ? "active" : ""}"
+                        type="button"
+                        data-option="${code}"
+                        title="Op. ${code} · ${escapeHtml(name)}"
                     >
-                        <option value="">
-                            Seleccione un valor
-                        </option>
+                        Op. ${code} · ${escapeHtml(name)}
+                    </button>
+                `)
+                .join("");
+        }
 
-                        ${allowedValues
-                            .map(
-                                function(value)
-                                {
-                                    return `
-                                        <option value="${escapeHtml(value)}">
-                                            ${escapeHtml(value)}
-                                        </option>
-                                    `;
-                                }
-                            )
-                            .join("")}
+        function buildInput(parameter) {
+            if (parameter.values.length) {
+                return `
+                    <select data-entry-id="${escapeHtml(parameter.id)}">
+                        <option value="">Seleccione un valor</option>
+                        ${parameter.values.map((value) => `
+                            <option value="${escapeHtml(value)}">${escapeHtml(value)}</option>
+                        `).join("")}
                     </select>
-
                     <small class="validation-message"></small>
                 `;
             }
 
             return `
                 <input
-                    class="parameter-input"
-                    data-parameter-id="${escapeHtml(parameter.id)}"
+                    data-entry-id="${escapeHtml(parameter.id)}"
                     placeholder="Digite el valor solicitado"
                 >
-
                 <small class="validation-message"></small>
             `;
         }
 
-        function renderParameters(parameters)
-        {
-            currentParameters = parameters;
+        function renderParameters() {
+            const selectedProduct = document.getElementById("productFilter").value;
 
-            if (!parameters.length)
-            {
+            visibleParameters = allParameters.filter((parameter) =>
+                productApplies(parameter.product, selectedProduct)
+            );
+
+            document.getElementById("recordCount").textContent =
+                `${visibleParameters.length} parámetro${visibleParameters.length === 1 ? "" : "s"} disponibles`;
+
+            document.getElementById("currentOptionText").textContent =
+                `Opción ${currentOption} · ${optionName(currentOption)} · Producto: ${selectedProduct}`;
+
+            document.getElementById("parametersTitle").textContent =
+                `Op. ${currentOption} · ${optionName(currentOption)}`;
+
+            document.getElementById("documentOptionTitle").textContent =
+                `OPC${currentOption} ${optionName(currentOption)}`;
+
+            document.getElementById("documentOptionCode").textContent =
+                `Opción ${currentOption}`;
+
+            if (!visibleParameters.length) {
                 parameterContainer.innerHTML = `
                     <div class="empty-state">
-                        La opción 5 no contiene parámetros publicados.
+                        No hay parámetros publicados para esta opción y producto.
                     </div>
                 `;
-
                 return;
             }
 
-            parameterContainer.innerHTML = parameters
-                .map(
-                    function(parameter, index)
-                    {
-                        const displayName = compactName(parameter);
+            parameterContainer.innerHTML = visibleParameters
+                .map((parameter) => {
+                    const collapsed = collapsedCards.has(parameter.id);
+                    const chips = parameter.values.length
+                        ? parameter.values.slice(0, 12).map((value) =>
+                            `<span class="value-chip">${escapeHtml(value)}</span>`
+                        ).join("")
+                        : `<span class="value-chip">Entrada manual</span>`;
 
-                        return `
-                            <div
-                                class="parameter-row"
-                                data-row-id="${escapeHtml(parameter.id)}"
-                            >
-                                <span class="parameter-number">
-                                    ${index + 1}
-                                </span>
-
-                                <div class="parameter-information">
+                    return `
+                        <article
+                            class="parameter-card ${collapsed ? "collapsed" : ""}"
+                            data-card-id="${escapeHtml(parameter.id)}"
+                        >
+                            <header class="parameter-card-heading" data-toggle-id="${escapeHtml(parameter.id)}">
+                                <span class="parameter-number">${parameter.number}</span>
+                                <div class="parameter-name">
                                     <strong>
-                                        ${escapeHtml(displayName)}
+                                        <span class="collapse-indicator">${collapsed ? "▶" : "▼"}</span>
+                                        ${escapeHtml(parameter.name)}
                                     </strong>
-
-                                    <small>
-                                        Opción ${OPTION_NUMBER}
-                                        ${parameter.producto
-                                            ? ` · ${escapeHtml(parameter.producto)}`
-                                            : ""}
-                                    </small>
+                                    <small>${escapeHtml(parameter.product || "Todos")}</small>
                                 </div>
-
-                                <div class="parameter-control">
-                                    ${buildControl(parameter)}
-                                </div>
-
                                 <button
                                     class="parameter-help"
                                     type="button"
                                     data-help-id="${escapeHtml(parameter.id)}"
-                                    aria-label="Consultar ficha de ${escapeHtml(displayName)}"
-                                    title="Consultar ficha del parámetro"
-                                >
-                                    ?
-                                </button>
+                                    title="Ver ficha del parámetro"
+                                    aria-label="Ver ficha de ${escapeHtml(parameter.name)}"
+                                >?</button>
+                            </header>
+
+                            <div class="parameter-body">
+                                <div class="parameter-grid">
+                                    <div class="parameter-meta">
+                                        <strong>Valores permitidos</strong>
+                                        <div class="value-chips">${chips}</div>
+                                    </div>
+
+                                    <div class="parameter-entry">
+                                        <label>Valor solicitado</label>
+                                        ${buildInput(parameter)}
+                                    </div>
+                                </div>
                             </div>
-                        `;
-                    }
-                )
+                        </article>
+                    `;
+                })
                 .join("");
 
-            attachValidationEvents();
-
-            attachTooltipEvents();
+            attachParameterEvents();
         }
 
-        function validateControl(control)
-        {
-            const parameter = currentParameters.find(
-                function(item)
-                {
-                    return String(item.id) ===
-                        String(control.dataset.parameterId);
-                }
+        function validateInput(control) {
+            const parameter = allParameters.find((item) =>
+                String(item.id) === String(control.dataset.entryId)
             );
 
-            const message = control.parentElement.querySelector(
-                ".validation-message"
-            );
-
+            const message = control.parentElement.querySelector(".validation-message");
             const value = control.value.trim();
 
             control.classList.remove("valid", "invalid");
-
             message.textContent = "";
 
-            if (!value || !parameter)
-            {
-                return;
-            }
+            if (!parameter) return;
+            parameter.value = value;
+            if (!value) return;
 
-            const allowedValues =
-                Array.isArray(parameter.valoresPermitidos)
-                    ? parameter.valoresPermitidos
-                    : [];
-
-            if (
-                allowedValues.length &&
-                !allowedValues.includes(value)
-            )
-            {
+            if (parameter.values.length && !parameter.values.includes(value)) {
                 control.classList.add("invalid");
-
-                message.textContent =
-                    "El valor no se encuentra entre los valores permitidos.";
-
+                message.textContent = "El valor no se encuentra entre los valores permitidos.";
                 return;
             }
 
             control.classList.add("valid");
         }
 
-        function attachValidationEvents()
-        {
-            document
-                .querySelectorAll(
-                    ".parameter-input, .parameter-select"
-                )
-                .forEach(
-                    function(control)
-                    {
-                        control.addEventListener(
-                            "change",
-                            function()
-                            {
-                                validateControl(control);
-                            }
-                        );
+        function attachParameterEvents() {
+            document.querySelectorAll("[data-toggle-id]").forEach((heading) => {
+                heading.addEventListener("click", (event) => {
+                    if (event.target.closest(".parameter-help")) return;
+                    const id = heading.dataset.toggleId;
+                    if (collapsedCards.has(id)) collapsedCards.delete(id);
+                    else collapsedCards.add(id);
+                    renderParameters();
+                });
+            });
 
-                        control.addEventListener(
-                            "blur",
-                            function()
-                            {
-                                validateControl(control);
-                            }
-                        );
-                    }
+            document.querySelectorAll("[data-entry-id]").forEach((control) => {
+                const parameter = allParameters.find((item) =>
+                    String(item.id) === String(control.dataset.entryId)
                 );
+                if (parameter?.value) control.value = parameter.value;
+                control.addEventListener("change", () => validateInput(control));
+                control.addEventListener("blur", () => validateInput(control));
+            });
+
+            document.querySelectorAll("[data-help-id]").forEach((button) => {
+                const parameter = allParameters.find((item) =>
+                    String(item.id) === String(button.dataset.helpId)
+                );
+
+                const show = () => showTooltip(button, parameter);
+                button.addEventListener("mouseenter", show);
+                button.addEventListener("focus", show);
+                button.addEventListener("click", show);
+                button.addEventListener("mouseleave", hideTooltipSoon);
+            });
         }
 
-        function buildTooltipSection(title, value)
-        {
-            if (!value)
-            {
-                return "";
-            }
+        function showTooltip(button, parameter) {
+            if (!parameter) return;
 
-            return `
-                <div class="tooltip-section">
-                    <strong>
-                        ${escapeHtml(title)}
-                    </strong>
+            const values = parameter.values.length
+                ? parameter.values.slice(0, 10).map((value) =>
+                    `<span>${escapeHtml(value)}</span>`
+                ).join("")
+                : `<span>Entrada manual</span>`;
 
-                    <p>
-                        ${escapeHtml(value)}
-                    </p>
-                </div>
-            `;
-        }
-
-        function positionTooltip(button)
-        {
-            const rectangle = button.getBoundingClientRect();
-
-            const tooltipWidth = Math.min(
-                460,
-                window.innerWidth - 28
-            );
-
-            let left = rectangle.right + 12;
-
-            if (left + tooltipWidth > window.innerWidth - 14)
-            {
-                left = rectangle.left - tooltipWidth - 12;
-            }
-
-            parameterTooltip.style.left =
-                `${Math.max(14, left)}px`;
-
-            parameterTooltip.style.top =
-                `${Math.max(
-                    14,
-                    Math.min(
-                        rectangle.top,
-                        window.innerHeight - 450
-                    )
-                )}px`;
-        }
-
-        function showTooltip(button, parameter)
-        {
-            if (!parameter)
-            {
-                return;
-            }
-
-            const allowedValues =
-                Array.isArray(parameter.valoresPermitidos)
-                    ? parameter.valoresPermitidos
-                    : [];
-
-            const valuesMarkup = allowedValues.length
-                ? allowedValues
-                    .map(
-                        function(value)
-                        {
-                            return `
-                                <span class="allowed-value">
-                                    ${escapeHtml(value)}
-                                </span>
-                            `;
-                        }
-                    )
-                    .join("")
-                : `
-                    <span class="allowed-value">
-                        Entrada manual en esta fase
-                    </span>
-                `;
+            const url = new URL("https://kiris25.github.io/parametros-emisor/");
+            url.searchParams.set("modo", "ficha");
+            url.searchParams.set("idioma", "es");
+            url.searchParams.set("ambito", "externo");
+            url.searchParams.set("opcion", currentOption);
+            url.searchParams.set("id", parameter.id);
 
             parameterTooltip.innerHTML = `
-                <span class="section-kicker">
-                    Opción ${OPTION_NUMBER}
-                </span>
-
-                <h3>
-                    ${escapeHtml(compactName(parameter))}
-                </h3>
-
-                ${buildTooltipSection(
-                    "¿Qué hace?",
-                    parameter.descripcion
-                )}
-
-                ${buildTooltipSection(
-                    "¿Cómo funciona?",
-                    parameter.funcionamiento
-                )}
-
-                ${buildTooltipSection(
-                    "Dependencias / Reglas",
-                    parameter.dependencias
-                )}
-
-                ${buildTooltipSection(
-                    "Notas",
-                    parameter.notas
-                )}
-
-                <div class="tooltip-section">
-                    <strong>
-                        Valores permitidos
-                    </strong>
-
-                    <div class="allowed-values">
-                        ${valuesMarkup}
-                    </div>
-                </div>
-
-                <a
-                    class="primary-button"
-                    style="margin-top: 13px;"
-                    href="${ParametrosSource.construirUrlFicha(parameter)}"
-                >
-                    Abrir ficha completa
-                </a>
+                <span class="section-kicker">Opción ${currentOption}</span>
+                <h3>${escapeHtml(parameter.name)}</h3>
+                <p>${escapeHtml(parameter.description || "Consulte los valores permitidos antes de completar el campo.")}</p>
+                <div class="tooltip-values">${values}</div>
+                <a class="tooltip-link" href="${url.href}">Abrir ficha completa →</a>
             `;
 
-            positionTooltip(button);
+            const rect = button.getBoundingClientRect();
+            const width = Math.min(340, window.innerWidth - 28);
+            let left = rect.right + 10;
+            if (left + width > window.innerWidth - 14) left = rect.left - width - 10;
 
+            parameterTooltip.style.left = `${Math.max(14, left)}px`;
+            parameterTooltip.style.top = `${Math.max(14, Math.min(rect.top, window.innerHeight - 300))}px`;
             parameterTooltip.hidden = false;
         }
 
-        function hideTooltipAfterDelay()
-        {
-            window.setTimeout(
-                function()
-                {
-                    if (!parameterTooltip.matches(":hover"))
-                    {
-                        parameterTooltip.hidden = true;
-                    }
-                },
-                180
-            );
+        function hideTooltipSoon() {
+            window.setTimeout(() => {
+                if (!parameterTooltip.matches(":hover")) parameterTooltip.hidden = true;
+            }, 160);
         }
 
-        function attachTooltipEvents()
-        {
-            document
-                .querySelectorAll("[data-help-id]")
-                .forEach(
-                    function(button)
-                    {
-                        const parameter = currentParameters.find(
-                            function(item)
-                            {
-                                return String(item.id) ===
-                                    String(button.dataset.helpId);
-                            }
-                        );
+        parameterTooltip.addEventListener("mouseleave", () => {
+            parameterTooltip.hidden = true;
+        });
 
-                        button.addEventListener(
-                            "mouseenter",
-                            function()
-                            {
-                                showTooltip(button, parameter);
-                            }
-                        );
+        async function loadOption(code) {
+            currentOption = code;
+            buildOptionsMenu();
+            parameterContainer.innerHTML = `<div class="empty-state">Cargando parámetros...</div>`;
 
-                        button.addEventListener(
-                            "focus",
-                            function()
-                            {
-                                showTooltip(button, parameter);
-                            }
-                        );
-
-                        button.addEventListener(
-                            "click",
-                            function()
-                            {
-                                showTooltip(button, parameter);
-                            }
-                        );
-
-                        button.addEventListener(
-                            "mouseleave",
-                            hideTooltipAfterDelay
-                        );
-                    }
+            try {
+                const response = await fetch(
+                    `${PARAMETER_BASE_URL}op${code}.json?v=${Date.now()}`,
+                    { cache: "no-store" }
                 );
-        }
 
-        parameterTooltip.addEventListener(
-            "mouseleave",
-            function()
-            {
-                parameterTooltip.hidden = true;
-            }
-        );
+                if (response.status === 404) {
+                    allParameters = [];
+                    renderParameters();
+                    return;
+                }
 
-        async function loadParameters()
-        {
-            loadError.hidden = true;
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
-            recordCount.textContent =
-                "Cargando parámetros...";
+                const records = await response.json();
+                allParameters = Array.isArray(records)
+                    ? records.map(adaptRecord)
+                    : [];
 
-            parameterContainer.innerHTML = `
-                <div class="empty-state">
-                    Cargando parámetros...
-                </div>
-            `;
-
-            try
-            {
-                const parameters =
-                    await ParametrosSource.cargarOpcion(
-                        OPTION_NUMBER
-                    );
-
-                renderParameters(parameters);
-
-                recordCount.textContent =
-                    `${parameters.length} parámetro${
-                        parameters.length === 1 ? "" : "s"
-                    } disponibles`;
-            }
-            catch (error)
-            {
+                collapsedCards.clear();
+                renderParameters();
+            } catch (error) {
                 console.error(error);
-
-                loadError.textContent =
-                    "No fue posible cargar los parámetros. Verifique la publicación del repositorio e intente nuevamente.";
-
-                loadError.hidden = false;
-
-                recordCount.textContent =
-                    "Parámetros no disponibles";
-
                 parameterContainer.innerHTML = `
-                    <div class="empty-state">
-                        No fue posible cargar el formulario.
+                    <div class="error-state">
+                        No fue posible cargar la opción ${escapeHtml(code)}.
                     </div>
                 `;
             }
         }
 
-        document
-            .getElementById("reloadButton")
-            .addEventListener(
-                "click",
-                loadParameters
-            );
+        function requestPayload() {
+            return {
+                id: `SOL-${Date.now()}`,
+                tipo: "formulario-parametros",
+                opcion: currentOption,
+                cliente: document.getElementById("clientName").value.trim(),
+                emisor: document.getElementById("issuerName").value.trim(),
+                accion: document.getElementById("requestedAction").value,
+                producto: document.getElementById("productFilter").value,
+                fechaSolicitud: document.getElementById("requestDate").value,
+                fechaRequerida: document.getElementById("requiredDateTime").value,
+                estado: "Borrador",
+                parametros: allParameters
+                    .filter((parameter) => parameter.value)
+                    .map((parameter) => ({
+                        id: parameter.id,
+                        valor: parameter.value
+                    }))
+            };
+        }
 
-        setCurrentDate();
+        function showToast(message) {
+            const toast = document.getElementById("toast");
+            toast.textContent = message;
+            toast.classList.add("show");
+            window.setTimeout(() => toast.classList.remove("show"), 2800);
+        }
 
-        loadParameters();
+        function validateHeader() {
+            const form = document.getElementById("requestForm");
+            if (!form.reportValidity()) return false;
+            return true;
+        }
+
+        async function githubRequest(url, options) {
+            const token = sessionStorage.getItem("siscardGitHubToken") ||
+                window.prompt("Ingrese el token de GitHub para guardar la solicitud:");
+
+            if (!token) throw new Error("No se proporcionó un token de GitHub.");
+            sessionStorage.setItem("siscardGitHubToken", token);
+
+            return fetch(url, {
+                ...options,
+                headers: {
+                    Accept: "application/vnd.github+json",
+                    Authorization: `Bearer ${token}`,
+                    "X-GitHub-Api-Version": "2022-11-28",
+                    ...(options.headers || {})
+                }
+            });
+        }
+
+        function utf8ToBase64(value) {
+            const bytes = new TextEncoder().encode(value);
+            let binary = "";
+            bytes.forEach((byte) => binary += String.fromCharCode(byte));
+            return btoa(binary);
+        }
+
+        async function saveRequest() {
+            if (!validateHeader()) return;
+
+            const payload = requestPayload();
+            const apiUrl =
+                `https://api.github.com/repos/${GITHUB_SETTINGS.owner}/` +
+                `${GITHUB_SETTINGS.repository}/contents/${GITHUB_SETTINGS.path}`;
+
+            try {
+                const currentResponse = await githubRequest(
+                    `${apiUrl}?ref=${GITHUB_SETTINGS.branch}&v=${Date.now()}`,
+                    { method: "GET" }
+                );
+
+                let sha = "";
+                let data = { solicitudes: [] };
+
+                if (currentResponse.ok) {
+                    const file = await currentResponse.json();
+                    sha = file.sha;
+                    const decoded = decodeURIComponent(
+                        escape(atob(file.content.replace(/\n/g, "")))
+                    );
+                    const parsed = JSON.parse(decoded);
+                    data = Array.isArray(parsed)
+                        ? { solicitudes: parsed }
+                        : parsed;
+                } else if (currentResponse.status !== 404) {
+                    throw new Error(`No se pudo leer solicitudes.json (${currentResponse.status}).`);
+                }
+
+                if (!Array.isArray(data.solicitudes)) data.solicitudes = [];
+                data.solicitudes.push(payload);
+
+                const body = {
+                    message: `Guardar ${payload.id}`,
+                    content: utf8ToBase64(JSON.stringify(data, null, 2)),
+                    branch: GITHUB_SETTINGS.branch
+                };
+
+                if (sha) body.sha = sha;
+
+                const saveResponse = await githubRequest(apiUrl, {
+                    method: "PUT",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(body)
+                });
+
+                if (!saveResponse.ok) {
+                    const detail = await saveResponse.text();
+                    throw new Error(`No se pudo guardar (${saveResponse.status}). ${detail}`);
+                }
+
+                localStorage.setItem("siscardLastRequest", JSON.stringify(payload));
+                showToast("Solicitud guardada correctamente.");
+            } catch (error) {
+                console.error(error);
+                localStorage.setItem("siscardLastRequest", JSON.stringify(payload));
+                showToast("Guardado local realizado. Revise permisos de GitHub para publicar.");
+            }
+        }
+
+        function exportExcel() {
+            const payload = requestPayload();
+            const rows = allParameters
+                .filter((parameter) => parameter.value)
+                .map((parameter) => ({
+                    Opción: currentOption,
+                    Parámetro: parameter.name,
+                    Producto: parameter.product,
+                    Valor: parameter.value
+                }));
+
+            const workbook = XLSX.utils.book_new();
+            const headerSheet = XLSX.utils.json_to_sheet([{
+                Cliente: payload.cliente,
+                Emisor: payload.emisor,
+                Acción: payload.accion,
+                Producto: payload.producto,
+                "Fecha de solicitud": payload.fechaSolicitud,
+                "Fecha requerida": payload.fechaRequerida
+            }]);
+            const parameterSheet = XLSX.utils.json_to_sheet(rows);
+
+            XLSX.utils.book_append_sheet(workbook, headerSheet, "Solicitud");
+            XLSX.utils.book_append_sheet(workbook, parameterSheet, "Parámetros");
+            XLSX.writeFile(workbook, `${payload.id}_op${currentOption}.xlsx`);
+        }
+
+        function exportPdf() {
+            window.print();
+        }
+
+        document.getElementById("optionsMenu").addEventListener("click", (event) => {
+            const button = event.target.closest("[data-option]");
+            if (button) loadOption(button.dataset.option);
+        });
+
+        document.getElementById("productFilter").addEventListener("change", renderParameters);
+        document.getElementById("hideAllButton").addEventListener("click", () => {
+            visibleParameters.forEach((parameter) => collapsedCards.add(parameter.id));
+            renderParameters();
+        });
+        document.getElementById("showAllButton").addEventListener("click", () => {
+            collapsedCards.clear();
+            renderParameters();
+        });
+        document.getElementById("exportExcelButton").addEventListener("click", exportExcel);
+        document.getElementById("exportPdfButton").addEventListener("click", exportPdf);
+        document.getElementById("saveButton").addEventListener("click", saveRequest);
+
+        const now = new Date();
+        const localDate = new Date(now.getTime() - now.getTimezoneOffset() * 60000);
+        document.getElementById("requestDate").value = localDate.toISOString().slice(0, 10);
+
+        buildOptionsMenu();
+        loadOption(currentOption);
     </script>
 </body>
-
 </html>
