@@ -517,7 +517,7 @@
                 <a class="nav-link" href="manuales.html">
                     <span class="nav-icon">▤</span><span>Manuales</span>
                 </a>
-                <a class="nav-link" href="https://kiris25.github.io/parametros-emisor/">
+                <a class="nav-link" href="https://kiris25.github.io/parametros-emisor-v2/">
                     <span class="nav-icon">⚙</span><span>Parámetros</span>
                 </a>
                 <a class="nav-link active" href="formularios.html" aria-current="page">
@@ -674,7 +674,7 @@
         "use strict";
 
         const PARAMETER_BASE_URL =
-            "https://kiris25.github.io/parametros-emisor/data/externo/";
+            "https://kiris25.github.io/parametros-emisor-v2/data/externo/";
 
         const GITHUB_SETTINGS = {
             owner: "Kiris25",
@@ -1058,7 +1058,7 @@
             if (!parameter) return;
 
             const allValues = parameter.rawValues || "Entrada manual";
-            const url = new URL("https://kiris25.github.io/parametros-emisor/");
+            const url = new URL("https://kiris25.github.io/parametros-emisor-v2/");
             url.searchParams.set("modo", "ficha");
             url.searchParams.set("idioma", "es");
             url.searchParams.set("ambito", "externo");
