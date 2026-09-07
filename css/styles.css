@@ -134,14 +134,23 @@ button
     border-right: 1px solid var(--sidebar-dark);
 }
 
-.brand
-{
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 0 10px 22px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.16);
-}
+.brand 
+
+{ 
+
+    display: flex; 
+
+    align-items: center; 
+
+    gap: 10px; 
+
+    padding: 4px 6px 18px; 
+
+    border-bottom: 1px solid #707174; 
+
+} 
+
+  
 
 .brand-mark 
 
@@ -151,13 +160,13 @@ button
 
     width: 10px; 
 
-    height: 60px; 
+    height: 46px; 
 
     border: 0; 
 
     border-radius: 999px; 
 
-    background: #ff6c0c; 
+    background: var(--orange); 
 
     box-shadow: none; 
 
@@ -165,15 +174,13 @@ button
 
   
 
-.brand 
+.brand-copy strong, 
+
+.brand-copy small 
 
 { 
 
-    display: flex; 
-
-    align-items: center; 
-
-    gap: 14px; 
+    display: block; 
 
 } 
 
@@ -183,11 +190,9 @@ button
 
 { 
 
-    display: block; 
-
     color: #ffffff; 
 
-    font-size: 25px; 
+    font-size: 21px; 
 
     font-weight: 400; 
 
@@ -201,7 +206,7 @@ button
 
 { 
 
-    color: #ff6c0c; 
+    color: var(--orange); 
 
 } 
 
@@ -211,35 +216,15 @@ button
 
 { 
 
-    display: block; 
+    margin-top: 3px; 
 
-    margin-top: 7px; 
+    color: #d7d7d7; 
 
-    color: #ffffff; 
-
-    font-size: 14px; 
+    font-size: 11px; 
 
     font-weight: 400; 
 
 } 
-.brand-copy strong
-{
-    display: block;
-    color: #ffffff;
-    font-size: 19px;
-    font-weight: 650;
-}
-
-.brand-copy strong span
-{
-    color: var(--orange);
-}
-
-.brand-copy small
-{
-    color: #dddddd;
-}
-
 .side-nav
 {
     margin-top: 8px;
