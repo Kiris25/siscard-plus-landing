@@ -564,227 +564,12 @@
     </style>
 </head>
 
-<body>
+<body data-page-title="Centro de Servicios Siscard+" data-page-subtitle="Acceso y autogestión">
     <div class="app-shell">
-        <aside
-            class="sidebar"
-            id="sidebar"
-            data-tour="navigation"
-        >
-            <div class="brand">
-                <div class="brand-mark"></div>
-
-                <div class="brand-copy">
-                    <strong>
-                        Landing
-                        <span>
-                            Siscard+
-                        </span>
-                    </strong>
-
-                    <small>
-                        Autogestión digital
-                    </small>
-                </div>
-            </div>
-
-            <nav class="side-nav">
-                <p class="nav-label">
-                    Principal
-                </p>
-
-                <a
-                    class="nav-link active"
-                    href="index.html"
-                >
-                    <span class="nav-icon">
-                        ⌂
-                    </span>
-
-                    <span>
-                        Inicio
-                    </span>
-                </a>
-
-                <p class="nav-label">
-                    Conocimiento
-                </p>
-
-                <a
-                    class="nav-link"
-                    href="manuales.html"
-                    data-tour="manuals"
-                >
-                    <span class="nav-icon">
-                        ▤
-                    </span>
-
-                    <span>
-                        Manuales
-                    </span>
-                </a>
-
-                <a
-                    class="nav-link"
-                    href="formularios.html"
-                    data-tour="forms"
-                >
-                    <span class="nav-icon">
-                        ▧
-                    </span>
-
-                    <span>
-                        Formularios
-                    </span>
-                </a>
-
-                <a
-                    class="nav-link"
-                    href="landing-ia.html"
-                    data-tour="ai"
-                >
-                    <span class="nav-icon">
-                        ✦
-                    </span>
-
-                    <span>
-                        Landing IA
-                    </span>
-                </a>
-
-                <p class="nav-label">
-                    Gestión
-                </p>
-
-                <a
-                    class="nav-link"
-                    href="seguridad.html"
-                    data-tour="security"
-                >
-                    <span class="nav-icon">
-                        🔐
-                    </span>
-
-                    <span>
-                        Seguridad
-                    </span>
-                </a>
-
-                <a
-                    class="nav-link"
-                    href="aprobaciones.html"
-                    data-tour="approvals"
-                >
-                    <span class="nav-icon">
-                        ✓
-                    </span>
-
-                    <span>
-                        Aprobaciones
-                    </span>
-                </a>
-
-                <a
-                    class="nav-link"
-                    href="mis-solicitudes.html"
-                    data-tour="requests"
-                >
-                    <span class="nav-icon">
-                        ◷
-                    </span>
-
-                    <span>
-                        Mis solicitudes
-                    </span>
-                </a>
-
-                <a
-                    class="nav-link"
-                    href="comunicados.html"
-                    data-tour="communications"
-                >
-                    <span class="nav-icon">
-                        ◉
-                    </span>
-
-                    <span>
-                        Comunicados
-                    </span>
-                </a>
-            </nav>
-
-            <div class="side-note">
-                <strong>
-                    Centro de Servicios
-                </strong>
-
-                <p>
-                    Acceso unificado a los servicios disponibles en Siscard+.
-                </p>
-            </div>
-        </aside>
+        <div id="sidebar-container"></div>
 
         <div class="main-area">
-            <header class="topbar">
-                <button
-                    class="menu-button"
-                    id="menuButton"
-                    type="button"
-                    aria-label="Abrir menú"
-                >
-                    ☰
-                </button>
-
-                <div class="top-title">
-                    <strong>
-                        Centro de Servicios Siscard+
-                    </strong>
-
-                    <small>
-                        Acceso y autogestión
-                    </small>
-                </div>
-
-                <div class="top-actions">
-                    <button
-                        class="help-button"
-                        id="topGuideButton"
-                        type="button"
-                    >
-                        ? Ver guía rápida
-                    </button>
-
-                    <button
-                        class="profile-button"
-                        id="profileButton"
-                        type="button"
-                    >
-                        <span class="avatar">
-                            CL
-                        </span>
-
-                        <span class="profile-copy">
-                            <strong>
-                                Cliente Siscard+
-                            </strong>
-
-                            <small>
-                                Portal de servicios
-                            </small>
-                        </span>
-                    </button>
-                </div>
-
-                <div
-                    class="profile-menu"
-                    id="profileMenu"
-                    hidden
-                >
-                    <button type="button">
-                        Mi perfil
-                    </button>
-                </div>
-            </header>
+            <div id="topbar-container"></div>
 
             <main class="content">
                 <section
@@ -906,7 +691,7 @@
                         <a
                             class="module-card"
                             href="manuales.html"
-                            data-search="manuales documentos guías documentación parámetros emisor TRT08SN0 visor configuraciones"
+                            data-search="manuales documentos guías documentación"
                         >
                             <span class="module-icon">
                                 ▤
@@ -917,7 +702,29 @@
                             </strong>
 
                             <small>
-                                Consulte documentación funcional, operativa y técnica, incluido el visor de Parámetros del Emisor TRT08SN0.
+                                Consulte documentación funcional, operativa y técnica.
+                            </small>
+
+                            <em>
+                                →
+                            </em>
+                        </a>
+
+                        <a
+                            class="module-card"
+                            href="manuales.html#parametros-emisor"
+                            data-search="parámetros emisor TRT08SN0 conocimiento"
+                        >
+                            <span class="module-icon">
+                                ⚙
+                            </span>
+
+                            <strong>
+                                Parámetros del Emisor TRT08SN0
+                            </strong>
+
+                            <small>
+                                Disponible desde el Centro de Conocimiento en Manuales.
                             </small>
 
                             <em>
@@ -1104,7 +911,7 @@
                                 </strong>
 
                                 <small>
-                                    Acceso disponible desde el Centro Documental de Manuales.
+                                    Acceso disponible desde el módulo Manuales.
                                 </small>
                             </div>
 
@@ -1272,18 +1079,7 @@
                 </section>
             </main>
 
-            <footer class="footer">
-                <span>
-                    <strong>
-                        Landing Siscard+
-                    </strong>
-                    · Centro de Servicios
-                </span>
-
-                <span>
-                    Versión demostrativa para desarrolladores
-                </span>
-            </footer>
+            <div id="footer-container"></div>
         </div>
     </div>
 
@@ -1375,6 +1171,7 @@
         aria-live="polite"
     ></div>
 
+    <script src="js/layout.js"></script>
     <script src="js/app.js"></script>
 
     <script>
@@ -1435,7 +1232,14 @@
                 target: "[data-tour='manuals']",
                 title: "Centro Documental",
                 text:
-                    "Manuales permite consultar documentación funcional, operativa y técnica, incluido Parámetros del Emisor TRT08SN0, mediante categorías y búsqueda."
+                    "Manuales permite consultar documentación funcional, operativa y técnica mediante categorías y búsqueda."
+            },
+
+            {
+                target: "[data-tour='parameters']",
+                title: "Parámetros del Emisor",
+                text:
+                    "Parámetros abre el visor real del repositorio para localizar configuraciones documentadas."
             },
 
             {
