@@ -8,90 +8,17 @@
     <title>Manuales | Landing Siscard+</title>
     <link rel="stylesheet" href="css/styles.css">
     <style>
-        .document-hero {
-            position: relative;
-            overflow: hidden;
-            display: grid;
-            grid-template-columns: minmax(0, 1.35fr) minmax(260px, .65fr);
-            gap: 28px;
-            align-items: center;
-            padding: 38px 42px;
-            border-radius: 25px;
-            color: #fff;
-            background: linear-gradient(120deg, #292e32 0%, #343b40 55%, #315d72 100%);
-            box-shadow: var(--shadow);
-        }
-
-        .document-hero::after {
-            content: "";
-            position: absolute;
-            width: 330px;
-            height: 330px;
-            right: -150px;
-            top: -190px;
-            border: 1px solid rgba(255, 255, 255, .12);
-            transform: rotate(45deg);
-        }
-
-        .document-hero-content,
-        .document-hero-summary {
-            position: relative;
-            z-index: 1;
-        }
-
-        .document-hero h1 {
-            margin: 9px 0 12px;
-            font-size: clamp(36px, 4vw, 54px);
-            line-height: 1.04;
-        }
-
-        .document-hero p {
-            max-width: 760px;
-            margin: 0;
-            color: #d6dbdf;
-            line-height: 1.6;
-        }
-
-        .document-search {
-            display: flex;
-            gap: 8px;
-            max-width: 790px;
-            margin-top: 22px;
-            padding: 6px;
-            border-radius: 14px;
-            background: #fff;
-            box-shadow: 0 12px 28px rgba(0, 0, 0, .18);
-        }
-
-        .document-search input {
-            flex: 1;
-            min-width: 0;
-            padding: 12px 14px;
-            border: 0;
-            outline: 0;
-            color: var(--ink);
-            background: transparent;
-        }
-
-        .document-hero-summary {
-            padding: 22px;
-            border: 1px solid rgba(255, 255, 255, .15);
-            border-radius: 20px;
-            background: rgba(255, 255, 255, .09);
-            backdrop-filter: blur(7px);
-        }
-
-        .document-hero-summary strong {
-            display: block;
-            margin: 4px 0;
-            font-size: 43px;
-        }
-
-        .document-hero-summary span {
-            color: #bde8ff;
-            font-weight: 800;
-        }
-
+        .document-hero { position: relative; overflow: hidden; padding: 24px 28px; border: 1px solid #4a4b4d; border-radius: 14px; color: #fff; background: linear-gradient(120deg,#303437 0%,#3b4145 68%,#315d72 100%); box-shadow: var(--shadow-small); }
+        .document-hero::after { content: ""; position: absolute; width: 180px; height: 180px; right: -95px; top: -115px; border: 1px solid rgba(255,255,255,.10); transform: rotate(45deg); pointer-events: none; }
+        .document-hero-content { position: relative; z-index: 1; }
+        .document-hero-heading { display: flex; align-items: end; justify-content: space-between; gap: 20px; margin-bottom: 15px; }
+        .document-hero h1 { margin: 5px 0 0; font-size: clamp(25px,2.5vw,34px); font-weight: 500; line-height: 1.15; }
+        .document-hero p { max-width: 660px; margin: 0; color: #d9dde0; font-size: 14px; line-height: 1.5; text-align: right; }
+        .document-search { display: flex; gap: 8px; width: 100%; margin: 0; padding: 6px; border: 1px solid rgba(255,255,255,.28); border-radius: 10px; background: #fff; box-shadow: 0 8px 20px rgba(0,0,0,.14); }
+        .document-search input { flex: 1; min-width: 0; padding: 11px 13px; border: 0; outline: 0; color: var(--ink); background: transparent; }
+        .parameter-card { border-top: 4px solid var(--orange); background: #fffaf6; }
+        .parameter-card .document-type { color: #fff; background: var(--orange); }
+        .web-icon { color: var(--orange-dark); background: var(--orange-soft); }
         .breadcrumb {
             display: flex;
             align-items: center;
@@ -419,22 +346,7 @@
                     <a href="index.html">Inicio</a><span>›</span><strong>Manuales</strong>
                 </nav>
 
-                <section class="document-hero">
-                    <div class="document-hero-content">
-                        <span class="eyebrow">Biblioteca de conocimiento</span>
-                        <h1>Encuentre el documento que necesita</h1>
-                        <p>Consulte manuales funcionales, guías operativas y documentación de productos Siscard+ desde un único espacio.</p>
-                        <form class="document-search" id="manualSearch" role="search">
-                            <input id="manualSearchInput" type="search" placeholder="Buscar por título, producto o palabra clave..." aria-label="Buscar manual">
-                            <button class="primary-button" type="submit">Buscar</button>
-                        </form>
-                    </div>
-                    <div class="document-hero-summary">
-                        <span>Biblioteca disponible</span>
-                        <strong>165</strong>
-                        <p>documentos demostrativos organizados para facilitar la consulta.</p>
-                    </div>
-                </section>
+                <section class="document-hero" aria-labelledby="manualesTitle"><div class="document-hero-content"><div class="document-hero-heading"><div><span class="eyebrow">Centro de conocimiento</span><h1 id="manualesTitle">Manuales</h1></div><p>Localice manuales, guías, documentación y contenidos dinámicos por título, producto o palabra clave.</p></div><form class="document-search" id="manualSearch" role="search"><input id="manualSearchInput" type="search" placeholder="Buscar manuales, parámetros, guías o palabras clave..." aria-label="Buscar en el centro de conocimiento"><button class="primary-button" type="submit">Buscar</button></form></div></section>
 
                 <section class="section">
                     <div class="section-heading">
@@ -448,6 +360,7 @@
                         <button class="category-card" type="button" data-category="seath"><span class="category-icon">◫</span><span><strong>SEATH</strong><small>Herramientas relacionadas</small></span><em>→</em></button>
                         <button class="category-card" type="button" data-category="seguridad"><span class="category-icon">🔐</span><span><strong>Seguridad</strong><small>Usuarios y accesos</small></span><em>→</em></button>
                         <button class="category-card" type="button" data-category="operaciones"><span class="category-icon">↻</span><span><strong>Operaciones</strong><small>Gestiones operativas</small></span><em>→</em></button>
+                        <a class="category-card" href="https://kiris25.github.io/parametros-emisor-v2/" id="parametros-emisor"><span class="category-icon">⚙</span><span><strong>Parámetros del Emisor TRT08SN0</strong><small>Consulta dinámica de configuraciones</small></span><em>→</em></a>
                         <button class="category-card" type="button" data-category="todos"><span class="category-icon">▤</span><span><strong>Todos los documentos</strong><small>Biblioteca completa</small></span><em>→</em></button>
                     </div>
                 </section>
@@ -457,6 +370,7 @@
                         <div><span class="section-kicker">Recomendados</span><h2>Documentos destacados</h2><p>Accesos demostrativos a contenidos de consulta frecuente.</p></div>
                     </div>
                     <div class="featured-grid" id="featuredDocuments">
+                        <article class="featured-document searchable-document parameter-card" data-category="parametros emisor trt08sn0" data-search="parámetros parametros emisor TRT08SN0 visor configuraciones dinámico"><span class="document-type">Contenido dinámico</span><h3>Parámetros del Emisor TRT08SN0</h3><p>Consulte parámetros, dependencias, validaciones y configuraciones documentadas en el visor web.</p><div class="document-meta"><span>Consulta web</span><span>Disponible</span></div><a class="open-document" href="https://kiris25.github.io/parametros-emisor-v2/">Abrir visor →</a></article>
                         <article class="featured-document searchable-document" data-category="siscard" data-search="manual usuario siscard portal navegación">
                             <span class="document-type">Manual de usuario</span><h3>Manual de Usuario Siscard+</h3><p>Guía general de ingreso, navegación y principales funcionalidades.</p><div class="document-meta"><span>Versión 2.4</span><span>Actualizado</span></div><button class="open-document" type="button" data-document="Manual de Usuario Siscard+">Abrir documento →</button>
                         </article>
@@ -473,7 +387,7 @@
                     <div class="panel">
                         <div class="panel-heading">
                             <div><span class="section-kicker">Biblioteca</span><h2>Documentos disponibles</h2></div>
-                            <span class="view-summary" id="resultSummary">6 documentos</span>
+                            <span class="view-summary" id="resultSummary">7 contenidos</span>
                         </div>
 
                         <div class="document-toolbar">
@@ -481,7 +395,7 @@
                                 <button class="active" type="button" data-filter="todos">Todos</button>
                                 <button type="button" data-filter="manual">Manuales</button>
                                 <button type="button" data-filter="guía">Guías</button>
-                                <button type="button" data-filter="seguridad">Seguridad</button>
+                                <button type="button" data-filter="seguridad">Seguridad</button><button type="button" data-filter="parametros">Parámetros</button>
                             </div>
                         </div>
 
@@ -489,6 +403,7 @@
                             <table class="document-table">
                                 <thead><tr><th>Documento</th><th>Categoría</th><th>Versión</th><th>Acción</th></tr></thead>
                                 <tbody id="documentRows">
+                                    <tr class="searchable-row" data-category="parametros emisor trt08sn0" data-search="parámetros parametros emisor TRT08SN0 visor configuraciones dinámico"><td><div class="document-name"><span class="file-icon web-icon">WEB</span><span><strong>Parámetros del Emisor TRT08SN0</strong><small>Consulta dinámica de configuraciones</small></span></div></td><td>Emisor</td><td>Dinámico</td><td><a class="table-action" href="https://kiris25.github.io/parametros-emisor-v2/">Abrir</a></td></tr>
                                     <tr class="searchable-row" data-category="siscard manual" data-search="manual usuario siscard portal"><td><div class="document-name"><span class="file-icon">PDF</span><span><strong>Manual de Usuario Siscard+</strong><small>Navegación y funcionalidades</small></span></div></td><td>Siscard+</td><td>2.4</td><td><button class="table-action" type="button" data-document="Manual de Usuario Siscard+">Abrir</button></td></tr>
                                     <tr class="searchable-row" data-category="click to pay guía" data-search="guía configuración click to pay"><td><div class="document-name"><span class="file-icon">PDF</span><span><strong>Guía de Configuración Click to Pay</strong><small>Configuración funcional</small></span></div></td><td>Click to Pay</td><td>1.8</td><td><button class="table-action" type="button" data-document="Guía de Configuración Click to Pay">Abrir</button></td></tr>
                                     <tr class="searchable-row" data-category="seguridad manual" data-search="manual administración seguridad usuarios grupos accesos"><td><div class="document-name"><span class="file-icon">PDF</span><span><strong>Administración de Seguridad</strong><small>Usuarios, grupos y accesos</small></span></div></td><td>Seguridad</td><td>3.1</td><td><button class="table-action" type="button" data-document="Administración de Seguridad">Abrir</button></td></tr>
