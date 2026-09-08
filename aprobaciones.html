@@ -1,1 +1,88 @@
-
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aprobaciones | Landing Siscard+</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        :root { --orange:#ff6c0c; --gray:#58595b; --line:#dedede; --soft:#f6f6f6; --green:#1f7a4d; --red:#b42318; --blue:#2563a8; }
+        * { box-sizing:border-box; }
+        body { margin:0; font-family:Segoe UI,Arial,sans-serif; color:#2f3133; background:#f5f5f5; }
+        .app-shell { display:grid; grid-template-columns:var(--sidebar-width,260px) minmax(0,1fr); min-height:100vh; }
+        .main-area { min-width:0; }
+        .content { padding:24px; }
+        .hero,.panel { border:1px solid var(--line); border-radius:14px; background:#fff; box-shadow:0 8px 24px rgba(0,0,0,.06); }
+        .hero { padding:26px; border-top:5px solid var(--orange); }
+        .hero h1 { margin:5px 0 8px; color:var(--gray); font-weight:400; }
+        .hero p { margin:0; color:#6c6d70; }
+        .kicker { color:var(--orange); font-size:12px; font-weight:800; text-transform:uppercase; }
+        .filters { display:flex; flex-wrap:wrap; gap:10px; margin:18px 0; }
+        input,select,textarea,button { font:inherit; }
+        input,select,textarea { min-height:42px; padding:9px 11px; border:1px solid #c9c9c9; border-radius:8px; background:#fff; }
+        .filters input { flex:1 1 260px; }
+        button { cursor:pointer; }
+        .btn { min-height:38px; padding:8px 13px; border:1px solid var(--orange); border-radius:8px; background:#fff; color:#b94700; font-weight:700; }
+        .btn.primary { background:var(--orange); color:#fff; }
+        .btn.danger { border-color:var(--red); color:var(--red); }
+        .stats { display:grid; grid-template-columns:repeat(6,minmax(120px,1fr)); gap:9px; margin:18px 0; }
+        .stat { padding:12px; border:1px solid var(--line); border-radius:10px; background:#fff; }
+        .stat strong,.stat span { display:block; }
+        .stat strong { font-size:22px; color:var(--gray); }
+        .stat span { color:#777; font-size:12px; }
+        .panel { overflow:hidden; }
+        .table-wrap { overflow:auto; }
+        table { width:100%; border-collapse:collapse; }
+        th,td { padding:12px; border-bottom:1px solid #e8e8e8; text-align:left; vertical-align:top; }
+        th { background:var(--soft); color:var(--gray); font-size:12px; text-transform:uppercase; }
+        .badge { display:inline-flex; padding:5px 9px; border-radius:999px; font-size:11px; font-weight:800; background:#eee; }
+        .badge[data-state="Enviada"] { background:#fff2d6; color:#8a5b00; }
+        .badge[data-state="En revisión"] { background:#e8f1ff; color:#18599a; }
+        .badge[data-state="Requiere información"] { background:#fff0df; color:#a64b00; }
+        .badge[data-state="Aprobada"] { background:#e4f7ec; color:#17663e; }
+        .badge[data-state="Completada"] { background:#dff5ee; color:#0f684c; }
+        .badge[data-state="Rechazada"] { background:#fde7e7; color:#a12626; }
+        .actions { display:flex; flex-wrap:wrap; gap:6px; }
+        .empty { padding:42px; text-align:center; color:#777; }
+        dialog { width:min(760px,calc(100vw - 28px)); max-height:88vh; overflow:auto; border:0; border-radius:14px; box-shadow:0 24px 70px rgba(0,0,0,.3); }
+        dialog::backdrop { background:rgba(0,0,0,.45); }
+        .dialog-head { display:flex; justify-content:space-between; gap:12px; align-items:center; border-bottom:1px solid var(--line); padding-bottom:12px; }
+        .detail-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; margin:14px 0; }
+        .detail { padding:10px; border:1px solid var(--line); border-radius:8px; background:var(--soft); }
+        .detail small,.detail strong { display:block; }
+        .detail small { color:#777; }
+        .parameter-row,.history-row { padding:10px 0; border-bottom:1px solid #eee; }
+        .comment-box { width:100%; min-height:90px; margin-top:12px; }
+        @media(max-width:900px){ .app-shell{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}.detail-grid{grid-template-columns:1fr}.content{padding:14px} }
+</style>
+</head>
+<body data-page-title="Aprobaciones" data-page-subtitle="Bandeja de revisión">
+    <div class="app-shell">
+        <div id="sidebar-container"></div>
+        <div class="main-area">
+            <div id="topbar-container"></div>
+            <main class="content">
+<section class="hero"><span class="kicker">Flujo de revisión</span><h1>Aprobaciones</h1><p>Revise las solicitudes asignadas a Seguridad y gestione su estado.</p></section>
+<div class="stats" id="stats"></div>
+<div class="filters"><input id="search" type="search" placeholder="Buscar por ID, cliente, emisor u opción"><select id="state"><option value="">Todos los estados</option><option>Enviada</option><option>En revisión</option><option>Requiere información</option><option>Aprobada</option><option>Completada</option><option>Rechazada</option></select></div>
+<section class="panel"><div class="table-wrap"><table><thead><tr><th>ID</th><th>Cliente</th><th>Opción</th><th>Aprobador</th><th>Estado</th><th>Acciones</th></tr></thead><tbody id="rows"></tbody></table></div><div class="empty" id="empty" hidden>No hay solicitudes para mostrar.</div></section>
+<dialog id="detailDialog"><div class="dialog-head"><div><span class="kicker">Detalle</span><h2 id="detailTitle"></h2></div><button class="btn" onclick="detailDialog.close()">Cerrar</button></div><div id="detailContent"></div><textarea class="comment-box" id="comment" placeholder="Comentario de revisión"></textarea><div class="actions" id="detailActions" style="margin-top:12px"></div></dialog></main>
+            <div id="footer-container"></div>
+        </div>
+    </div>
+    <script src="js/layout.js"></script>
+    <script src="js/app.js"></script>
+    <script>
+"use strict";
+const STATES=["Enviada","En revisión","Requiere información","Aprobada","Completada","Rechazada"];
+let selectedId="";
+const load=()=>JSON.parse(localStorage.getItem("siscardRequests")||"[]");
+const save=(items)=>localStorage.setItem("siscardRequests",JSON.stringify(items));
+const esc=(v)=>String(v??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function render(){const items=load();const q=document.getElementById("search").value.toLowerCase();const st=document.getElementById("state").value;document.getElementById("stats").innerHTML=STATES.map(x=>`<div class="stat"><strong>${items.filter(i=>i.estado===x).length}</strong><span>${x}</span></div>`).join("");const visible=items.filter(i=>(!st||i.estado===st)&&[i.id,i.cliente,i.emisor,i.opcion].join(" ").toLowerCase().includes(q));document.getElementById("rows").innerHTML=visible.map(i=>`<tr><td><strong>${esc(i.id)}</strong><br><small>${esc(i.fechaSolicitud||"")}</small></td><td>${esc(i.cliente)}</td><td>OP${esc(i.opcion)}</td><td>${esc(i.aprobador||"Seguridad")}</td><td><span class="badge" data-state="${esc(i.estado)}">${esc(i.estado)}</span></td><td><div class="actions"><button class="btn" onclick="openDetail('${esc(i.id)}')">Ver</button>${buttons(i,true)}</div></td></tr>`).join("");document.getElementById("empty").hidden=visible.length>0;}
+function buttons(i,compact=false){const b=[];if(i.estado==="Enviada")b.push(["Tomar solicitud","En revisión","primary"]);if(i.estado==="En revisión"){b.push(["Aprobar","Aprobada","primary"],["Requiere información","Requiere información",""] ,["Rechazar","Rechazada","danger"])}if(i.estado==="Requiere información")b.push(["Retomar","En revisión","primary"]);if(i.estado==="Aprobada")b.push(["Marcar completada","Completada","primary"]);return b.map(x=>`<button class="btn ${x[2]}" onclick="changeState('${esc(i.id)}','${x[1]}')">${x[0]}</button>`).join("");}
+function openDetail(id){selectedId=id;const i=load().find(x=>x.id===id);if(!i)return;document.getElementById("detailTitle").textContent=i.id;document.getElementById("detailContent").innerHTML=`<div class="detail-grid"><div class="detail"><small>Cliente</small><strong>${esc(i.cliente)}</strong></div><div class="detail"><small>Emisor</small><strong>${esc(i.emisor)}</strong></div><div class="detail"><small>Opción</small><strong>OP${esc(i.opcion)}</strong></div><div class="detail"><small>Estado</small><strong>${esc(i.estado)}</strong></div></div><h3>Parámetros solicitados</h3>${(i.parametros||[]).map(p=>`<div class="parameter-row"><strong>${esc(p.nombre||p.id)}</strong><br>${esc(p.valor)}</div>`).join("")||"<p>No se registraron valores.</p>"}<h3>Historial</h3>${(i.historial||[]).map(h=>`<div class="history-row"><strong>${esc(h.estado)}</strong> · ${esc(h.usuario||"")}<br><small>${esc(h.fecha||"")}</small><br>${esc(h.comentario||"")}</div>`).join("")}`;document.getElementById("detailActions").innerHTML=buttons(i);document.getElementById("comment").value="";detailDialog.showModal();}
+function changeState(id,state){const comment=document.getElementById("comment")?.value.trim()||"";if(["Requiere información","Rechazada"].includes(state)&&!comment){if(selectedId===id){document.getElementById("comment").focus();alert("Ingrese un comentario para continuar.");}else{openDetail(id);document.getElementById("comment").focus();}return;}const items=load();const i=items.find(x=>x.id===id);if(!i)return;i.estado=state;i.aprobador="Seguridad";i.fechaActualizacion=new Date().toISOString();i.historial=i.historial||[];i.historial.push({estado:state,fecha:i.fechaActualizacion,usuario:"Seguridad",comentario:comment||`Solicitud actualizada a ${state}.`});save(items);render();if(selectedId===id)openDetail(id);}
+document.getElementById("search").addEventListener("input",render);document.getElementById("state").addEventListener("change",render);render();</script>
+</body>
+</html>
