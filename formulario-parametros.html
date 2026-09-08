@@ -507,6 +507,11 @@
             <div id="topbar-container"></div>
 
             <main class="content">
+                <div style="margin-bottom: 14px;">
+                    <a class="tertiary-button" href="formularios.html">
+                        ← Volver al catálogo
+                    </a>
+                </div>
                 <section class="form-document">
                     <div class="document-heading">
                         <img class="evertec-logo" src="assets/logo-evertec.png" alt="Evertec">
@@ -573,9 +578,17 @@
                         </div>
                     </form>
                 </section>
-                <div style="margin-bottom:14px;">
-                    <a class="tertiary-button" href="formularios.html">← Volver al catálogo</a>
-                </div>
+
+                <section class="options-area" hidden>
+                    <div class="options-heading">
+                        <div>
+                            <span class="section-kicker">Opciones del visor</span>
+                            <h2>Seleccione una opción</h2>
+                        </div>
+                    </div>
+                    <nav class="options-menu" id="optionsMenu"></nav>
+                </section>
+
                 <form class="parameter-search" id="parameterSearchForm">
                     <input
                         id="parameterSearchInput"
@@ -664,8 +677,11 @@
             notes: ["notas", "observaciones", "notes"]
         };
 
-        const requestedOption = new URLSearchParams(window.location.search).get("opcion") || "05";
-        let currentOption = OPTIONS.some((item) => item[0] === requestedOption)
+        const requestedOption =
+            new URLSearchParams(window.location.search).get("opcion") || "05";
+        let currentOption = OPTIONS.some(
+            (item) => item[0] === requestedOption
+        )
             ? requestedOption
             : "05";
         let allParameters = [];
@@ -1251,6 +1267,10 @@
             document.title=originalTitle;
             cards.forEach(card=>{card.style.display=card.dataset.printHidden||"";delete card.dataset.printHidden;});
         }
+        document.getElementById("optionsMenu").addEventListener("click", (event) => {
+            const button = event.target.closest("[data-option]");
+            if (button) loadOption(button.dataset.option);
+        });
 
         document.getElementById("productFilter").addEventListener("change", renderParameters);
         document.getElementById("parameterSearchInput").addEventListener("input", renderParameters);
@@ -1278,6 +1298,7 @@
         const localDate = new Date(now.getTime() - now.getTimezoneOffset() * 60000);
         document.getElementById("requestDate").value = localDate.toISOString().slice(0, 10);
 
+        buildOptionsMenu();
         loadOption(currentOption);
     </script>
 </body>
