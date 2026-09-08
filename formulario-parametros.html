@@ -227,7 +227,9 @@
         }
 
         .parameter-list {
-            padding: 0 17px;
+            max-width: 920px;
+            margin: 0 auto;
+            padding: 0 12px;
         }
 
         .parameter-card {
@@ -240,18 +242,18 @@
 
         .parameter-card-heading {
             display: grid;
-            grid-template-columns: 48px minmax(0, 1fr) 38px;
-            gap: 10px;
+            grid-template-columns: 40px minmax(0, 1fr) auto;
+            gap: 8px;
             align-items: center;
-            min-height: 60px;
+            min-height: 50px;
             cursor: pointer;
         }
 
         .parameter-number {
             display: grid;
             place-items: center;
-            width: 40px;
-            height: 40px;
+            width: 34px;
+            height: 34px;
             border: 1px solid var(--line);
             border-top: 3px solid var(--orange);
             border-radius: var(--radius);
@@ -300,9 +302,26 @@
             color: #ffffff;
             outline: none;
         }
+        .parameter-heading-actions {
+            display: inline-flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 6px;
+        }
+        .required-indicator {
+            display: inline-grid;
+            place-items: center;
+            min-width: 18px;
+            height: 18px;
+            color: #c84630;
+            font-size: 18px;
+            font-weight: 900;
+            line-height: 1;
+        }
 
         .parameter-body {
-            padding: 0 0 14px 58px;
+            max-width: 720px;
+            padding: 0 0 8px 40px;
         }
 
         .parameter-card.collapsed .parameter-body {
@@ -311,12 +330,12 @@
 
         .parameter-grid {
             display: grid;
-            grid-template-columns: 1fr;
-            gap: 12px;
+            grid-template-columns: minmax(0, 1fr);
+            gap: 6px;
         }
 
         .parameter-entry {
-            padding: 12px;
+            padding: 8px 10px;
             border: 1px solid var(--line);
             border-top: 3px solid #b7b7b7;
             border-radius: var(--radius);
@@ -349,8 +368,8 @@
         .parameter-entry input,
         .parameter-entry select {
             width: 100%;
-            min-height: 42px;
-            padding: 9px 11px;
+            min-height: 36px;
+            padding: 7px 9px;
             border-radius: var(--radius);
         }
 
@@ -858,8 +877,8 @@
                 ]);
                 return {
                     ...parameter,
-                    required: required === true || allowsBlank === false,
-                    allowsBlank: allowsBlank !== false,
+                    required: required === true,
+                    allowsBlank: required !== true,
                     internalRuleFound: required !== null || allowsBlank !== null
                 };
             });
@@ -975,13 +994,18 @@
                                     </strong>
                                     <small>${highlightSearch(parameter.product || "Todos")}</small>
                                 </div>
-                                <button
-                                    class="parameter-help"
-                                    type="button"
-                                    data-help-id="${escapeHtml(parameter.id)}"
-                                    title="Ver ficha del parámetro"
-                                    aria-label="Ver ficha de ${escapeHtml(parameter.name)}"
-                                >?</button>
+                                <div class="parameter-heading-actions">
+                                    ${parameter.required
+                                        ? '<span class="required-indicator" title="Campo obligatorio" aria-label="Campo obligatorio">*</span>'
+                                        : ''}
+                                    <button
+                                        class="parameter-help"
+                                        type="button"
+                                        data-help-id="${escapeHtml(parameter.id)}"
+                                        title="Ver ficha del parámetro"
+                                        aria-label="Ver ficha de ${escapeHtml(parameter.name)}"
+                                    >?</button>
+                                </div>
                             </header>
 
                             <div class="parameter-body">
