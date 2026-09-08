@@ -1330,19 +1330,45 @@
                 console.info("No se cargaron valores predeterminados.", error);
             }
         }
+        function consecutivePart(value) {
+            return String(value || "")
+                .normalize("NFD")
+                .replace(/[\u0300-\u036f]/g, "")
+                .replace(/[^a-zA-Z0-9]/g, "")
+                .toUpperCase() || "SINNOMBRE";
+        }
+        function requestDateCode() {
+            const date = new Date();
+            return [
+                String(date.getDate()).padStart(2, "0"),
+                String(date.getMonth() + 1).padStart(2, "0"),
+                String(date.getFullYear()).slice(-2),
+            ].join("");
+        }
+        function nextRequestId(client, issuer) {
+            const clientCode = consecutivePart(client);
+            const issuerCode = consecutivePart(issuer);
+            const dateCode = requestDateCode();
+            const counterKey = `siscardCounter:${clientCode}:${issuerCode}:${dateCode}`;
+            const next = Number(localStorage.getItem(counterKey) || "0") + 1;
+            localStorage.setItem(counterKey, String(next));
+            return `${clientCode}${issuerCode}${next}${dateCode}`;
+        }
         function requestPayload() {
+            const client = document.getElementById("clientName").value.trim();
+            const issuer = document.getElementById("issuerName").value.trim();
             return {
-                id: `SOL-${Date.now()}`,
+                id: nextRequestId(client, issuer),
                 tipo: "formulario-parametros",
                 opcion: currentOption,
-                cliente: document.getElementById("clientName").value.trim(),
-                emisor: document.getElementById("issuerName").value.trim(),
+                cliente: client,
+                emisor: issuer,
                 accion: document.getElementById("requestedAction").value,
                 producto: document.getElementById("productFilter").value,
                 fechaSolicitud: document.getElementById("requestDate").value,
                 fechaRequerida: document.getElementById("requiredDateTime").value,
                 estado: "Enviada",
-                aprobador: "Seguridad",
+                aprobador: "",
                 fechaCreacion: new Date().toISOString(),
                 fechaActualizacion: new Date().toISOString(),
                 comentarios: [],
@@ -1350,7 +1376,7 @@
                     {
                         estado: "Enviada",
                         fecha: new Date().toISOString(),
-                        usuario: document.getElementById("clientName").value.trim() || "Solicitante",
+                        usuario: client || "Solicitante",
                         comentario: "Solicitud enviada para revisión."
                     }
                 ],
