@@ -865,6 +865,13 @@
                             >
                                 Mostrar todos
                             </button>
+                            <button
+                                class="tertiary-button"
+                                id="toggleEmptyButton"
+                                type="button"
+                            >
+                                Mostrar campos vacíos
+                            </button>
                         </div>
                     </section>
 
@@ -985,6 +992,7 @@
             let collapsedCards = new Set();
             let selectedRequestId = "";
             let selectedRequest = null;
+            let showEmptyParameters = false;
 
             const parameterContainer = document.getElementById("parameterContainer");
             const parameterTooltip = document.getElementById("parameterTooltip");
@@ -1303,11 +1311,15 @@
                     );
                     const searchMatches =
                         !searchQuery || searchableText.includes(searchQuery);
-                    return productMatches && searchMatches;
+                    const valueMatches = showEmptyParameters || Boolean(parameter.value);
+                    return productMatches && searchMatches && valueMatches;
                 });
 
+                const answeredCount = allParameters.filter((parameter) => parameter.value).length;
                 document.getElementById("recordCount").textContent =
-                    `${visibleParameters.length} parámetro${visibleParameters.length === 1 ? "" : "s"} disponibles`;
+                    showEmptyParameters
+                        ? `${visibleParameters.length} parámetros mostrados · ${answeredCount} con respuesta`
+                        : `${answeredCount} parámetro${answeredCount === 1 ? "" : "s"} con respuesta`;
 
                 document.getElementById("currentOptionText").textContent =
                     `Opción ${currentOption} · ${optionName(currentOption)} · Producto: ${selectedProduct}`;
@@ -1646,6 +1658,9 @@
                 if (!request) return;
                 selectedRequestId = requestId;
                 selectedRequest = request;
+                showEmptyParameters = false;
+                document.getElementById("toggleEmptyButton").textContent =
+                    "Mostrar campos vacíos";
                 document.getElementById("approvalFormDocument").style.display =
                     "block";
                 document.getElementById("parameterSearchForm").style.display =
@@ -1973,6 +1988,14 @@
             });
             document.getElementById("showAllButton").addEventListener("click", () => {
                 collapsedCards.clear();
+                renderParameters();
+            });
+            document.getElementById("toggleEmptyButton").addEventListener("click", () => {
+                showEmptyParameters = !showEmptyParameters;
+                document.getElementById("toggleEmptyButton").textContent =
+                    showEmptyParameters
+                        ? "Ocultar campos vacíos"
+                        : "Mostrar campos vacíos";
                 renderParameters();
             });
             document
