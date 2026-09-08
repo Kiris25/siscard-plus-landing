@@ -636,6 +636,8 @@
 
         const PARAMETER_BASE_URL =
             "https://kiris25.github.io/parametros-emisor-v2/data/externo/";
+        const INTERNAL_PARAMETER_BASE_URL =
+            "https://kiris25.github.io/parametros-emisor-v2/data/interno/";
 
         const GITHUB_SETTINGS = {
             owner: "Kiris25",
@@ -809,9 +811,58 @@
                 operation: field(record, FIELD_NAMES.operation),
                 dependencies: field(record, FIELD_NAMES.dependencies),
                 notes: field(record, FIELD_NAMES.notes),
+                required: false,
+                allowsBlank: true,
+                internalRuleFound: false,
                 value: "",
                 original: record
             };
+        }
+
+        function internalBoolean(record, aliases) {
+            const value = field(record, aliases, "");
+            const normalized = normalize(value);
+            if (["si", "s", "true", "1", "yes"].includes(normalized)) return true;
+            if (["no", "n", "false", "0"].includes(normalized)) return false;
+            return null;
+        }
+
+        function recordIdentity(record, index) {
+            const identifier = field(record, ["id", "numero", "codigo", "orden"], "");
+            const name = field(record, FIELD_NAMES.name, "");
+            return {
+                id: normalize(identifier),
+                name: normalize(name),
+                index
+            };
+        }
+
+        function mergeInternalRules(parameters, internalRecords) {
+            const identities = internalRecords.map(recordIdentity);
+            return parameters.map((parameter, index) => {
+                const parameterId = normalize(parameter.id);
+                const parameterName = normalize(parameter.name);
+                const matchIndex = identities.findIndex((identity) =>
+                    (parameterId && identity.id === parameterId) ||
+                    (parameterName && identity.name === parameterName)
+                );
+                const fallbackIndex = matchIndex >= 0 ? matchIndex : index;
+                const internalRecord = internalRecords[fallbackIndex];
+                if (!internalRecord) return parameter;
+                const required = internalBoolean(internalRecord, [
+                    "obligatorio", "Obligatorio", "required", "esObligatorio"
+                ]);
+                const allowsBlank = internalBoolean(internalRecord, [
+                    "permiteBlancos", "Permite Blancos", "permite blancos",
+                    "permite_blancos", "allowsBlank", "admiteBlancos"
+                ]);
+                return {
+                    ...parameter,
+                    required: required === true || allowsBlank === false,
+                    allowsBlank: allowsBlank !== false,
+                    internalRuleFound: required !== null || allowsBlank !== null
+                };
+            });
         }
 
         function optionName(code) {
@@ -851,7 +902,7 @@
                     ? `Seleccione: ${choices.join(" / ")}`
                     : `Seleccione una de ${choices.length} opciones permitidas`;
                 return `
-                    <select data-entry-id="${escapeHtml(parameter.id)}">
+                    <select data-entry-id="${escapeHtml(parameter.id)}" ${parameter.required ? "required" : ""}>
                         <option value="">${escapeHtml(instruction)}</option>
                         ${choices.map(value => `<option value="${escapeHtml(value)}">${escapeHtml(value)}</option>`).join("")}
                     </select>
@@ -859,7 +910,7 @@
             }
             const kind = inputKind(parameter);
             const attributes = [`type="${kind.type}"`, kind.min!==undefined?`min="${kind.min}"`:"", kind.max!==undefined?`max="${kind.max}"`:"", kind.step!==undefined?`step="${kind.step}"`:""].filter(Boolean).join(" ");
-            return `<input ${attributes} data-entry-id="${escapeHtml(parameter.id)}" data-validation-reason="${escapeHtml(kind.reason)}" placeholder="Digite el valor solicitado"><small class="validation-message"></small>`;
+            return `<input ${attributes} data-entry-id="${escapeHtml(parameter.id)}" ${parameter.required ? "required" : ""} data-validation-reason="${escapeHtml(kind.reason)}" placeholder="Digite el valor solicitado"><small class="validation-message"></small>`;
         }
         function renderParameters() {
             const selectedProduct = document.getElementById("productFilter").value;
@@ -936,7 +987,17 @@
                             <div class="parameter-body">
                                 <div class="parameter-grid">
                                     <div class="parameter-entry">
-                                        <label>Valor solicitado</label>
+                                        <label>
+                                            Valor solicitado
+                                            ${parameter.required
+                                                ? '<span style="color:#c84630;font-weight:800;">*</span>'
+                                                : ''}
+                                        </label>
+                                        <small style="display:block;margin-bottom:6px;color:${parameter.required ? '#a43725' : 'var(--muted)'};">
+                                            ${parameter.required
+                                                ? 'Campo obligatorio'
+                                                : 'Puede dejarse en blanco'}
+                                        </small>
                                         ${buildInput(parameter)}
                                     </div>
                                 </div>
@@ -962,7 +1023,13 @@
 
             if (!parameter) return;
             parameter.value = value;
-            if (!value) return;
+            if (!value) {
+                if (parameter.required) {
+                    control.classList.add("invalid");
+                    message.textContent = "Este campo es obligatorio y no permite valores en blanco.";
+                }
+                return;
+            }
 
             const choices = productFilteredChoices(parameter);
 
@@ -1078,23 +1145,33 @@
             parameterContainer.innerHTML = `<div class="empty-state">Cargando parámetros...</div>`;
 
             try {
-                const response = await fetch(
-                    `${PARAMETER_BASE_URL}op${code}.json?v=${Date.now()}`,
-                    { cache: "no-store" }
-                );
+                const cacheKey = Date.now();
+                const [externalResponse, internalResponse] = await Promise.all([
+                    fetch(`${PARAMETER_BASE_URL}op${code}.json?v=${cacheKey}`, { cache: "no-store" }),
+                    fetch(`${INTERNAL_PARAMETER_BASE_URL}op${code}.json?v=${cacheKey}`, { cache: "no-store" })
+                ]);
 
-                if (response.status === 404) {
+                if (externalResponse.status === 404) {
                     allParameters = [];
                     renderParameters();
                     return;
                 }
 
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                if (!externalResponse.ok) {
+                    throw new Error(`HTTP externo ${externalResponse.status}`);
+                }
 
-                const records = await response.json();
-                allParameters = Array.isArray(records)
+                const records = await externalResponse.json();
+                const internalRecords = internalResponse.ok
+                    ? await internalResponse.json()
+                    : [];
+                const adaptedParameters = Array.isArray(records)
                     ? records.map(adaptRecord)
                     : [];
+                allParameters = mergeInternalRules(
+                    adaptedParameters,
+                    Array.isArray(internalRecords) ? internalRecords : []
+                );
 
                 collapsedCards.clear();
                 renderParameters();
