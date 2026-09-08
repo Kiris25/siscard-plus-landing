@@ -1439,6 +1439,18 @@
             requests.unshift(payload);
             localStorage.setItem("siscardRequests", JSON.stringify(requests));
             localStorage.setItem("siscardLastRequest", JSON.stringify(payload));
+            localStorage.setItem(
+                "siscardLastTemplate",
+                JSON.stringify({
+                    cliente: payload.cliente,
+                    emisor: payload.emisor,
+                    accion: payload.accion,
+                    producto: payload.producto, 
+                    fechaRequerida: payload.fechaRequerida,
+                    opcion: payload.opcion,
+                    parametros: payload.parametros
+                })
+            );
             closeConfirmation();
             showToast(`Solicitud ${payload.id} enviada a Seguridad.`);
         }
