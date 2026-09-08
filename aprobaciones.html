@@ -566,6 +566,24 @@
                 margin-top: 4px;
                 color: var(--muted);
             }
+            .approval-request-meta {
+                display: grid;
+                gap: 3px;
+                margin-top: 7px;
+                color: var(--muted);
+                font-size: 11px;
+            }
+            .approval-request-actions {
+                display: flex;
+                gap: 6px;
+                flex-wrap: wrap;
+                margin-top: 9px;
+            }
+            .approval-request-actions button {
+                min-height: 30px;
+                padding: 5px 9px;
+                font-size: 11px;
+            }
             .approval-state {
                 display: inline-flex;
                 margin-top: 7px;
@@ -721,6 +739,13 @@
                                 <span class="section-kicker">Seguridad</span>
                                 <h2>Solicitudes para revisar</h2>
                             </div>
+                            <button
+                                class="tertiary-button"
+                                id="exportHistoryButton"
+                                type="button"
+                            >
+                                Descargar historial Excel
+                            </button>
                         </div>
                         <div
                             class="approval-request-list"
@@ -1625,6 +1650,15 @@
                 }
             }
 
+            function formatDateTime(value) {
+                if (!value) return "Sin fecha";
+                const date = new Date(value);
+                if (Number.isNaN(date.getTime())) return String(value);
+                return new Intl.DateTimeFormat("es-CR", {
+                    dateStyle: "short",
+                    timeStyle: "short",
+                }).format(date);
+            }
             function loadRequests() {
                 return JSON.parse(localStorage.getItem("siscardRequests") || "[]");
             }
@@ -1636,20 +1670,39 @@
                 const container = document.getElementById("approvalRequestList");
                 container.innerHTML = requests.length
                     ? requests
-                          .map(
-                              (request) => `
-                    <button
+                          .map((request) => `
+                    <article
                         class="approval-request-button ${selectedRequestId === request.id ? "active" : ""}"
-                        type="button"
-                        data-approval-request-id="${escapeHtml(request.id)}"
                     >
                         <strong>${escapeHtml(request.id)}</strong>
                         <small>${escapeHtml(request.cliente)} · OP${escapeHtml(request.opcion)}</small>
                         <small>${escapeHtml(request.emisor)}</small>
-                        <span class="approval-state">${escapeHtml(request.estado)}</span>
-                    </button>
-                `,
-                          )
+                        <span class="approval-state">${escapeHtml(request.estado || "Enviada")}</span>
+                        <div class="approval-request-meta">
+                            <span>Enviada: ${escapeHtml(formatDateTime(request.fechaCreacion))}</span>
+                            <span>Actualizada: ${escapeHtml(formatDateTime(request.fechaActualizacion))}</span>
+                        </div>
+                        <div class="approval-request-actions">
+                            <button
+                                class="tertiary-button"
+                                type="button"
+                                data-view-request-id="${escapeHtml(request.id)}"
+                            >
+                                Ver solicitud
+                            </button>
+                            ${["Enviada", "Pendiente"].includes(request.estado)
+                                ? `
+                                <button
+                                    class="primary-button"
+                                    type="button"
+                                    data-take-request-id="${escapeHtml(request.id)}"
+                                >
+                                    Tomar solicitud
+                                </button>`
+                                : ""}
+                        </div>
+                    </article>
+                `)
                           .join("")
                     : '<div class="empty-state">No hay solicitudes registradas.</div>';
             }
@@ -1731,14 +1784,14 @@
             function renderApprovalButtons() {
                 if (!selectedRequest) return;
                 const container = document.getElementById("approvalButtons");
-                if (selectedRequest.estado === "Enviada") {
+                if (["Enviada", "Pendiente"].includes(selectedRequest.estado)) {
                     container.innerHTML =
                         '<button class="primary-button" data-approval-state="En revisión">Tomar solicitud</button>';
                     return;
                 }
                 if (selectedRequest.estado === "En revisión") {
                     container.innerHTML = `
-                    <button class="primary-button" data-approval-state="Aprobada">Aprobar</button>
+                    <button class="primary-button" data-approval-state="Aprobada">Aceptar</button>
                     <button class="tertiary-button" data-approval-state="Requiere información">Requiere información</button>
                     <button class="tertiary-button" data-approval-state="Rechazada">Rechazar</button>
                 `;
@@ -1801,6 +1854,61 @@
                 renderApprovalRequestList();
                 renderApprovalButtons();
                 showToast(`Solicitud actualizada a ${nextState}.`);
+            }
+            function takeRequest(requestId) {
+                selectedRequestId = requestId;
+                selectedRequest = loadRequests().find((item) => item.id === requestId) || null;
+                if (!selectedRequest) return;
+                if (["Enviada", "Pendiente"].includes(selectedRequest.estado)) {
+                    changeApprovalState("En revisión");
+                }
+                selectApprovalRequest(requestId);
+            }
+            function exportApprovalHistory() {
+                const requests = loadRequests();
+                if (!requests.length) {
+                    showToast("No hay registros para exportar.");
+                    return;
+                }
+                const summaryRows = requests.map((request) => ({
+                    Solicitud: request.id || "",
+                    Cliente: request.cliente || "",
+                    Emisor: request.emisor || "",
+                    Opción: request.opcion || "",
+                    Acción: request.accion || "",
+                    Producto: request.producto || "",
+                    Estado: request.estado || "",
+                    Responsable: request.aprobador || "",
+                    "Fecha de creación": formatDateTime(request.fechaCreacion),
+                    "Última actualización": formatDateTime(request.fechaActualizacion),
+                }));
+                const movementRows = requests.flatMap((request) =>
+                    (request.historial || []).map((movement) => ({
+                        Solicitud: request.id || "",
+                        Cliente: request.cliente || "",
+                        Emisor: request.emisor || "",
+                        Estado: movement.estado || "",
+                        Usuario: movement.usuario || "",
+                        Fecha: formatDateTime(movement.fecha),
+                        Comentario: movement.comentario || "",
+                    })),
+                );
+                const workbook = XLSX.utils.book_new();
+                const summarySheet = XLSX.utils.json_to_sheet(summaryRows);
+                const historySheet = XLSX.utils.json_to_sheet(movementRows);
+                summarySheet["!cols"] = [
+                    { wch: 34 }, { wch: 22 }, { wch: 22 }, { wch: 10 },
+                    { wch: 16 }, { wch: 16 }, { wch: 24 }, { wch: 20 },
+                    { wch: 22 }, { wch: 22 },
+                ];
+                historySheet["!cols"] = [
+                    { wch: 34 }, { wch: 22 }, { wch: 22 }, { wch: 24 },
+                    { wch: 20 }, { wch: 22 }, { wch: 48 },
+                ];
+                XLSX.utils.book_append_sheet(workbook, summarySheet, "Solicitudes");
+                XLSX.utils.book_append_sheet(workbook, historySheet, "Historial de estados");
+                const stamp = new Date().toISOString().slice(0, 10).replaceAll("-", "");
+                XLSX.writeFile(workbook, `historial_aprobaciones_${stamp}.xlsx`);
             }
             function requestPayload() {
                 return {
@@ -2001,8 +2109,15 @@
             document
                 .getElementById("approvalRequestList")
                 .addEventListener("click", (event) => {
-                    const button = event.target.closest("[data-approval-request-id]");
-                    if (button) selectApprovalRequest(button.dataset.approvalRequestId);
+                    const viewButton = event.target.closest("[data-view-request-id]");
+                    const takeButton = event.target.closest("[data-take-request-id]");
+                    if (takeButton) {
+                        takeRequest(takeButton.dataset.takeRequestId);
+                        return;
+                    }
+                    if (viewButton) {
+                        selectApprovalRequest(viewButton.dataset.viewRequestId);
+                    }
                 });
             document
                 .getElementById("approvalButtons")
@@ -2011,6 +2126,9 @@
                     if (button) changeApprovalState(button.dataset.approvalState);
                 });
 
+            document
+                .getElementById("exportHistoryButton")
+                .addEventListener("click", exportApprovalHistory);
             const now = new Date();
             const localDate = new Date(now.getTime() - now.getTimezoneOffset() * 60000);
             document.getElementById("requestDate").value = localDate
