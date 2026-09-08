@@ -1,1 +1,8 @@
-{}
+{
+  "defaults": {
+    "cliente": "",
+    "emisor": "",
+    "producto": "Todos",
+    "accion": ""
+  }
+}
