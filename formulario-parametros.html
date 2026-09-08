@@ -1075,7 +1075,6 @@
 
         async function loadOption(code) {
             currentOption = code;
-            buildOptionsMenu();
             parameterContainer.innerHTML = `<div class="empty-state">Cargando parámetros...</div>`;
 
             try {
@@ -1298,7 +1297,6 @@
         const localDate = new Date(now.getTime() - now.getTimezoneOffset() * 60000);
         document.getElementById("requestDate").value = localDate.toISOString().slice(0, 10);
 
-        buildOptionsMenu();
         loadOption(currentOption);
     </script>
 </body>
