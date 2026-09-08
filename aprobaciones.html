@@ -724,7 +724,7 @@
                             id="approvalRequestList"
                         ></div>
                     </section>
-                    <section class="form-document">
+                    <section class="form-document" id="approvalFormDocument" hidden>
                         <div class="document-heading">
                             <img
                                 class="evertec-logo"
@@ -820,7 +820,7 @@
                         <nav class="options-menu" id="optionsMenu"></nav>
                     </section>
 
-                    <form class="parameter-search" id="parameterSearchForm">
+                    <form class="parameter-search" id="parameterSearchForm" hidden>
                         <input
                             id="parameterSearchInput"
                             type="search"
@@ -829,7 +829,7 @@
                         <button class="primary-button" type="submit">Buscar</button>
                     </form>
 
-                    <section class="parameters-toolbar">
+                    <section class="parameters-toolbar" id="approvalParametersToolbar" hidden>
                         <div>
                             <strong id="recordCount">Cargando parámetros...</strong>
                             <small id="currentOptionText">Opción 05</small>
@@ -853,7 +853,7 @@
                         </div>
                     </section>
 
-                    <section class="parameters-panel">
+                    <section class="parameters-panel" id="approvalParametersPanel" hidden>
                         <header class="parameters-panel-header">
                             <h2 id="parametersTitle">
                                 Parámetros generales del emisor
@@ -1642,6 +1642,10 @@
                     .forEach((control) => {
                         control.disabled = true;
                     });
+                document.getElementById("approvalFormDocument").hidden = false;
+                document.getElementById("parameterSearchForm").hidden = false;
+                document.getElementById("approvalParametersToolbar").hidden = false;
+                document.getElementById("approvalParametersPanel").hidden = false;
                 loadOption(currentOption).then(() => {
                     const submitted = request.parametros || [];
                     allParameters = allParameters
