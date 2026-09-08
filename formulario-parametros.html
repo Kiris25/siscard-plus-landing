@@ -903,7 +903,7 @@
                     : `Seleccione una de ${choices.length} opciones permitidas`;
                 return `
                     <select data-entry-id="${escapeHtml(parameter.id)}" ${parameter.required ? "required" : ""}>
-                        <option value="">${escapeHtml(instruction)}</option>
+                        <option value="" selected disabled hidden></option>
                         ${choices.map(value => `<option value="${escapeHtml(value)}">${escapeHtml(value)}</option>`).join("")}
                     </select>
                     <small class="validation-message"></small>`;
@@ -1219,91 +1219,18 @@
             return true;
         }
 
-        async function githubRequest(url, options) {
-            const token = sessionStorage.getItem("siscardGitHubToken") ||
-                window.prompt("Ingrese el token de GitHub para guardar la solicitud:");
-
-            if (!token) throw new Error("No se proporcionó un token de GitHub.");
-            sessionStorage.setItem("siscardGitHubToken", token);
-
-            return fetch(url, {
-                ...options,
-                headers: {
-                    Accept: "application/vnd.github+json",
-                    Authorization: `Bearer ${token}`,
-                    "X-GitHub-Api-Version": "2022-11-28",
-                    ...(options.headers || {})
-                }
-            });
+        async function saveRequest() {
+            if (!validateHeader()) return;
+            const payload = requestPayload();
+            localStorage.setItem('siscardLastRequest', JSON.stringify(payload));
+            showToast('Solicitud registrada correctamente.');
         }
 
-        function utf8ToBase64(value) {
+function utf8ToBase64(value) {
             const bytes = new TextEncoder().encode(value);
             let binary = "";
             bytes.forEach((byte) => binary += String.fromCharCode(byte));
             return btoa(binary);
-        }
-
-        async function saveRequest() {
-            if (!validateHeader()) return;
-
-            const payload = requestPayload();
-            const apiUrl =
-                `https://api.github.com/repos/${GITHUB_SETTINGS.owner}/` +
-                `${GITHUB_SETTINGS.repository}/contents/${GITHUB_SETTINGS.path}`;
-
-            try {
-                const currentResponse = await githubRequest(
-                    `${apiUrl}?ref=${GITHUB_SETTINGS.branch}&v=${Date.now()}`,
-                    { method: "GET" }
-                );
-
-                let sha = "";
-                let data = { solicitudes: [] };
-
-                if (currentResponse.ok) {
-                    const file = await currentResponse.json();
-                    sha = file.sha;
-                    const decoded = decodeURIComponent(
-                        escape(atob(file.content.replace(/\n/g, "")))
-                    );
-                    const parsed = JSON.parse(decoded);
-                    data = Array.isArray(parsed)
-                        ? { solicitudes: parsed }
-                        : parsed;
-                } else if (currentResponse.status !== 404) {
-                    throw new Error(`No se pudo leer solicitudes.json (${currentResponse.status}).`);
-                }
-
-                if (!Array.isArray(data.solicitudes)) data.solicitudes = [];
-                data.solicitudes.push(payload);
-
-                const body = {
-                    message: `Guardar ${payload.id}`,
-                    content: utf8ToBase64(JSON.stringify(data, null, 2)),
-                    branch: GITHUB_SETTINGS.branch
-                };
-
-                if (sha) body.sha = sha;
-
-                const saveResponse = await githubRequest(apiUrl, {
-                    method: "PUT",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(body)
-                });
-
-                if (!saveResponse.ok) {
-                    const detail = await saveResponse.text();
-                    throw new Error(`No se pudo guardar (${saveResponse.status}). ${detail}`);
-                }
-
-                localStorage.setItem("siscardLastRequest", JSON.stringify(payload));
-                showToast("Solicitud guardada correctamente.");
-            } catch (error) {
-                console.error(error);
-                localStorage.setItem("siscardLastRequest", JSON.stringify(payload));
-                showToast("Guardado local realizado. Revise permisos de GitHub para publicar.");
-            }
         }
 
         function exportExcel() {
