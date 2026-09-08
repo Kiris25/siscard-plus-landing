@@ -3,467 +3,1973 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="description" content="Formularios de parámetros Siscard+" />
         <title>Aprobaciones | Landing Siscard+</title>
         <link rel="stylesheet" href="css/styles.css" />
+        <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
         <style>
             :root {
-                --orange: #ff6c0c;
-                --gray: #58595b;
-                --line: #dedede;
-                --soft: #f6f6f6;
-                --green: #1f7a4d;
-                --red: #b42318;
-                --blue: #2563a8;
+                --form-orange: #ff6c0c;
+                --form-gray: #58595b;
+                --form-line: #d9d9d9;
+                --form-soft: #f7f7f7;
             }
-            * {
-                box-sizing: border-box;
-            }
-            body {
-                margin: 0;
-                font-family:
-                    Segoe UI,
-                    Arial,
-                    sans-serif;
-                color: #2f3133;
-                background: #f5f5f5;
-            }
-            .app-shell {
-                display: grid;
-                grid-template-columns: var(--sidebar-width, 260px) minmax(
-                        0,
-                        1fr
-                    );
-                min-height: 100vh;
-            }
-            .main-area {
-                min-width: 0;
-            }
-            .content {
-                padding: 24px;
-            }
-            .hero,
-            .panel {
+
+            .form-document,
+            .parameters-panel {
+                overflow: hidden;
                 border: 1px solid var(--line);
-                border-radius: 14px;
-                background: #fff;
-                box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+                border-radius: var(--radius-large);
+                background: #ffffff;
+                box-shadow: var(--shadow-small);
             }
-            .hero {
-                padding: 26px;
-                border-top: 5px solid var(--orange);
-            }
-            .hero h1 {
-                margin: 5px 0 8px;
-                color: var(--gray);
-                font-weight: 400;
-            }
-            .hero p {
-                margin: 0;
-                color: #6c6d70;
-            }
-            .kicker {
-                color: var(--orange);
-                font-size: 12px;
-                font-weight: 800;
-                text-transform: uppercase;
-            }
-            .filters {
-                display: flex;
-                flex-wrap: wrap;
-                gap: 10px;
-                margin: 18px 0;
-            }
-            input,
-            select,
-            textarea,
-            button {
-                font: inherit;
-            }
-            input,
-            select,
-            textarea {
-                min-height: 42px;
-                padding: 9px 11px;
-                border: 1px solid #c9c9c9;
-                border-radius: 8px;
-                background: #fff;
-            }
-            .filters input {
-                flex: 1 1 260px;
-            }
-            button {
-                cursor: pointer;
-            }
-            .btn {
-                min-height: 38px;
-                padding: 8px 13px;
-                border: 1px solid var(--orange);
-                border-radius: 8px;
-                background: #fff;
-                color: #b94700;
-                font-weight: 700;
-            }
-            .btn.primary {
-                background: var(--orange);
-                color: #fff;
-            }
-            .btn.danger {
-                border-color: var(--red);
-                color: var(--red);
-            }
-            .stats {
+
+            .document-heading {
                 display: grid;
-                grid-template-columns: repeat(6, minmax(120px, 1fr));
-                gap: 9px;
-                margin: 18px 0;
+                grid-template-columns: 270px minmax(0, 1fr) 170px;
+                gap: 22px;
+                align-items: center;
+                padding: 22px 25px;
             }
-            .stat {
-                padding: 12px;
-                border: 1px solid var(--line);
-                border-radius: 10px;
-                background: #fff;
+
+            .evertec-logo {
+                display: block;
+                width: min(245px, 100%);
+                height: auto;
             }
-            .stat strong,
-            .stat span {
+
+            .document-title {
+                text-align: center;
+            }
+
+            .document-title strong,
+            .document-title span,
+            .document-code strong,
+            .document-code span {
                 display: block;
             }
-            .stat strong {
-                font-size: 22px;
-                color: var(--gray);
+
+            .document-title strong {
+                color: var(--sidebar);
+                font-size: 20px;
             }
-            .stat span {
-                color: #777;
-                font-size: 12px;
+
+            .document-title span {
+                margin-top: 4px;
+                color: var(--muted);
+                font-size: 14px;
             }
-            .panel {
-                overflow: hidden;
-            }
-            .table-wrap {
-                overflow: auto;
-            }
-            table {
-                width: 100%;
-                border-collapse: collapse;
-            }
-            th,
-            td {
+
+            .document-code {
                 padding: 12px;
-                border-bottom: 1px solid #e8e8e8;
-                text-align: left;
-                vertical-align: top;
+                border: 1px solid var(--line);
+                border-top: 4px solid var(--orange);
+                background: var(--surface-soft);
+                text-align: center;
             }
-            th {
-                background: var(--soft);
-                color: var(--gray);
-                font-size: 12px;
+
+            .document-code span {
+                margin-top: 3px;
+                color: var(--muted);
+                font-size: 11px;
+            }
+
+            .category-band {
+                padding: 10px 18px;
+                background: var(--orange);
+                color: #ffffff;
+                text-align: center;
+                font-size: 13px;
+                font-weight: 800;
+            }
+
+            .request-fields {
+                display: grid;
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+                gap: 15px;
+                padding: 20px 25px 24px;
+            }
+
+            .request-field.wide {
+                grid-column: span 2;
+            }
+
+            .request-field label {
+                display: block;
+                margin-bottom: 6px;
+                color: var(--sidebar);
+                font-size: 11px;
+                font-weight: 850;
                 text-transform: uppercase;
             }
-            .badge {
-                display: inline-flex;
-                padding: 5px 9px;
-                border-radius: 999px;
+
+            .request-field input,
+            .request-field select {
+                width: 100%;
+                min-height: 43px;
+                padding: 10px 12px;
+                border-radius: var(--radius);
+            }
+
+            .field-hint {
+                display: block;
+                margin-top: 5px;
+                color: var(--muted);
                 font-size: 11px;
-                font-weight: 800;
-                background: #eee;
+                font-style: italic;
+                line-height: 1.4;
             }
-            .badge[data-state="Enviada"] {
-                background: #fff2d6;
-                color: #8a5b00;
+
+            .options-area {
+                margin-top: 17px;
+                padding: 14px;
+                border: 1px solid var(--line);
+                border-radius: var(--radius);
+                background: #ffffff;
+                box-shadow: var(--shadow-small);
             }
-            .badge[data-state="En revisión"] {
-                background: #e8f1ff;
-                color: #18599a;
-            }
-            .badge[data-state="Requiere información"] {
-                background: #fff0df;
-                color: #a64b00;
-            }
-            .badge[data-state="Aprobada"] {
-                background: #e4f7ec;
-                color: #17663e;
-            }
-            .badge[data-state="Completada"] {
-                background: #dff5ee;
-                color: #0f684c;
-            }
-            .badge[data-state="Rechazada"] {
-                background: #fde7e7;
-                color: #a12626;
-            }
-            .actions {
-                display: flex;
-                flex-wrap: wrap;
-                gap: 6px;
-            }
-            .empty {
-                padding: 42px;
-                text-align: center;
-                color: #777;
-            }
-            dialog {
-                width: min(760px, calc(100vw - 28px));
-                max-height: 88vh;
-                overflow: auto;
-                border: 0;
-                border-radius: 14px;
-                box-shadow: 0 24px 70px rgba(0, 0, 0, 0.3);
-            }
-            dialog::backdrop {
-                background: rgba(0, 0, 0, 0.45);
-            }
-            .dialog-head {
+
+            .options-heading,
+            .parameters-toolbar,
+            .parameters-panel-header {
                 display: flex;
                 justify-content: space-between;
-                gap: 12px;
                 align-items: center;
-                border-bottom: 1px solid var(--line);
-                padding-bottom: 12px;
+                gap: 12px;
+                flex-wrap: wrap;
             }
-            .detail-grid {
+
+            .options-heading {
+                margin-bottom: 10px;
+            }
+
+            .options-heading h2,
+            .parameters-panel-header h2 {
+                margin: 0;
+                color: var(--sidebar);
+                font-weight: 400;
+            }
+
+            .options-menu {
                 display: grid;
-                grid-template-columns: repeat(2, minmax(0, 1fr));
-                gap: 10px;
-                margin: 14px 0;
+                grid-template-columns: repeat(10, minmax(0, 1fr));
+                gap: 5px;
             }
-            .detail {
-                padding: 10px;
+
+            .option-button {
+                min-height: 32px;
+                overflow: hidden;
+                padding: 5px 7px;
+                border: 1px solid var(--line-strong);
+                border-radius: 999px;
+                background: #ffffff;
+                color: var(--sidebar);
+                font-size: 10px;
+                font-weight: 800;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+
+            .option-button:hover,
+            .option-button.active {
+                border-color: var(--orange);
+                background: var(--orange);
+                color: #ffffff;
+            }
+
+            .parameter-search {
+                position: sticky;
+                top: 0;
+                z-index: 86;
+                display: grid;
+                grid-template-columns: minmax(0, 1fr) auto;
+                gap: 8px;
+                margin: 14px 0 0;
+                padding: 10px 12px;
                 border: 1px solid var(--line);
-                border-radius: 8px;
-                background: var(--soft);
+                border-bottom: 0;
+                border-radius: var(--radius) var(--radius) 0 0;
+                background: rgba(255, 255, 255, 0.98);
+                box-shadow: 0 8px 18px rgba(0, 0, 0, 0.08);
+                backdrop-filter: blur(8px);
             }
-            .detail small,
-            .detail strong {
+
+            .parameter-search input {
+                width: 100%;
+                min-height: 42px;
+                padding: 9px 12px;
+                border-radius: var(--radius);
+            }
+
+            .parameters-toolbar {
+                position: sticky;
+                top: 78px;
+                z-index: 85;
+                margin: 0 0 11px;
+                padding: 10px 13px;
+                border: 1px solid var(--line);
+                border-radius: 0 0 var(--radius) var(--radius);
+                background: rgba(255, 255, 255, 0.98);
+                box-shadow: 0 8px 18px rgba(0, 0, 0, 0.08);
+                backdrop-filter: blur(8px);
+            }
+
+            .parameters-toolbar strong,
+            .parameters-toolbar small {
                 display: block;
             }
-            .detail small {
-                color: #777;
+
+            .parameters-toolbar small {
+                margin-top: 3px;
+                color: var(--muted);
             }
-            .parameter-row,
-            .history-row {
-                padding: 10px 0;
-                border-bottom: 1px solid #eee;
+
+            .toolbar-actions {
+                display: flex;
+                gap: 7px;
+                flex-wrap: wrap;
             }
-            .comment-box {
+
+            .parameters-panel-header {
+                padding: 14px 17px;
+                border-bottom: 1px solid var(--line);
+                background: var(--surface-soft);
+            }
+
+            .parameter-list {
+                max-width: 920px;
+                margin: 0 auto;
+                padding: 0 12px;
+            }
+
+            .parameter-card {
+                border-bottom: 1px solid var(--line);
+            }
+
+            .parameter-card:last-child {
+                border-bottom: 0;
+            }
+
+            .parameter-card-heading {
+                display: grid;
+                grid-template-columns: 40px minmax(0, 1fr) auto;
+                gap: 8px;
+                align-items: center;
+                min-height: 50px;
+                cursor: pointer;
+            }
+
+            .parameter-number {
+                display: grid;
+                place-items: center;
+                width: 34px;
+                height: 34px;
+                border: 1px solid var(--line);
+                border-top: 3px solid var(--orange);
+                border-radius: var(--radius);
+                background: var(--surface-soft);
+                color: var(--sidebar);
+                font-weight: 850;
+            }
+
+            .parameter-name strong,
+            .parameter-name small {
+                display: block;
+            }
+
+            .parameter-name strong {
+                color: var(--sidebar);
+                font-size: 15px;
+            }
+
+            .parameter-name small {
+                margin-top: 3px;
+                color: var(--muted);
+            }
+
+            .collapse-indicator {
+                display: inline-block;
+                width: 18px;
+                color: var(--orange);
+                font-weight: 900;
+            }
+
+            .parameter-help {
+                width: 32px;
+                height: 32px;
+                display: grid;
+                place-items: center;
+                border: 1px solid var(--orange);
+                border-radius: 50%;
+                background: var(--orange-soft);
+                color: var(--orange);
+                font-weight: 900;
+            }
+
+            .parameter-help:hover,
+            .parameter-help:focus {
+                background: var(--orange);
+                color: #ffffff;
+                outline: none;
+            }
+            .parameter-heading-actions {
+                display: inline-flex;
+                align-items: center;
+                justify-content: flex-end;
+                gap: 6px;
+            }
+            .required-indicator {
+                display: inline-grid;
+                place-items: center;
+                min-width: 18px;
+                height: 18px;
+                color: #c84630;
+                font-size: 18px;
+                font-weight: 900;
+                line-height: 1;
+            }
+
+            .parameter-body {
+                max-width: 720px;
+                padding: 0 0 8px 40px;
+            }
+
+            .parameter-card.collapsed .parameter-body {
+                display: none;
+            }
+
+            .parameter-grid {
+                display: grid;
+                grid-template-columns: minmax(0, 1fr);
+                gap: 6px;
+            }
+
+            .parameter-entry {
+                padding: 8px 10px;
+                border: 1px solid var(--line);
+                border-top: 3px solid #b7b7b7;
+                border-radius: var(--radius);
+                background: var(--surface-soft);
+            }
+
+            .parameter-entry label {
+                display: block;
+                margin-bottom: 7px;
+                color: var(--sidebar);
+                font-size: 11px;
+                font-weight: 850;
+                text-transform: uppercase;
+            }
+
+            .value-chips {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 5px;
+            }
+
+            .value-chip {
+                padding: 4px 7px;
+                border: 1px solid var(--line);
+                border-radius: var(--radius-small);
+                background: #ffffff;
+                font-size: 11px;
+            }
+
+            .parameter-entry input,
+            .parameter-entry select {
                 width: 100%;
-                min-height: 90px;
-                margin-top: 12px;
+                min-height: 36px;
+                padding: 7px 9px;
+                border-radius: var(--radius);
             }
-            @media (max-width: 900px) {
+
+            .parameter-entry input.valid,
+            .parameter-entry select.valid {
+                border-color: var(--green);
+                background: #f3fbf7;
+            }
+
+            .parameter-entry input.invalid,
+            .parameter-entry select.invalid {
+                border-color: var(--red);
+                background: #fff5f5;
+            }
+
+            .validation-message {
+                display: block;
+                min-height: 15px;
+                margin-top: 4px;
+                color: var(--red);
+                font-size: 11px;
+            }
+
+            .parameter-tooltip {
+                position: fixed;
+                z-index: 250;
+                width: min(365px, calc(100vw - 28px));
+                max-height: min(520px, calc(100vh - 28px));
+                overflow-y: auto;
+                padding: 14px;
+                border: 1px solid var(--line);
+                border-top: 4px solid var(--orange);
+                border-radius: var(--radius);
+                background: #ffffff;
+                box-shadow: var(--shadow-medium);
+            }
+
+            .parameter-tooltip[hidden] {
+                display: none;
+            }
+
+            .parameter-tooltip h3 {
+                margin: 4px 0 8px;
+                color: var(--sidebar);
+                font-size: 16px;
+            }
+
+            .parameter-tooltip p {
+                margin: 0;
+                color: var(--muted);
+                font-size: 11px;
+                line-height: 1.35;
+            }
+
+            .tooltip-values {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 5px;
+                margin: 9px 0;
+            }
+
+            .tooltip-values span {
+                padding: 4px 6px;
+                border: 1px solid var(--line);
+                background: var(--surface-soft);
+                font-size: 10px;
+            }
+
+            .tooltip-link {
+                display: inline-flex;
+                margin-top: 9px;
+                color: var(--orange-dark);
+                font-size: 12px;
+                font-weight: 800;
+            }
+
+            .empty-state,
+            .error-state {
+                padding: 34px;
+                text-align: center;
+            }
+
+            .empty-state {
+                color: var(--muted);
+            }
+
+            .error-state {
+                color: var(--red);
+            }
+
+            @media (max-width: 1180px) {
+                .options-menu {
+                    grid-template-columns: repeat(6, minmax(0, 1fr));
+                }
+
+                .document-heading {
+                    grid-template-columns: 220px minmax(0, 1fr);
+                }
+
+                .document-code {
+                    grid-column: 1 / -1;
+                }
+            }
+
+            @media (max-width: 850px) {
+                .request-fields,
+                .parameter-grid,
+                .document-heading {
+                    grid-template-columns: 1fr;
+                }
+
+                .request-field.wide {
+                    grid-column: auto;
+                }
+
+                .evertec-logo {
+                    margin: 0 auto;
+                }
+
+                .parameter-body {
+                    padding-left: 0;
+                }
+            }
+
+            @media (max-width: 620px) {
+                .options-menu {
+                    grid-template-columns: repeat(3, minmax(0, 1fr));
+                }
+            }
+
+            mark {
+                padding: 0 2px;
+                background: #fff176;
+                color: #000;
+            }
+
+            .approval-inbox {
+                margin-bottom: 14px;
+                padding: 14px;
+                border: 1px solid var(--line);
+                border-radius: var(--radius-large);
+                background: #ffffff;
+                box-shadow: var(--shadow-small);
+            }
+            .approval-inbox-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                gap: 12px;
+                margin-bottom: 10px;
+            }
+            .approval-inbox-header h2 {
+                margin: 0;
+                color: var(--sidebar);
+                font-weight: 400;
+            }
+            .approval-request-list {
+                display: flex;
+                gap: 8px;
+                overflow-x: auto;
+                padding-bottom: 4px;
+            }
+            .approval-request-button {
+                min-width: 220px;
+                padding: 10px 12px;
+                border: 1px solid var(--line);
+                border-left: 4px solid var(--orange);
+                border-radius: var(--radius);
+                background: var(--surface-soft);
+                text-align: left;
+            }
+            .approval-request-button.active {
+                border-color: var(--orange);
+                background: var(--orange-soft);
+            }
+            .approval-request-button strong,
+            .approval-request-button small {
+                display: block;
+            }
+            .approval-request-button small {
+                margin-top: 4px;
+                color: var(--muted);
+            }
+            .approval-state {
+                display: inline-flex;
+                margin-top: 7px;
+                padding: 4px 7px;
+                border-radius: 999px;
+                background: #e8f1ff;
+                color: #18599a;
+                font-size: 10px;
+                font-weight: 850;
+            }
+            .approval-review {
+                display: grid;
+                grid-template-columns: 190px minmax(220px, 1fr);
+                gap: 10px;
+                align-items: start;
+                margin-top: 10px;
+            }
+            .approval-checks {
+                display: flex;
+                gap: 6px;
+                flex-wrap: wrap;
+            }
+            .approval-check {
+                min-height: 34px;
+                padding: 6px 9px;
+                border: 1px solid var(--line-strong);
+                border-radius: var(--radius);
+                background: #ffffff;
+                color: var(--sidebar);
+                font-weight: 750;
+            }
+            .approval-check.selected-ok {
+                border-color: var(--green);
+                background: #eaf8f0;
+                color: #17643e;
+            }
+            .approval-check.selected-fix {
+                border-color: var(--orange);
+                background: var(--orange-soft);
+                color: var(--orange-dark);
+            }
+            .approval-note {
+                width: 100%;
+                min-height: 58px;
+                padding: 8px 10px;
+                border-radius: var(--radius);
+                resize: vertical;
+            }
+            .approval-actions-panel {
+                position: sticky;
+                bottom: 0;
+                z-index: 90;
+                display: grid;
+                grid-template-columns: minmax(260px, 1fr) auto;
+                gap: 12px;
+                align-items: end;
+                margin-top: 14px;
+                padding: 12px;
+                border: 1px solid var(--line);
+                border-radius: var(--radius);
+                background: rgba(255, 255, 255, 0.98);
+                box-shadow: 0 -8px 18px rgba(0, 0, 0, 0.08);
+            }
+            .approval-general-comment label {
+                display: block;
+                margin-bottom: 5px;
+                color: var(--sidebar);
+                font-size: 10px;
+                font-weight: 850;
+                text-transform: uppercase;
+            }
+            .approval-general-comment textarea {
+                width: 100%;
+                min-height: 54px;
+                padding: 8px 10px;
+                border-radius: var(--radius);
+                resize: vertical;
+            }
+            .approval-buttons {
+                display: flex;
+                gap: 7px;
+                flex-wrap: wrap;
+                justify-content: flex-end;
+            }
+            @media (max-width: 850px) {
+                .approval-review,
+                .approval-actions-panel {
+                    grid-template-columns: 1fr;
+                }
+            }
+            @media print {
+                @page {
+                    size: A4 landscape;
+                    margin: 10mm;
+                }
+                body {
+                    background: #fff;
+                }
+                .sidebar,
+                .topbar,
+                .options-area,
+                .parameter-search,
+                .parameters-toolbar,
+                .parameter-help,
+                .footer,
+                .toast,
+                .parameter-tooltip {
+                    display: none !important;
+                }
                 .app-shell {
-                    grid-template-columns: 1fr;
+                    display: block;
                 }
-                .stats {
-                    grid-template-columns: repeat(2, 1fr);
-                }
-                .detail-grid {
-                    grid-template-columns: 1fr;
-                }
+                .main-area,
                 .content {
-                    padding: 14px;
+                    width: 100%;
+                    margin: 0;
+                    padding: 0;
+                }
+                .form-document,
+                .parameters-panel {
+                    border: 1px solid #999;
+                    border-radius: 0;
+                    box-shadow: none;
+                }
+                .parameter-card {
+                    break-inside: avoid;
+                }
+                .parameter-card.collapsed .parameter-body {
+                    display: block;
+                }
+                .parameter-body {
+                    padding-left: 0;
                 }
             }
         </style>
     </head>
-    <body
-        data-page-title="Aprobaciones"
-        data-page-subtitle="Bandeja de revisión"
-    >
+    <body data-page-title="Aprobaciones" data-page-subtitle="Revisión de solicitudes">
         <div class="app-shell">
             <div id="sidebar-container"></div>
+
             <div class="main-area">
                 <div id="topbar-container"></div>
+
                 <main class="content">
-                    <section class="hero">
-                        <span class="kicker">Flujo de revisión</span>
-                        <h1>Aprobaciones</h1>
-                        <p>
-                            Revise las solicitudes asignadas a Seguridad y
-                            gestione su estado.
-                        </p>
-                    </section>
-                    <div class="stats" id="stats"></div>
-                    <div class="filters">
-                        <input
-                            id="search"
-                            type="search"
-                            placeholder="Buscar por ID, cliente, emisor u opción"
-                        /><select id="state">
-                            <option value="">Todos los estados</option>
-                            <option>Enviada</option>
-                            <option>En revisión</option>
-                            <option>Requiere información</option>
-                            <option>Aprobada</option>
-                            <option>Completada</option>
-                            <option>Rechazada</option>
-                        </select>
+                    <div style="margin-bottom: 14px">
+                        <a class="tertiary-button" href="aprobaciones.html">
+                            ← Volver a la bandeja
+                        </a>
                     </div>
-                    <section class="panel">
-                        <div class="table-wrap">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>ID</th>
-                                        <th>Cliente</th>
-                                        <th>Opción</th>
-                                        <th>Aprobador</th>
-                                        <th>Estado</th>
-                                        <th>Acciones</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="rows"></tbody>
-                            </table>
-                        </div>
-                        <div class="empty" id="empty" hidden>
-                            No hay solicitudes para mostrar.
-                        </div>
-                    </section>
-                    <dialog id="detailDialog">
-                        <div class="dialog-head">
+                    <section class="approval-inbox">
+                        <div class="approval-inbox-header">
                             <div>
-                                <span class="kicker">Detalle</span>
-                                <h2 id="detailTitle"></h2>
+                                <span class="section-kicker">Seguridad</span>
+                                <h2>Solicitudes para revisar</h2>
                             </div>
-                            <button class="btn" onclick="detailDialog.close()">
-                                Cerrar
+                        </div>
+                        <div
+                            class="approval-request-list"
+                            id="approvalRequestList"
+                        ></div>
+                    </section>
+                    <section class="form-document">
+                        <div class="document-heading">
+                            <img
+                                class="evertec-logo"
+                                src="assets/logo-evertec.png"
+                                alt="Evertec"
+                            />
+
+                            <div class="document-title">
+                                <strong>Evertec Costa Rica</strong>
+                                <span>Parámetros del emisor - TRT08SN0</span>
+                                <span id="documentOptionTitle"
+                                    >OPC05 Parámetros generales del emisor</span
+                                >
+                            </div>
+
+                            <div class="document-code">
+                                <strong id="documentCode">OPE-PA-FO-003</strong>
+                                <span id="documentOptionCode">Opción 05</span>
+                            </div>
+                        </div>
+
+                        <div class="category-band">
+                            Incluir en Categoría: CR.TRAMITES.Parametros Siscard
+                        </div>
+
+                        <form class="request-fields" id="requestForm">
+                            <div class="request-field">
+                                <label for="clientName">Cliente</label>
+                                <input
+                                    id="clientName"
+                                    required
+                                    placeholder="Nombre del cliente"
+                                />
+                            </div>
+
+                            <div class="request-field">
+                                <label for="requestDate">Fecha de solicitud</label>
+                                <input id="requestDate" type="date" readonly />
+                            </div>
+
+                            <div class="request-field">
+                                <label for="issuerName">Emisor</label>
+                                <input
+                                    id="issuerName"
+                                    required
+                                    placeholder="Nombre o código del emisor"
+                                />
+                            </div>
+
+                            <div class="request-field">
+                                <label for="requestedAction">Acción por realizar</label>
+                                <select id="requestedAction" required>
+                                    <option value="">Seleccione una acción</option>
+                                    <option value="Agregar">Agregar</option>
+                                    <option value="Modificar">Modificar</option>
+                                    <option value="Eliminar">Eliminar</option>
+                                </select>
+                            </div>
+
+                            <div class="request-field">
+                                <label for="productFilter">Producto</label>
+                                <select id="productFilter">
+                                    <option value="Todos">Todos</option>
+                                    <option value="Credito">Crédito</option>
+                                    <option value="Debito">Débito</option>
+                                    <option value="Prepago">Prepago</option>
+                                    <option value="Corporativo">Corporativo</option>
+                                </select>
+                            </div>
+
+                            <div class="request-field wide">
+                                <label for="requiredDateTime"
+                                    >Fecha y hora en la que se requiere la
+                                    solicitud</label
+                                >
+                                <input id="requiredDateTime" type="datetime-local" />
+                                <small class="field-hint">
+                                    Se debe completar cuando se requiera que lo
+                                    solicitado se realice en una fecha y hora en
+                                    específico.
+                                </small>
+                            </div>
+                        </form>
+                    </section>
+
+                    <section class="options-area" hidden>
+                        <div class="options-heading">
+                            <div>
+                                <span class="section-kicker">Opciones del visor</span>
+                                <h2>Seleccione una opción</h2>
+                            </div>
+                        </div>
+                        <nav class="options-menu" id="optionsMenu"></nav>
+                    </section>
+
+                    <form class="parameter-search" id="parameterSearchForm">
+                        <input
+                            id="parameterSearchInput"
+                            type="search"
+                            placeholder="Buscar por nombre, descripción, producto, valores o dependencias"
+                        />
+                        <button class="primary-button" type="submit">Buscar</button>
+                    </form>
+
+                    <section class="parameters-toolbar">
+                        <div>
+                            <strong id="recordCount">Cargando parámetros...</strong>
+                            <small id="currentOptionText">Opción 05</small>
+                        </div>
+
+                        <div class="toolbar-actions">
+                            <button
+                                class="tertiary-button"
+                                id="hideAllButton"
+                                type="button"
+                            >
+                                Esconder todos
+                            </button>
+                            <button
+                                class="tertiary-button"
+                                id="showAllButton"
+                                type="button"
+                            >
+                                Mostrar todos
                             </button>
                         </div>
-                        <div id="detailContent"></div>
-                        <textarea
-                            class="comment-box"
-                            id="comment"
-                            placeholder="Comentario de revisión"
-                        ></textarea>
-                        <div
-                            class="actions"
-                            id="detailActions"
-                            style="margin-top: 12px"
-                        ></div>
-                    </dialog>
+                    </section>
+
+                    <section class="parameters-panel">
+                        <header class="parameters-panel-header">
+                            <h2 id="parametersTitle">
+                                Parámetros generales del emisor
+                            </h2>
+                        </header>
+                        <div class="parameter-list" id="parameterContainer">
+                            <div class="empty-state">Cargando parámetros...</div>
+                        </div>
+                    </section>
+                    <section
+                        class="approval-actions-panel"
+                        id="approvalActionsPanel"
+                        hidden
+                    >
+                        <div class="approval-general-comment">
+                            <label for="approvalGeneralComment"
+                                >Comentario general de la revisión</label
+                            >
+                            <textarea
+                                id="approvalGeneralComment"
+                                placeholder="Comentario visible para el solicitante"
+                            ></textarea>
+                        </div>
+                        <div class="approval-buttons" id="approvalButtons"></div>
+                    </section>
                 </main>
                 <div id="footer-container"></div>
             </div>
         </div>
+
+        <aside class="parameter-tooltip" id="parameterTooltip" hidden></aside>
+        <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
         <script src="js/layout.js"></script>
         <script src="js/app.js"></script>
         <script>
             "use strict";
-            const STATES = [
-                "Enviada",
-                "En revisión",
-                "Requiere información",
-                "Aprobada",
-                "Completada",
-                "Rechazada",
+
+            const PARAMETER_BASE_URL =
+                "https://kiris25.github.io/parametros-emisor-v2/data/externo/";
+            const INTERNAL_PARAMETER_BASE_URL =
+                "https://kiris25.github.io/parametros-emisor-v2/data/interno/";
+
+            const GITHUB_SETTINGS = {
+                owner: "Kiris25",
+                repository: "siscard-plus-landing",
+                branch: "main",
+                path: "data/solicitudes.json",
+            };
+
+            const OPTIONS = [
+                ["05", "Consultar"],
+                ["12", "Trabajar con"],
+                ["13", "Moneda"],
+                ["14", "Clasificación"],
+                ["15", "Membresías"],
+                ["16", "Cargos Auto"],
+                ["17", "Ciclos"],
+                ["18", "Tipo Cliente"],
+                ["19", "Renovación"],
+                ["20", "Pólizas"],
+                ["21", "Mensajes"],
+                ["22", "Sorteos"],
+                ["23", "Estados"],
+                ["24", "Clases"],
+                ["25", "Trasiego"],
+                ["26", "Cargos I.V."],
+                ["27", "Corporativo"],
+                ["28", "Skip Pay"],
+                ["29", "Diseño"],
+                ["30", "Extrafin."],
+                ["31", "Limpiar"],
+                ["32", "Tipo Cta."],
+                ["33", "Costos"],
+                ["34", "Estados Cta."],
+                ["35", "Excepciones"],
+                ["36", "Origen"],
+                ["38", "No Intereses"],
+                ["39", "Excep."],
+                ["40", "Documentos"],
+                ["42", "Prepago"],
+                ["44", "Reducc."],
+                ["45", "Vence Pago"],
+                ["46", "Copia"],
+                ["47", "Deterioro"],
+                ["48", "Prospecto"],
+                ["49", "Renov. Tarj."],
+                ["50", "Renov. Emisor"],
+                ["52", "Rangos"],
+                ["53", "Tecnología"],
             ];
-            let selectedId = "";
-            const load = () =>
-                JSON.parse(localStorage.getItem("siscardRequests") || "[]");
-            const save = (items) =>
-                localStorage.setItem("siscardRequests", JSON.stringify(items));
-            const esc = (v) =>
-                String(v ?? "").replace(
-                    /[&<>"]/g,
-                    (c) =>
-                        ({
-                            "&": "&amp;",
-                            "<": "&lt;",
-                            ">": "&gt;",
-                            '"': "&quot;",
-                        })[c],
-                );
-            function render() {
-                const items = load();
-                const q = document.getElementById("search").value.toLowerCase();
-                const st = document.getElementById("state").value;
-                document.getElementById("stats").innerHTML = STATES.map(
-                    (x) =>
-                        `<div class="stat"><strong>${items.filter((i) => i.estado === x).length}</strong><span>${x}</span></div>`,
-                ).join("");
-                const visible = items.filter(
-                    (i) =>
-                        (!st || i.estado === st) &&
-                        [i.id, i.cliente, i.emisor, i.opcion]
-                            .join(" ")
-                            .toLowerCase()
-                            .includes(q),
-                );
-                document.getElementById("rows").innerHTML = visible
-                    .map(
-                        (i) =>
-                            `<tr><td><strong>${esc(i.id)}</strong><br><small>${esc(i.fechaSolicitud || "")}</small></td><td>${esc(i.cliente)}</td><td>OP${esc(i.opcion)}</td><td>${esc(i.aprobador || "Seguridad")}</td><td><span class="badge" data-state="${esc(i.estado)}">${esc(i.estado)}</span></td><td><div class="actions"><button class="btn" onclick="openDetail('${esc(i.id)}')">Ver</button>${buttons(i, true)}</div></td></tr>`,
-                    )
-                    .join("");
-                document.getElementById("empty").hidden = visible.length > 0;
+
+            const FIELD_NAMES = {
+                name: ["nombre", "parametro", "titulo", "name"],
+                product: ["producto", "product"],
+                values: ["valores", "valoresPermitidos", "opciones", "allowedValues"],
+                description: ["que", "descripcion", "detalle", "description"],
+                operation: ["como", "funcionamiento", "how"],
+                dependencies: ["dependencias", "dep", "reglas", "dependencies"],
+                notes: ["notas", "observaciones", "notes"],
+            };
+
+            const requestedOption =
+                new URLSearchParams(window.location.search).get("opcion") || "05";
+            let currentOption = OPTIONS.some((item) => item[0] === requestedOption)
+                ? requestedOption
+                : "05";
+            let allParameters = [];
+            let visibleParameters = [];
+            let collapsedCards = new Set();
+            let selectedRequestId = "";
+            let selectedRequest = null;
+
+            const parameterContainer = document.getElementById("parameterContainer");
+            const parameterTooltip = document.getElementById("parameterTooltip");
+
+            function normalize(value) {
+                return String(value ?? "")
+                    .toLowerCase()
+                    .normalize("NFD")
+                    .replace(/[\u0300-\u036f]/g, "")
+                    .replace(/[^a-z0-9]+/g, " ")
+                    .replace(/\s+/g, " ")
+                    .trim();
             }
-            function buttons(i, compact = false) {
-                const b = [];
-                if (i.estado === "Enviada")
-                    b.push(["Tomar solicitud", "En revisión", "primary"]);
-                if (i.estado === "En revisión") {
-                    b.push(
-                        ["Aprobar", "Aprobada", "primary"],
-                        ["Requiere información", "Requiere información", ""],
-                        ["Rechazar", "Rechazada", "danger"],
-                    );
+
+            function plainText(value) {
+                const temporary = document.createElement("div");
+                temporary.innerHTML = String(value ?? "");
+                return temporary.textContent.trim();
+            }
+
+            function field(record, names, defaultValue = "") {
+                for (const name of names) {
+                    const value = record?.[name];
+                    if (
+                        value !== undefined &&
+                        value !== null &&
+                        String(value).trim() !== ""
+                    ) {
+                        return plainText(value);
+                    }
                 }
-                if (i.estado === "Requiere información")
-                    b.push(["Retomar", "En revisión", "primary"]);
-                if (i.estado === "Aprobada")
-                    b.push(["Marcar completada", "Completada", "primary"]);
-                return b
-                    .map(
-                        (x) =>
-                            `<button class="btn ${x[2]}" onclick="changeState('${esc(i.id)}','${x[1]}')">${x[0]}</button>`,
+                return defaultValue;
+            }
+
+            function escapeHtml(value) {
+                const temporary = document.createElement("div");
+                temporary.textContent = String(value ?? "");
+                return temporary.innerHTML;
+            }
+
+            function highlightSearch(value) {
+                const escaped = escapeHtml(value);
+                const query = document
+                    .getElementById("parameterSearchInput")
+                    .value.trim();
+                if (!query) return escaped;
+                const terms = query
+                    .split(/\s+/)
+                    .filter(Boolean)
+                    .sort((a, b) => b.length - a.length)
+                    .map((term) => term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
+                return terms.length
+                    ? escaped.replace(
+                          new RegExp(`(${terms.join("|")})`, "gi"),
+                          "<mark>$1</mark>",
+                      )
+                    : escaped;
+            }
+
+            function rawAllowedValues(record) {
+                return plainText(
+                    record.valoresPermitidos ??
+                        record.valores ??
+                        record.opciones ??
+                        record.allowedValues ??
+                        "",
+                );
+            }
+
+            function cleanAllowedValuesText(value) {
+                return String(value || "")
+                    .replace(
+                        /^\s*(?:c[oó]digos?\s+de\s+producto(?:s)?(?:\s+como)?|c[oó]digos?\s+permitidos?(?:\s+como)?|valores?\s+permitidos?(?:\s+como)?|opciones?(?:\s+como)?)\s*[:\-]?\s*/i,
+                        "",
                     )
+                    .trim();
+            }
+            function parseEnumeratedValues(record) {
+                const raw = cleanAllowedValuesText(rawAllowedValues(record));
+                if (!raw) return [];
+
+                const separatorPattern = /\s*(?:\r?\n|[;,|/])\s*/;
+                const parts = raw
+                    .split(separatorPattern)
+                    .map(cleanAllowedValuesText)
+                    .map((value) => value.replace(/^[•*-]\s*/, "").trim())
+                    .filter(Boolean);
+
+                const pairedValues = parts.filter((value) =>
+                    /^[A-Za-z0-9]{1,8}\s*(?:=|–|-)\s*.+/.test(value),
+                );
+
+                if (pairedValues.length >= 2) {
+                    return [...new Set(pairedValues)];
+                }
+
+                const compactList = parts.filter((value) => value.length <= 80);
+                if (compactList.length >= 2 && compactList.length <= 30) {
+                    return [...new Set(compactList)];
+                }
+
+                const products = raw.match(
+                    /(?:visa|mastercard|american express|amex|local|internacional)\s+(?:cr[eé]dito|d[eé]bito|prepago|corporativo)/gi,
+                );
+
+                return products?.length
+                    ? [...new Set(products.map((value) => value.trim()))]
+                    : [];
+            }
+
+            function inputKind(parameter) {
+                const name = normalize(parameter.name);
+
+                if (/porcentaje|porc|tasa/.test(name)) {
+                    return {
+                        type: "number",
+                        min: "0",
+                        max: "100",
+                        step: "0.01",
+                        reason: "Ingrese un porcentaje entre 0 y 100.",
+                    };
+                }
+
+                if (/dias|dia|maximo de dias|cantidad de dias/.test(name)) {
+                    return {
+                        type: "number",
+                        min: "0",
+                        step: "1",
+                        reason: "Ingrese una cantidad de días igual o mayor que 0.",
+                    };
+                }
+
+                return {
+                    type: "text",
+                    reason: "Ingrese un valor compatible con la ficha del parámetro.",
+                };
+            }
+
+            function productFilteredChoices(parameter) {
+                const selectedProduct = document.getElementById("productFilter").value;
+                if (selectedProduct === "Todos") return parameter.values;
+
+                const selected = normalize(selectedProduct);
+                const productChoices = parameter.values.filter((value) => {
+                    const normalizedValue = normalize(value);
+                    const mentionsProduct = /(credito|debito|prepago|corporativo)/.test(
+                        normalizedValue,
+                    );
+                    return !mentionsProduct || normalizedValue.includes(selected);
+                });
+
+                return productChoices.length ? productChoices : parameter.values;
+            }
+
+            function adaptRecord(record, index) {
+                const identifier = field(
+                    record,
+                    ["id", "numero", "codigo", "orden"],
+                    `${currentOption}-${index + 1}`,
+                );
+
+                return {
+                    id: identifier,
+                    number: index + 1,
+                    name: field(record, FIELD_NAMES.name, `Parámetro ${index + 1}`),
+                    product: field(record, FIELD_NAMES.product, "Todos"),
+                    values: parseEnumeratedValues(record),
+                    rawValues: rawAllowedValues(record),
+                    description: field(record, FIELD_NAMES.description),
+                    operation: field(record, FIELD_NAMES.operation),
+                    dependencies: field(record, FIELD_NAMES.dependencies),
+                    notes: field(record, FIELD_NAMES.notes),
+                    required: false,
+                    allowsBlank: true,
+                    internalRuleFound: false,
+                    value: "",
+                    original: record,
+                };
+            }
+
+            function internalBoolean(record, aliases) {
+                const value = field(record, aliases, "");
+                const normalized = normalize(value);
+                if (["si", "s", "true", "1", "yes"].includes(normalized)) return true;
+                if (["no", "n", "false", "0"].includes(normalized)) return false;
+                return null;
+            }
+
+            function recordIdentity(record, index) {
+                const identifier = field(
+                    record,
+                    ["id", "numero", "codigo", "orden"],
+                    "",
+                );
+                const name = field(record, FIELD_NAMES.name, "");
+                return {
+                    id: normalize(identifier),
+                    name: normalize(name),
+                    index,
+                };
+            }
+
+            function mergeInternalRules(parameters, internalRecords) {
+                const identities = internalRecords.map(recordIdentity);
+                return parameters.map((parameter, index) => {
+                    const parameterId = normalize(parameter.id);
+                    const parameterName = normalize(parameter.name);
+                    const matchIndex = identities.findIndex(
+                        (identity) =>
+                            (parameterId && identity.id === parameterId) ||
+                            (parameterName && identity.name === parameterName),
+                    );
+                    const fallbackIndex = matchIndex >= 0 ? matchIndex : index;
+                    const internalRecord = internalRecords[fallbackIndex];
+                    if (!internalRecord) return parameter;
+                    const required = internalBoolean(internalRecord, [
+                        "obligatorio",
+                        "Obligatorio",
+                        "required",
+                        "esObligatorio",
+                    ]);
+                    const allowsBlank = internalBoolean(internalRecord, [
+                        "permiteBlancos",
+                        "Permite Blancos",
+                        "permite blancos",
+                        "permite_blancos",
+                        "allowsBlank",
+                        "admiteBlancos",
+                    ]);
+                    return {
+                        ...parameter,
+                        required: required === true,
+                        allowsBlank: required !== true,
+                        internalRuleFound: required !== null || allowsBlank !== null,
+                    };
+                });
+            }
+
+            function optionName(code) {
+                return OPTIONS.find((item) => item[0] === code)?.[1] || "";
+            }
+
+            function productApplies(parameterProduct, selectedProduct) {
+                if (selectedProduct === "Todos") return true;
+
+                const product = normalize(parameterProduct);
+                const selected = normalize(selectedProduct);
+
+                if (!product || product === "todos" || product === "todo") return true;
+
+                return product.includes(selected);
+            }
+
+            function buildOptionsMenu() {
+                document.getElementById("optionsMenu").innerHTML = OPTIONS.map(
+                    ([code, name]) => `
+                    <button
+                        class="option-button ${currentOption === code ? "active" : ""}"
+                        type="button"
+                        data-option="${code}"
+                        title="Op. ${code} · ${escapeHtml(name)}"
+                    >
+                        Op. ${code} · ${escapeHtml(name)}
+                    </button>
+                `,
+                ).join("");
+            }
+
+            function buildInput(parameter) {
+                const choices = productFilteredChoices(parameter);
+                if (choices.length) {
+                    const instruction =
+                        choices.length <= 3
+                            ? `Seleccione: ${choices.join(" / ")}`
+                            : `Seleccione una de ${choices.length} opciones permitidas`;
+                    return `
+                    <select data-entry-id="${escapeHtml(parameter.id)}" disabled>
+                        <option value="" selected disabled hidden></option>
+                        ${choices.map((value) => `<option value="${escapeHtml(value)}">${escapeHtml(value)}</option>`).join("")}
+                    </select>
+                    <small class="validation-message"></small>`;
+                }
+                const kind = inputKind(parameter);
+                const attributes = [
+                    `type="${kind.type}"`,
+                    kind.min !== undefined ? `min="${kind.min}"` : "",
+                    kind.max !== undefined ? `max="${kind.max}"` : "",
+                    kind.step !== undefined ? `step="${kind.step}"` : "",
+                ]
+                    .filter(Boolean)
+                    .join(" ");
+                return `<input ${attributes} data-entry-id="${escapeHtml(parameter.id)}" ${parameter.required ? "required" : ""} data-validation-reason="${escapeHtml(kind.reason)}" placeholder="Digite el valor solicitado" readonly><small class="validation-message"></small>`;
+            }
+            function renderParameters() {
+                const selectedProduct = document.getElementById("productFilter").value;
+
+                const searchQuery = normalize(
+                    document.getElementById("parameterSearchInput").value,
+                );
+
+                visibleParameters = allParameters.filter((parameter) => {
+                    const productMatches = productApplies(
+                        parameter.product,
+                        selectedProduct,
+                    );
+                    const searchableText = normalize(
+                        [
+                            parameter.name,
+                            parameter.product,
+                            parameter.rawValues,
+                            parameter.description,
+                            parameter.operation,
+                            parameter.dependencies,
+                            parameter.notes,
+                        ].join(" "),
+                    );
+                    const searchMatches =
+                        !searchQuery || searchableText.includes(searchQuery);
+                    return productMatches && searchMatches;
+                });
+
+                document.getElementById("recordCount").textContent =
+                    `${visibleParameters.length} parámetro${visibleParameters.length === 1 ? "" : "s"} disponibles`;
+
+                document.getElementById("currentOptionText").textContent =
+                    `Opción ${currentOption} · ${optionName(currentOption)} · Producto: ${selectedProduct}`;
+
+                document.getElementById("parametersTitle").textContent =
+                    `Op. ${currentOption} · ${optionName(currentOption)}`;
+
+                document.getElementById("documentOptionTitle").textContent =
+                    `OPC${currentOption} ${optionName(currentOption)}`;
+
+                document.getElementById("documentOptionCode").textContent =
+                    `Opción ${currentOption}`;
+
+                if (!visibleParameters.length) {
+                    parameterContainer.innerHTML = `
+                    <div class="empty-state">
+                        No hay parámetros publicados para esta opción y producto.
+                    </div>
+                `;
+                    return;
+                }
+
+                parameterContainer.innerHTML = visibleParameters
+                    .map((parameter) => {
+                        const collapsed = collapsedCards.has(parameter.id);
+                        return `
+                        <article
+                            class="parameter-card ${collapsed ? "collapsed" : ""}"
+                            data-card-id="${escapeHtml(parameter.id)}"
+                        >
+                            <header class="parameter-card-heading" data-toggle-id="${escapeHtml(parameter.id)}">
+                                <span class="parameter-number">${parameter.number}</span>
+                                <div class="parameter-name">
+                                    <strong>
+                                        <span class="collapse-indicator">${collapsed ? "▶" : "▼"}</span>
+                                        ${highlightSearch(parameter.name)}
+                                    </strong>
+                                    <small>${highlightSearch(parameter.product || "Todos")}</small>
+                                </div>
+                                <div class="parameter-heading-actions">
+                                    ${
+                                        parameter.required
+                                            ? '<span class="required-indicator" title="Campo obligatorio" aria-label="Campo obligatorio">*</span>'
+                                            : ""
+                                    }
+                                    <button
+                                        class="parameter-help"
+                                        type="button"
+                                        data-help-id="${escapeHtml(parameter.id)}"
+                                        title="Ver ficha del parámetro"
+                                        aria-label="Ver ficha de ${escapeHtml(parameter.name)}"
+                                    >?</button>
+                                </div>
+                            </header>
+
+                            <div class="parameter-body">
+                                <div class="parameter-grid">
+                                    <div class="parameter-entry">
+                                        <label>Valor enviado</label>
+                                        ${buildInput(parameter)}
+                                        <div class="approval-review">
+                                            <div class="approval-checks">
+                                                <button
+                                                    class="approval-check ${parameter.reviewStatus === "Correcto" ? "selected-ok" : ""}"
+                                                    type="button"
+                                                    data-review-id="${escapeHtml(parameter.id)}"
+                                                    data-review-value="Correcto"
+                                                >✓ Correcto</button>
+                                                <button
+                                                    class="approval-check ${parameter.reviewStatus === "Requiere ajuste" ? "selected-fix" : ""}"
+                                                    type="button"
+                                                    data-review-id="${escapeHtml(parameter.id)}"
+                                                    data-review-value="Requiere ajuste"
+                                                >⚠ Requiere ajuste</button>
+                                            </div>
+                                            <textarea
+                                                class="approval-note"
+                                                data-review-note-id="${escapeHtml(parameter.id)}"
+                                                placeholder="Nota del aprobador"
+                                            >${escapeHtml(parameter.approvalNote || "")}</textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </article>
+                    `;
+                    })
                     .join("");
+
+                attachParameterEvents();
             }
-            function openDetail(id) {
-                selectedId = id;
-                const i = load().find((x) => x.id === id);
-                if (!i) return;
-                document.getElementById("detailTitle").textContent = i.id;
-                document.getElementById("detailContent").innerHTML =
-                    `<div class="detail-grid"><div class="detail"><small>Cliente</small><strong>${esc(i.cliente)}</strong></div><div class="detail"><small>Emisor</small><strong>${esc(i.emisor)}</strong></div><div class="detail"><small>Opción</small><strong>OP${esc(i.opcion)}</strong></div><div class="detail"><small>Estado</small><strong>${esc(i.estado)}</strong></div></div><h3>Parámetros solicitados</h3>${(i.parametros || []).map((p) => `<div class="parameter-row"><strong>${esc(p.nombre || p.id)}</strong><br>${esc(p.valor)}</div>`).join("") || "<p>No se registraron valores.</p>"}<h3>Historial</h3>${(i.historial || []).map((h) => `<div class="history-row"><strong>${esc(h.estado)}</strong> · ${esc(h.usuario || "")}<br><small>${esc(h.fecha || "")}</small><br>${esc(h.comentario || "")}</div>`).join("")}`;
-                document.getElementById("detailActions").innerHTML = buttons(i);
-                document.getElementById("comment").value = "";
-                detailDialog.showModal();
-            }
-            function changeState(id, state) {
-                const comment =
-                    document.getElementById("comment")?.value.trim() || "";
-                if (
-                    ["Requiere información", "Rechazada"].includes(state) &&
-                    !comment
-                ) {
-                    if (selectedId === id) {
-                        document.getElementById("comment").focus();
-                        alert("Ingrese un comentario para continuar.");
-                    } else {
-                        openDetail(id);
-                        document.getElementById("comment").focus();
+
+            function validateInput(control) {
+                const parameter = allParameters.find(
+                    (item) => String(item.id) === String(control.dataset.entryId),
+                );
+
+                const message =
+                    control.parentElement.querySelector(".validation-message");
+                const value = control.value.trim();
+
+                control.classList.remove("valid", "invalid");
+                message.textContent = "";
+
+                if (!parameter) return;
+                parameter.value = value;
+                if (!value) {
+                    if (parameter.required) {
+                        control.classList.add("invalid");
+                        message.textContent =
+                            "Este campo es obligatorio y no permite valores en blanco.";
                     }
                     return;
                 }
-                const items = load();
-                const i = items.find((x) => x.id === id);
-                if (!i) return;
-                i.estado = state;
-                i.aprobador = "Seguridad";
-                i.fechaActualizacion = new Date().toISOString();
-                i.historial = i.historial || [];
-                i.historial.push({
-                    estado: state,
-                    fecha: i.fechaActualizacion,
-                    usuario: "Seguridad",
-                    comentario: comment || `Solicitud actualizada a ${state}.`,
-                });
-                save(items);
-                render();
-                if (selectedId === id) openDetail(id);
+
+                const choices = productFilteredChoices(parameter);
+
+                if (choices.length && !choices.includes(value)) {
+                    control.classList.add("invalid");
+                    control.value = "";
+                    parameter.value = "";
+                    message.textContent =
+                        "Valor rechazado: seleccione uno de los valores permitidos para el producto elegido.";
+                    return;
+                }
+
+                if (!control.checkValidity()) {
+                    control.classList.add("invalid");
+                    control.value = "";
+                    parameter.value = "";
+                    message.textContent =
+                        control.dataset.validationReason ||
+                        "El valor no cumple las reglas del parámetro.";
+                    return;
+                }
+
+                control.classList.add("valid");
             }
-            document.getElementById("search").addEventListener("input", render);
-            document.getElementById("state").addEventListener("change", render);
-            render();
+
+            function attachParameterEvents() {
+                document.querySelectorAll("[data-toggle-id]").forEach((heading) => {
+                    heading.addEventListener("click", (event) => {
+                        if (event.target.closest(".parameter-help")) return;
+                        const id = heading.dataset.toggleId;
+                        if (collapsedCards.has(id)) collapsedCards.delete(id);
+                        else collapsedCards.add(id);
+                        renderParameters();
+                    });
+                });
+
+                document.querySelectorAll("[data-entry-id]").forEach((control) => {
+                    const parameter = allParameters.find(
+                        (item) => String(item.id) === String(control.dataset.entryId),
+                    );
+                    if (parameter?.value) control.value = parameter.value;
+                    control.addEventListener("change", () => validateInput(control));
+                    control.addEventListener("blur", () => validateInput(control));
+                });
+
+                document.querySelectorAll("[data-review-id]").forEach((button) => {
+                    button.addEventListener("click", () => {
+                        const parameter = allParameters.find(
+                            (item) =>
+                                String(item.id) === String(button.dataset.reviewId),
+                        );
+                        if (!parameter) return;
+                        parameter.reviewStatus = button.dataset.reviewValue;
+                        saveCurrentReview();
+                        renderParameters();
+                    });
+                });
+                document
+                    .querySelectorAll("[data-review-note-id]")
+                    .forEach((control) => {
+                        control.addEventListener("change", () => {
+                            const parameter = allParameters.find(
+                                (item) =>
+                                    String(item.id) ===
+                                    String(control.dataset.reviewNoteId),
+                            );
+                            if (!parameter) return;
+                            parameter.approvalNote = control.value.trim();
+                            saveCurrentReview();
+                        });
+                    });
+                document.querySelectorAll("[data-help-id]").forEach((button) => {
+                    const parameter = allParameters.find(
+                        (item) => String(item.id) === String(button.dataset.helpId),
+                    );
+
+                    const show = () => showTooltip(button, parameter);
+                    button.addEventListener("mouseenter", show);
+                    button.addEventListener("focus", show);
+                    button.addEventListener("click", show);
+                    button.addEventListener("mouseleave", hideTooltipSoon);
+                });
+            }
+
+            function showTooltip(button, parameter) {
+                if (!parameter) return;
+
+                const allValues = parameter.rawValues || "Entrada manual";
+                const url = new URL("https://kiris25.github.io/parametros-emisor-v2/");
+                url.searchParams.set("modo", "ficha");
+                url.searchParams.set("idioma", "es");
+                url.searchParams.set("ambito", "externo");
+                url.searchParams.set("opcion", currentOption);
+                url.searchParams.set("id", parameter.id);
+
+                const row = (label, value) =>
+                    value
+                        ? `
+                <div style="margin-top:8px;padding-top:7px;border-top:1px solid #e6e6e6;">
+                    <strong style="display:block;font-size:10px;text-transform:uppercase;color:#58595b;">
+                        ${escapeHtml(label)}
+                    </strong>
+                    <p>${escapeHtml(value)}</p>
+                </div>
+            `
+                        : "";
+
+                parameterTooltip.innerHTML = `
+                <span class="section-kicker">Opción ${currentOption}</span>
+                <h3>${escapeHtml(parameter.name)}</h3>
+                ${row("Producto", parameter.product)}
+                ${row("Valores permitidos", allValues)}
+                ${row("¿Qué hace?", parameter.description)}
+                ${row("¿Cómo funciona?", parameter.operation)}
+                ${row("Dependencias / Reglas", parameter.dependencies)}
+                ${row("Notas", parameter.notes)}
+                <a class="tooltip-link" href="${url.href}">Abrir ficha completa →</a>
+            `;
+
+                const rect = button.getBoundingClientRect();
+                const width = Math.min(365, window.innerWidth - 28);
+                let left = rect.right + 10;
+                if (left + width > window.innerWidth - 14)
+                    left = rect.left - width - 10;
+
+                parameterTooltip.style.left = `${Math.max(14, left)}px`;
+                parameterTooltip.style.top = `${Math.max(14, Math.min(rect.top, window.innerHeight - 480))}px`;
+                parameterTooltip.hidden = false;
+            }
+
+            function hideTooltipSoon() {
+                window.setTimeout(() => {
+                    if (!parameterTooltip.matches(":hover"))
+                        parameterTooltip.hidden = true;
+                }, 160);
+            }
+
+            parameterTooltip.addEventListener("mouseleave", () => {
+                parameterTooltip.hidden = true;
+            });
+
+            async function loadOption(code) {
+                currentOption = code;
+                parameterContainer.innerHTML = `<div class="empty-state">Cargando parámetros...</div>`;
+
+                try {
+                    const cacheKey = Date.now();
+                    const [externalResponse, internalResponse] = await Promise.all([
+                        fetch(`${PARAMETER_BASE_URL}op${code}.json?v=${cacheKey}`, {
+                            cache: "no-store",
+                        }),
+                        fetch(
+                            `${INTERNAL_PARAMETER_BASE_URL}op${code}.json?v=${cacheKey}`,
+                            { cache: "no-store" },
+                        ),
+                    ]);
+
+                    if (externalResponse.status === 404) {
+                        allParameters = [];
+                        renderParameters();
+                        return;
+                    }
+
+                    if (!externalResponse.ok) {
+                        throw new Error(`HTTP externo ${externalResponse.status}`);
+                    }
+
+                    const records = await externalResponse.json();
+                    const internalRecords = internalResponse.ok
+                        ? await internalResponse.json()
+                        : [];
+                    const adaptedParameters = Array.isArray(records)
+                        ? records.map(adaptRecord)
+                        : [];
+                    allParameters = mergeInternalRules(
+                        adaptedParameters,
+                        Array.isArray(internalRecords) ? internalRecords : [],
+                    );
+
+                    collapsedCards.clear();
+                    renderParameters();
+                } catch (error) {
+                    console.error(error);
+                    parameterContainer.innerHTML = `
+                    <div class="error-state">
+                        No fue posible cargar la opción ${escapeHtml(code)}.
+                    </div>
+                `;
+                }
+            }
+
+            function loadRequests() {
+                return JSON.parse(localStorage.getItem("siscardRequests") || "[]");
+            }
+            function storeRequests(requests) {
+                localStorage.setItem("siscardRequests", JSON.stringify(requests));
+            }
+            function renderApprovalRequestList() {
+                const requests = loadRequests();
+                const container = document.getElementById("approvalRequestList");
+                container.innerHTML = requests.length
+                    ? requests
+                          .map(
+                              (request) => `
+                    <button
+                        class="approval-request-button ${selectedRequestId === request.id ? "active" : ""}"
+                        type="button"
+                        data-approval-request-id="${escapeHtml(request.id)}"
+                    >
+                        <strong>${escapeHtml(request.id)}</strong>
+                        <small>${escapeHtml(request.cliente)} · OP${escapeHtml(request.opcion)}</small>
+                        <small>${escapeHtml(request.emisor)}</small>
+                        <span class="approval-state">${escapeHtml(request.estado)}</span>
+                    </button>
+                `,
+                          )
+                          .join("")
+                    : '<div class="empty-state">No hay solicitudes registradas.</div>';
+            }
+            function selectApprovalRequest(requestId) {
+                const request = loadRequests().find((item) => item.id === requestId);
+                if (!request) return;
+                selectedRequestId = requestId;
+                selectedRequest = request;
+                currentOption = request.opcion || "05";
+                document.getElementById("clientName").value = request.cliente || "";
+                document.getElementById("issuerName").value = request.emisor || "";
+                document.getElementById("requestedAction").value = request.accion || "";
+                document.getElementById("productFilter").value =
+                    request.producto || "Todos";
+                document.getElementById("requestDate").value =
+                    request.fechaSolicitud || "";
+                document.getElementById("requiredDateTime").value =
+                    request.fechaRequerida || "";
+                document
+                    .querySelectorAll("#requestForm input, #requestForm select")
+                    .forEach((control) => {
+                        control.disabled = true;
+                    });
+                loadOption(currentOption).then(() => {
+                    const submitted = request.parametros || [];
+                    allParameters = allParameters
+                        .filter((parameter) =>
+                            submitted.some(
+                                (item) => String(item.id) === String(parameter.id),
+                            ),
+                        )
+                        .map((parameter) => {
+                            const stored = submitted.find(
+                                (item) => String(item.id) === String(parameter.id),
+                            );
+                            return {
+                                ...parameter,
+                                value: stored?.valor || "",
+                                reviewStatus: stored?.revision || "Pendiente",
+                                approvalNote: stored?.notaAprobador || "",
+                            };
+                        });
+                    renderParameters();
+                    document.getElementById("approvalActionsPanel").hidden = false;
+                    renderApprovalButtons();
+                    renderApprovalRequestList();
+                });
+            }
+            function saveCurrentReview() {
+                if (!selectedRequestId) return;
+                const requests = loadRequests();
+                const request = requests.find((item) => item.id === selectedRequestId);
+                if (!request) return;
+                request.parametros = allParameters.map((parameter) => ({
+                    id: parameter.id,
+                    nombre: parameter.name,
+                    producto: parameter.product,
+                    obligatorio: parameter.required,
+                    valor: parameter.value,
+                    revision: parameter.reviewStatus || "Pendiente",
+                    notaAprobador: parameter.approvalNote || "",
+                }));
+                storeRequests(requests);
+            }
+            function renderApprovalButtons() {
+                if (!selectedRequest) return;
+                const container = document.getElementById("approvalButtons");
+                if (selectedRequest.estado === "Enviada") {
+                    container.innerHTML =
+                        '<button class="primary-button" data-approval-state="En revisión">Tomar solicitud</button>';
+                    return;
+                }
+                if (selectedRequest.estado === "En revisión") {
+                    container.innerHTML = `
+                    <button class="primary-button" data-approval-state="Aprobada">Aprobar</button>
+                    <button class="tertiary-button" data-approval-state="Requiere información">Requiere información</button>
+                    <button class="tertiary-button" data-approval-state="Rechazada">Rechazar</button>
+                `;
+                    return;
+                }
+                if (selectedRequest.estado === "Aprobada") {
+                    container.innerHTML =
+                        '<button class="primary-button" data-approval-state="Completada">Marcar completada</button>';
+                    return;
+                }
+                container.innerHTML = "";
+            }
+            function changeApprovalState(nextState) {
+                saveCurrentReview();
+                const requests = loadRequests();
+                const request = requests.find((item) => item.id === selectedRequestId);
+                if (!request) return;
+                const comment = document
+                    .getElementById("approvalGeneralComment")
+                    .value.trim();
+                const adjustmentItems = (request.parametros || []).filter(
+                    (item) => item.revision === "Requiere ajuste",
+                );
+                if (
+                    nextState === "Aprobada" &&
+                    (request.parametros || []).some(
+                        (item) => item.revision !== "Correcto",
+                    )
+                ) {
+                    showToast(
+                        "Marque todos los registros como Correcto antes de aprobar.",
+                    );
+                    return;
+                }
+                if (nextState === "Requiere información" && !adjustmentItems.length) {
+                    showToast("Marque al menos un registro como Requiere ajuste.");
+                    return;
+                }
+                if (
+                    ["Requiere información", "Rechazada"].includes(nextState) &&
+                    !comment &&
+                    !adjustmentItems.some((item) => item.notaAprobador)
+                ) {
+                    showToast("Incluya una nota o comentario para continuar.");
+                    return;
+                }
+                request.estado = nextState;
+                request.fechaActualizacion = new Date().toISOString();
+                request.aprobador = "Seguridad";
+                request.historial = request.historial || [];
+                request.historial.push({
+                    estado: nextState,
+                    fecha: request.fechaActualizacion,
+                    usuario: "Seguridad",
+                    comentario: comment || `Solicitud actualizada a ${nextState}.`,
+                });
+                storeRequests(requests);
+                selectedRequest = request;
+                document.getElementById("approvalGeneralComment").value = "";
+                renderApprovalRequestList();
+                renderApprovalButtons();
+                showToast(`Solicitud actualizada a ${nextState}.`);
+            }
+            function requestPayload() {
+                return {
+                    id: `SOL-${Date.now()}`,
+                    tipo: "formulario-parametros",
+                    opcion: currentOption,
+                    cliente: document.getElementById("clientName").value.trim(),
+                    emisor: document.getElementById("issuerName").value.trim(),
+                    accion: document.getElementById("requestedAction").value,
+                    producto: document.getElementById("productFilter").value,
+                    fechaSolicitud: document.getElementById("requestDate").value,
+                    fechaRequerida: document.getElementById("requiredDateTime").value,
+                    estado: "Enviada",
+                    aprobador: "Seguridad",
+                    fechaCreacion: new Date().toISOString(),
+                    fechaActualizacion: new Date().toISOString(),
+                    comentarios: [],
+                    historial: [
+                        {
+                            estado: "Enviada",
+                            fecha: new Date().toISOString(),
+                            usuario:
+                                document.getElementById("clientName").value.trim() ||
+                                "Solicitante",
+                            comentario: "Solicitud enviada para revisión.",
+                        },
+                    ],
+                    parametros: allParameters
+                        .filter((parameter) => parameter.value)
+                        .map((parameter) => ({
+                            id: parameter.id,
+                            nombre: parameter.name,
+                            producto: parameter.product,
+                            obligatorio: parameter.required,
+                            valor: parameter.value,
+                            revision: "Pendiente",
+                            notaAprobador: "",
+                        })),
+                };
+            }
+
+            function showToast(message) {
+                const toast = document.getElementById("toast");
+                toast.textContent = message;
+                toast.classList.add("show");
+                window.setTimeout(() => toast.classList.remove("show"), 2800);
+            }
+
+            function validateHeader() {
+                const form = document.getElementById("requestForm");
+                if (!form.reportValidity()) return false;
+                return true;
+            }
+            async function saveRequest() {
+                if (!validateHeader()) return;
+
+                const invalidRequired = allParameters
+                    .map((parameter) =>
+                        document.querySelector(`[data-entry-id="${parameter.id}"]`),
+                    )
+                    .filter((control) => control && !control.checkValidity());
+
+                if (invalidRequired.length) {
+                    invalidRequired[0].reportValidity();
+                    invalidRequired[0].scrollIntoView({
+                        behavior: "smooth",
+                        block: "center",
+                    });
+                    showToast("Complete los campos obligatorios antes de enviar.");
+                    return;
+                }
+
+                const payload = requestPayload();
+                const requests = JSON.parse(
+                    localStorage.getItem("siscardRequests") || "[]",
+                );
+                requests.unshift(payload);
+                localStorage.setItem("siscardRequests", JSON.stringify(requests));
+                localStorage.setItem("siscardLastRequest", JSON.stringify(payload));
+                showToast(`Solicitud ${payload.id} enviada a Seguridad.`);
+            }
+
+            function utf8ToBase64(value) {
+                const bytes = new TextEncoder().encode(value);
+                let binary = "";
+                bytes.forEach((byte) => (binary += String.fromCharCode(byte)));
+                return btoa(binary);
+            }
+
+            function exportExcel() {
+                if (!validateHeader()) return;
+                const payload = requestPayload();
+                const selected = allParameters.filter((parameter) => parameter.value);
+                const rows = [
+                    ["EVERTEC COSTA RICA"],
+                    ["Parámetros del emisor - TRT08SN0"],
+                    [`OPC${currentOption} ${optionName(currentOption)}`],
+                    ["OPE-PA-FO-003"],
+                    [],
+                    [
+                        "Cliente",
+                        payload.cliente,
+                        "Fecha de solicitud",
+                        payload.fechaSolicitud,
+                    ],
+                    ["Emisor", payload.emisor, "Acción por realizar", payload.accion],
+                    [
+                        "Producto",
+                        payload.producto,
+                        "Fecha y hora requerida",
+                        payload.fechaRequerida || "",
+                    ],
+                    [],
+                    ["N.º", "Parámetro", "Producto", "Valor solicitado"],
+                    ...selected.map((parameter, index) => [
+                        index + 1,
+                        parameter.name,
+                        parameter.product,
+                        parameter.value,
+                    ]),
+                ];
+                const worksheet = XLSX.utils.aoa_to_sheet(rows);
+                worksheet["!merges"] = [0, 1, 2, 3].map((r) => ({
+                    s: { r, c: 0 },
+                    e: { r, c: 3 },
+                }));
+                worksheet["!cols"] = [
+                    { wch: 8 },
+                    { wch: 48 },
+                    { wch: 24 },
+                    { wch: 34 },
+                ];
+                const workbook = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(workbook, worksheet, "Formulario");
+                XLSX.writeFile(workbook, `${payload.id}_op${currentOption}.xlsx`);
+            }
+            function exportPdf() {
+                if (!validateHeader()) return;
+                const originalTitle = document.title;
+                const payload = requestPayload();
+                const cards = Array.from(document.querySelectorAll(".parameter-card"));
+                cards.forEach((card) => {
+                    const parameter = allParameters.find(
+                        (item) => String(item.id) === String(card.dataset.cardId),
+                    );
+                    card.dataset.printHidden = card.style.display || "";
+                    if (!parameter?.value) card.style.display = "none";
+                });
+                document.title = `${payload.id}_OP${currentOption}`;
+                window.print();
+                document.title = originalTitle;
+                cards.forEach((card) => {
+                    card.style.display = card.dataset.printHidden || "";
+                    delete card.dataset.printHidden;
+                });
+            }
+            document
+                .getElementById("optionsMenu")
+                .addEventListener("click", (event) => {
+                    const button = event.target.closest("[data-option]");
+                    if (button) loadOption(button.dataset.option);
+                });
+
+            document
+                .getElementById("productFilter")
+                .addEventListener("change", renderParameters);
+            document
+                .getElementById("parameterSearchInput")
+                .addEventListener("input", renderParameters);
+            document
+                .getElementById("parameterSearchForm")
+                .addEventListener("submit", (event) => {
+                    event.preventDefault();
+                    renderParameters();
+                    document.querySelector(".parameter-card")?.scrollIntoView({
+                        behavior: "smooth",
+                        block: "center",
+                    });
+                });
+            document.getElementById("hideAllButton").addEventListener("click", () => {
+                visibleParameters.forEach((parameter) =>
+                    collapsedCards.add(parameter.id),
+                );
+                renderParameters();
+            });
+            document.getElementById("showAllButton").addEventListener("click", () => {
+                collapsedCards.clear();
+                renderParameters();
+            });
+            document
+                .getElementById("approvalRequestList")
+                .addEventListener("click", (event) => {
+                    const button = event.target.closest("[data-approval-request-id]");
+                    if (button) selectApprovalRequest(button.dataset.approvalRequestId);
+                });
+            document
+                .getElementById("approvalButtons")
+                .addEventListener("click", (event) => {
+                    const button = event.target.closest("[data-approval-state]");
+                    if (button) changeApprovalState(button.dataset.approvalState);
+                });
+
+            const now = new Date();
+            const localDate = new Date(now.getTime() - now.getTimezoneOffset() * 60000);
+            document.getElementById("requestDate").value = localDate
+                .toISOString()
+                .slice(0, 10);
+
+            renderApprovalRequestList();
+            document
+                .querySelectorAll("#requestForm input, #requestForm select")
+                .forEach((control) => {
+                    control.disabled = true;
+                });
         </script>
     </body>
 </html>
