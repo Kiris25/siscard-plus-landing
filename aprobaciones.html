@@ -653,43 +653,6 @@
                     grid-template-columns: 1fr;
                 }
             }
-
-            body:not(.approval-detail-open) .approval-inbox {
-                margin-bottom: 0;
-            }
-
-            body:not(.approval-detail-open) .approval-request-list {
-                display: grid;
-                grid-template-columns: repeat(3, minmax(230px, 1fr));
-                gap: 10px;
-                overflow: visible;
-            }
-
-            body:not(.approval-detail-open) .approval-request-button {
-                min-width: 0;
-                min-height: 118px;
-            }
-
-            body.approval-detail-open .approval-request-list {
-                display: none;
-            }
-
-            body.approval-detail-open .approval-inbox-header {
-                margin-bottom: 0;
-            }
-
-            @media (max-width: 1050px) {
-                body:not(.approval-detail-open) .approval-request-list {
-                    grid-template-columns: repeat(2, minmax(220px, 1fr));
-                }
-            }
-
-            @media (max-width: 650px) {
-                body:not(.approval-detail-open) .approval-request-list {
-                    grid-template-columns: 1fr;
-                }
-            }
-
             @media print {
                 @page {
                     size: A4 landscape;
@@ -744,27 +707,24 @@
                 <div id="topbar-container"></div>
 
                 <main class="content">
+                    <div style="margin-bottom: 14px">
+                        <a class="tertiary-button" href="aprobaciones.html">
+                            ← Volver a la bandeja
+                        </a>
+                    </div>
                     <section class="approval-inbox">
                         <div class="approval-inbox-header">
                             <div>
                                 <span class="section-kicker">Seguridad</span>
                                 <h2>Solicitudes para revisar</h2>
                             </div>
-                            <button
-                                class="tertiary-button"
-                                id="backToApprovalList"
-                                type="button"
-                                hidden
-                            >
-                                ← Volver a solicitudes
-                            </button>
                         </div>
                         <div
                             class="approval-request-list"
                             id="approvalRequestList"
                         ></div>
                     </section>
-                    <section class="form-document" id="approvalFormView" hidden>
+                    <section class="form-document">
                         <div class="document-heading">
                             <img
                                 class="evertec-logo"
@@ -1668,10 +1628,6 @@
                 selectedRequestId = requestId;
                 selectedRequest = request;
                 currentOption = request.opcion || "05";
-
-                document.body.classList.add("approval-detail-open");
-                document.getElementById("approvalFormView").hidden = false;
-                document.getElementById("backToApprovalList").hidden = false;
                 document.getElementById("clientName").value = request.cliente || "";
                 document.getElementById("issuerName").value = request.emisor || "";
                 document.getElementById("requestedAction").value = request.accion || "";
@@ -1801,25 +1757,6 @@
                 renderApprovalButtons();
                 showToast(`Solicitud actualizada a ${nextState}.`);
             }
-            function returnToApprovalList() {
-                saveCurrentReview();
-
-                selectedRequestId = "";
-                selectedRequest = null;
-
-                document.body.classList.remove("approval-detail-open");
-                document.getElementById("approvalFormView").hidden = true;
-                document.getElementById("approvalActionsPanel").hidden = true;
-                document.getElementById("backToApprovalList").hidden = true;
-
-                renderApprovalRequestList();
-
-                window.scrollTo({
-                    top: 0,
-                    behavior: "smooth",
-                });
-            }
-
             function requestPayload() {
                 return {
                     id: `SOL-${Date.now()}`,
@@ -2027,13 +1964,7 @@
                 .toISOString()
                 .slice(0, 10);
 
-            document
-                .getElementById("backToApprovalList")
-                .addEventListener("click", returnToApprovalList);
-
             renderApprovalRequestList();
-            document.getElementById("approvalFormView").hidden = true;
-            document.getElementById("approvalActionsPanel").hidden = true;
             document
                 .querySelectorAll("#requestForm input, #requestForm select")
                 .forEach((control) => {
