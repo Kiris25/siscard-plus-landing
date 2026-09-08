@@ -7,6 +7,8 @@
     <title>Solicitud de parámetros | Landing Siscard+</title>
     <link rel="stylesheet" href="css/styles.css">
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.4/dist/jspdf.plugin.autotable.min.js"></script>
     <style>
         :root {
             --form-orange: #ff6c0c;
@@ -511,6 +513,58 @@
         }
 
         mark { padding: 0 2px; background: #fff176; color: #000; }
+
+        .confirmation-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 1000;
+            display: grid;
+            place-items: center;
+            padding: 22px;
+            background: rgba(25, 25, 25, 0.72);
+            backdrop-filter: blur(4px);
+        }
+        .confirmation-overlay[hidden] { display: none !important; }
+        .confirmation-dialog {
+            width: min(560px, 100%);
+            overflow: hidden;
+            border-radius: var(--radius-large);
+            background: #ffffff;
+            box-shadow: 0 24px 70px rgba(0,0,0,.30);
+        }
+        .confirmation-header {
+            padding: 22px 24px 16px;
+            border-top: 5px solid var(--orange);
+        }
+        .confirmation-header h2 { margin: 0; color: var(--sidebar); }
+        .confirmation-header p { margin: 7px 0 0; color: var(--muted); }
+        .confirmation-summary {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+            padding: 0 24px 20px;
+        }
+        .confirmation-item {
+            padding: 11px;
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+            background: var(--surface-soft);
+        }
+        .confirmation-item strong,
+        .confirmation-item span { display: block; }
+        .confirmation-item strong { color: var(--muted); font-size: 10px; text-transform: uppercase; }
+        .confirmation-item span { margin-top: 4px; color: var(--sidebar); font-weight: 750; }
+        .confirmation-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+            padding: 16px 24px;
+            border-top: 1px solid var(--line);
+            background: var(--surface-soft);
+        }
+        @media (max-width: 620px) {
+            .confirmation-summary { grid-template-columns: 1fr; }
+        }
         @media print {
             @page { size: A4 landscape; margin: 10mm; }
             body { background: #fff; }
@@ -655,6 +709,20 @@
         </div>
     </div>
 
+
+    <div class="confirmation-overlay" id="confirmationOverlay" hidden>
+        <section class="confirmation-dialog" role="dialog" aria-modal="true" aria-labelledby="confirmationTitle">
+            <header class="confirmation-header">
+                <h2 id="confirmationTitle">Confirmar envío</h2>
+                <p>Revise el resumen antes de enviar la solicitud a Seguridad.</p>
+            </header>
+            <div class="confirmation-summary" id="confirmationSummary"></div>
+            <footer class="confirmation-actions">
+                <button class="tertiary-button" id="cancelSendButton" type="button">Cancelar</button>
+                <button class="primary-button" id="confirmSendButton" type="button">Sí, enviar solicitud</button>
+            </footer>
+        </section>
+    </div>
     <aside class="parameter-tooltip" id="parameterTooltip" hidden></aside>
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
@@ -1238,6 +1306,30 @@
             }
         }
 
+        async function loadConfiguration() {
+            try {
+                const response = await fetch(`configuracion.json?v=${Date.now()}`, {
+                    cache: "no-store"
+                });
+                if (!response.ok) return;
+                const configuration = await response.json();
+                const defaults = configuration.defaults || configuration;
+                const values = {
+                    clientName: defaults.cliente || "",
+                    issuerName: defaults.emisor || "",
+                    requestedAction: defaults.accion || "",
+                    productFilter: defaults.producto || "Todos"
+                };
+                Object.entries(values).forEach(([id, value]) => {
+                    const control = document.getElementById(id);
+                    if (control && value !== undefined && value !== null) {
+                        control.value = value;
+                    }
+                });
+            } catch (error) {
+                console.info("No se cargaron valores predeterminados.", error);
+            }
+        }
         function requestPayload() {
             return {
                 id: `SOL-${Date.now()}`,
@@ -1288,29 +1380,44 @@
             if (!form.reportValidity()) return false;
             return true;
         }
-        async function saveRequest() {
+        function openConfirmation() {
             if (!validateHeader()) return;
-
             const invalidRequired = allParameters
                 .map((parameter) => document.querySelector(`[data-entry-id="${parameter.id}"]`))
                 .filter((control) => control && !control.checkValidity());
-
             if (invalidRequired.length) {
                 invalidRequired[0].reportValidity();
                 invalidRequired[0].scrollIntoView({ behavior: "smooth", block: "center" });
                 showToast("Complete los campos obligatorios antes de enviar.");
                 return;
             }
-
+            const payload = requestPayload();
+            const completed = payload.parametros.filter((item) => item.valor).length;
+            document.getElementById("confirmationSummary").innerHTML = `
+                <div class="confirmation-item"><strong>Cliente</strong><span>${escapeHtml(payload.cliente)}</span></div>
+                <div class="confirmation-item"><strong>Emisor</strong><span>${escapeHtml(payload.emisor)}</span></div>
+                <div class="confirmation-item"><strong>Acción</strong><span>${escapeHtml(payload.accion)}</span></div>
+                <div class="confirmation-item"><strong>Producto</strong><span>${escapeHtml(payload.producto)}</span></div>
+                <div class="confirmation-item"><strong>Opción</strong><span>OP${escapeHtml(payload.opcion)} · ${escapeHtml(optionName(payload.opcion))}</span></div>
+                <div class="confirmation-item"><strong>Respuestas</strong><span>${completed} parámetro${completed === 1 ? "" : "s"}</span></div>
+            `;
+            document.getElementById("confirmationOverlay").hidden = false;
+            document.body.style.overflow = "hidden";
+        }
+        function closeConfirmation() {
+            document.getElementById("confirmationOverlay").hidden = true;
+            document.body.style.overflow = "";
+        }
+        async function saveRequest() {
             const payload = requestPayload();
             const requests = JSON.parse(localStorage.getItem("siscardRequests") || "[]");
             requests.unshift(payload);
             localStorage.setItem("siscardRequests", JSON.stringify(requests));
             localStorage.setItem("siscardLastRequest", JSON.stringify(payload));
+            closeConfirmation();
             showToast(`Solicitud ${payload.id} enviada a Seguridad.`);
         }
-
-function utf8ToBase64(value) {
+        function utf8ToBase64(value) {
             const bytes = new TextEncoder().encode(value);
             let binary = "";
             bytes.forEach((byte) => binary += String.fromCharCode(byte));
@@ -1319,40 +1426,117 @@ function utf8ToBase64(value) {
 
         function exportExcel() {
             if (!validateHeader()) return;
-            const payload=requestPayload();
-            const selected=allParameters.filter(parameter=>parameter.value);
-            const rows=[
-                ["EVERTEC COSTA RICA"],
-                ["Parámetros del emisor - TRT08SN0"],
-                [`OPC${currentOption} ${optionName(currentOption)}`],
-                ["OPE-PA-FO-003"],[],
-                ["Cliente",payload.cliente,"Fecha de solicitud",payload.fechaSolicitud],
-                ["Emisor",payload.emisor,"Acción por realizar",payload.accion],
-                ["Producto",payload.producto,"Fecha y hora requerida",payload.fechaRequerida||""],[],
-                ["N.º","Parámetro","Producto","Valor solicitado"],
-                ...selected.map((parameter,index)=>[index+1,parameter.name,parameter.product,parameter.value])
+            const payload = requestPayload();
+            const selected = payload.parametros.filter((item) => item.valor);
+            const rows = [
+                ["EVERTEC COSTA RICA", "", "", ""],
+                ["Parámetros del emisor - TRT08SN0", "", "", ""],
+                [`OPC${currentOption} ${optionName(currentOption)}`, "", "", ""],
+                ["OPE-PA-FO-003", "", "", ""],
+                ["Incluir en Categoría: CR.TRAMITES.Parametros Siscard", "", "", ""],
+                [],
+                ["Cliente", payload.cliente, "Fecha de solicitud", payload.fechaSolicitud],
+                ["Emisor", payload.emisor, "Acción por realizar", payload.accion],
+                ["Producto", payload.producto, "Fecha y hora requerida", payload.fechaRequerida || ""],
+                [],
+                ["N.º", "Parámetro", "Producto", "Valor solicitado"],
+                ...selected.map((parameter, index) => [
+                    index + 1,
+                    parameter.nombre,
+                    parameter.producto,
+                    parameter.valor
+                ]),
+                [],
+                ["Observaciones", "", "", ""],
+                [],
+                ["Solicitado por:", payload.cliente, "Firma:", ""],
+                ["Aprobado por:", "", "Firma:", ""]
             ];
-            const worksheet=XLSX.utils.aoa_to_sheet(rows);
-            worksheet["!merges"]=[0,1,2,3].map(r=>({s:{r,c:0},e:{r,c:3}}));
-            worksheet["!cols"]=[{wch:8},{wch:48},{wch:24},{wch:34}];
-            const workbook=XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(workbook,worksheet,"Formulario");
-            XLSX.writeFile(workbook,`${payload.id}_op${currentOption}.xlsx`);
+            const worksheet = XLSX.utils.aoa_to_sheet(rows);
+            worksheet["!merges"] = [0,1,2,3,4].map((r) => ({
+                s: { r, c: 0 }, e: { r, c: 3 }
+            }));
+            worksheet["!cols"] = [
+                { wch: 9 }, { wch: 52 }, { wch: 25 }, { wch: 38 }
+            ];
+            worksheet["!rows"] = rows.map((_, index) => ({
+                hpt: index < 5 ? 24 : 19
+            }));
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Solicitud");
+            XLSX.writeFile(workbook, `${payload.id}_OP${currentOption}.xlsx`);
         }
         function exportPdf() {
             if (!validateHeader()) return;
-            const originalTitle=document.title;
-            const payload=requestPayload();
-            const cards=Array.from(document.querySelectorAll(".parameter-card"));
-            cards.forEach(card=>{
-                const parameter=allParameters.find(item=>String(item.id)===String(card.dataset.cardId));
-                card.dataset.printHidden=card.style.display||"";
-                if (!parameter?.value) card.style.display="none";
+            const payload = requestPayload();
+            const selected = payload.parametros.filter((item) => item.valor);
+            if (!selected.length) {
+                showToast("Complete al menos un parámetro antes de exportar.");
+                return;
+            }
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" });
+            pdf.setFillColor(255, 108, 12);
+            pdf.rect(0, 0, 297, 7, "F");
+            pdf.setTextColor(88, 89, 91);
+            pdf.setFont("helvetica", "bold");
+            pdf.setFontSize(18);
+            pdf.text("Evertec Costa Rica", 14, 19);
+            pdf.setFontSize(12);
+            pdf.text("Parámetros del emisor - TRT08SN0", 14, 27);
+            pdf.setFont("helvetica", "normal");
+            pdf.text(`OPC${currentOption} ${optionName(currentOption)}`, 14, 34);
+            pdf.setFont("helvetica", "bold");
+            pdf.text("OPE-PA-FO-003", 282, 19, { align: "right" });
+            pdf.setFontSize(9);
+            pdf.text("CR.TRAMITES.Parametros Siscard", 282, 26, { align: "right" });
+            pdf.autoTable({
+                startY: 41,
+                theme: "grid",
+                styles: { fontSize: 9, cellPadding: 3 },
+                headStyles: { fillColor: [88,89,91], textColor: 255 },
+                body: [
+                    ["Cliente", payload.cliente, "Fecha de solicitud", payload.fechaSolicitud],
+                    ["Emisor", payload.emisor, "Acción", payload.accion],
+                    ["Producto", payload.producto, "Fecha requerida", payload.fechaRequerida || "No indicada"]
+                ]
             });
-            document.title=`${payload.id}_OP${currentOption}`;
-            window.print();
-            document.title=originalTitle;
-            cards.forEach(card=>{card.style.display=card.dataset.printHidden||"";delete card.dataset.printHidden;});
+            pdf.autoTable({
+                startY: pdf.lastAutoTable.finalY + 7,
+                theme: "striped",
+                head: [["N.º", "Parámetro", "Producto", "Respuesta del cliente"]],
+                body: selected.map((item, index) => [
+                    index + 1, item.nombre, item.producto, item.valor
+                ]),
+                styles: { fontSize: 8.5, cellPadding: 2.5, overflow: "linebreak" },
+                headStyles: { fillColor: [255,108,12], textColor: 255 },
+                columnStyles: {
+                    0: { cellWidth: 14 },
+                    1: { cellWidth: 125 },
+                    2: { cellWidth: 52 },
+                    3: { cellWidth: 76 }
+                },
+                margin: { left: 14, right: 14 },
+                didDrawPage: function(data) {
+                    const pages = pdf.internal.getNumberOfPages();
+                    pdf.setFontSize(8);
+                    pdf.setTextColor(110);
+                    pdf.text(`Solicitud ${payload.id} · Página ${pages}`, 282, 202, { align: "right" });
+                }
+            });
+            let finalY = pdf.lastAutoTable.finalY + 9;
+            if (finalY > 185) {
+                pdf.addPage();
+                finalY = 18;
+            }
+            pdf.setDrawColor(180);
+            pdf.line(14, finalY + 12, 92, finalY + 12);
+            pdf.line(108, finalY + 12, 186, finalY + 12);
+            pdf.setFontSize(9);
+            pdf.setTextColor(88,89,91);
+            pdf.text("Solicitado por", 14, finalY + 17);
+            pdf.text("Aprobado por", 108, finalY + 17);
+            pdf.save(`${payload.id}_OP${currentOption}.pdf`);
         }
         document.getElementById("optionsMenu").addEventListener("click", (event) => {
             const button = event.target.closest("[data-option]");
@@ -1379,13 +1563,20 @@ function utf8ToBase64(value) {
         });
         document.getElementById("exportExcelButton").addEventListener("click", exportExcel);
         document.getElementById("exportPdfButton").addEventListener("click", exportPdf);
-        document.getElementById("saveButton").addEventListener("click", saveRequest);
+        document.getElementById("saveButton").addEventListener("click", openConfirmation);
+        document.getElementById("cancelSendButton").addEventListener("click", closeConfirmation);
+        document.getElementById("confirmSendButton").addEventListener("click", saveRequest);
+        document.getElementById("confirmationOverlay").addEventListener("click", (event) => {
+            if (event.target.id === "confirmationOverlay") closeConfirmation();
+        });
 
         const now = new Date();
         const localDate = new Date(now.getTime() - now.getTimezoneOffset() * 60000);
         document.getElementById("requestDate").value = localDate.toISOString().slice(0, 10);
 
-        loadOption(currentOption);
+        loadConfiguration().finally(() => {
+            loadOption(currentOption);
+        });
     </script>
 </body>
 </html>
