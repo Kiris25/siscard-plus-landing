@@ -628,7 +628,7 @@
                         <button class="tertiary-button" id="showAllButton" type="button">Mostrar todos</button>
                         <button class="tertiary-button" id="exportExcelButton" type="button">Exportar Excel</button>
                         <button class="tertiary-button" id="exportPdfButton" type="button">Exportar PDF</button>
-                        <button class="primary-button" id="saveButton" type="button">Guardar</button>
+                        <button class="primary-button" id="saveButton" type="button">Enviar solicitud</button>
                     </div>
                 </section>
 
@@ -1220,7 +1220,19 @@
                 producto: document.getElementById("productFilter").value,
                 fechaSolicitud: document.getElementById("requestDate").value,
                 fechaRequerida: document.getElementById("requiredDateTime").value,
-                estado: "Borrador",
+                estado: "Enviada",
+                aprobador: "Seguridad",
+                fechaCreacion: new Date().toISOString(),
+                fechaActualizacion: new Date().toISOString(),
+                comentarios: [],
+                historial: [
+                    {
+                        estado: "Enviada",
+                        fecha: new Date().toISOString(),
+                        usuario: document.getElementById("clientName").value.trim() || "Solicitante",
+                        comentario: "Solicitud enviada para revisión."
+                    }
+                ],
                 parametros: allParameters
                     .filter((parameter) => parameter.value)
                     .map((parameter) => ({
@@ -1242,12 +1254,26 @@
             if (!form.reportValidity()) return false;
             return true;
         }
-
         async function saveRequest() {
             if (!validateHeader()) return;
+
+            const invalidRequired = allParameters
+                .map((parameter) => document.querySelector(`[data-entry-id="${parameter.id}"]`))
+                .filter((control) => control && !control.checkValidity());
+
+            if (invalidRequired.length) {
+                invalidRequired[0].reportValidity();
+                invalidRequired[0].scrollIntoView({ behavior: "smooth", block: "center" });
+                showToast("Complete los campos obligatorios antes de enviar.");
+                return;
+            }
+
             const payload = requestPayload();
-            localStorage.setItem('siscardLastRequest', JSON.stringify(payload));
-            showToast('Solicitud registrada correctamente.');
+            const requests = JSON.parse(localStorage.getItem("siscardRequests") || "[]");
+            requests.unshift(payload);
+            localStorage.setItem("siscardRequests", JSON.stringify(requests));
+            localStorage.setItem("siscardLastRequest", JSON.stringify(payload));
+            showToast(`Solicitud ${payload.id} enviada a Seguridad.`);
         }
 
 function utf8ToBase64(value) {
