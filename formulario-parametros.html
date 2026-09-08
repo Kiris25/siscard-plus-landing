@@ -178,15 +178,20 @@
         }
 
         .parameter-search {
+            position: sticky;
+            top: 0;
+            z-index: 86;
             display: grid;
             grid-template-columns: minmax(0, 1fr) auto;
             gap: 8px;
             margin: 14px 0 0;
-            padding: 12px;
+            padding: 10px 12px;
             border: 1px solid var(--line);
-            border-radius: var(--radius);
-            background: #ffffff;
-            box-shadow: var(--shadow-small);
+            border-bottom: 0;
+            border-radius: var(--radius) var(--radius) 0 0;
+            background: rgba(255, 255, 255, 0.98);
+            box-shadow: 0 8px 18px rgba(0, 0, 0, 0.08);
+            backdrop-filter: blur(8px);
         }
 
         .parameter-search input {
@@ -197,11 +202,16 @@
         }
 
         .parameters-toolbar {
-            margin: 15px 0 11px;
-            padding: 12px 15px;
+            position: sticky;
+            top: 78px;
+            z-index: 85;
+            margin: 0 0 11px;
+            padding: 10px 13px;
             border: 1px solid var(--line);
-            border-radius: var(--radius);
-            background: #ffffff;
+            border-radius: 0 0 var(--radius) var(--radius);
+            background: rgba(255, 255, 255, 0.98);
+            box-shadow: 0 8px 18px rgba(0, 0, 0, 0.08);
+            backdrop-filter: blur(8px);
         }
 
         .parameters-toolbar strong,
@@ -773,17 +783,36 @@
         function parseEnumeratedValues(record) {
             const raw = cleanAllowedValuesText(rawAllowedValues(record));
             if (!raw) return [];
-            let match;
-            const pairs=[];
-            const pairPattern=/(?:^|[\/|;,\n])\s*([A-Za-z0-9]{1,5})\s*=\s*([^\/|;,\n]+)/g;
-            while ((match=pairPattern.exec(raw))!==null) pairs.push(`${match[1].trim()} = ${match[2].trim()}`);
-            if (pairs.length>=2) return pairs;
-            const products=raw.match(/(?:visa|mastercard|american express|amex|local|internacional)\s+(?:cr[eé]dito|d[eé]bito|prepago|corporativo)/gi);
-            if (products?.length) return [...new Set(products.map(v=>v.trim()))];
-            if (/(visa|mastercard|amex|credito|crédito|debito|débito|prepago|corporativo)/i.test(raw) && /[,;|\n]/.test(raw))
-                return raw.split(/\r?\n|;|\||,(?=\s*[A-Za-zÁÉÍÓÚáéíóú])/).map(cleanAllowedValuesText).filter(Boolean);
-            return [];
+
+            const separatorPattern = /\s*(?:\r?\n|[;,|/])\s*/;
+            const parts = raw
+                .split(separatorPattern)
+                .map(cleanAllowedValuesText)
+                .map((value) => value.replace(/^[•*-]\s*/, "").trim())
+                .filter(Boolean);
+
+            const pairedValues = parts.filter((value) =>
+                /^[A-Za-z0-9]{1,8}\s*(?:=|–|-)\s*.+/.test(value)
+            );
+
+            if (pairedValues.length >= 2) {
+                return [...new Set(pairedValues)];
+            }
+
+            const compactList = parts.filter((value) => value.length <= 80);
+            if (compactList.length >= 2 && compactList.length <= 30) {
+                return [...new Set(compactList)];
+            }
+
+            const products = raw.match(
+                /(?:visa|mastercard|american express|amex|local|internacional)\s+(?:cr[eé]dito|d[eé]bito|prepago|corporativo)/gi
+            );
+
+            return products?.length
+                ? [...new Set(products.map((value) => value.trim()))]
+                : [];
         }
+
         function inputKind(parameter) {
             const name = normalize(parameter.name);
 
@@ -1237,7 +1266,12 @@
                     .filter((parameter) => parameter.value)
                     .map((parameter) => ({
                         id: parameter.id,
-                        valor: parameter.value
+                        nombre: parameter.name,
+                        producto: parameter.product,
+                        obligatorio: parameter.required,
+                        valor: parameter.value,
+                        revision: "Pendiente",
+                        notaAprobador: ""
                     }))
             };
         }
