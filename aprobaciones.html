@@ -8,6 +8,9 @@
         <link rel="stylesheet" href="css/styles.css" />
         <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
         <style>
+            [hidden] {
+                display: none !important;
+            }
             :root {
                 --form-orange: #ff6c0c;
                 --form-gray: #58595b;
@@ -724,7 +727,11 @@
                             id="approvalRequestList"
                         ></div>
                     </section>
-                    <section class="form-document" id="approvalFormDocument" hidden>
+                    <section
+                        class="form-document"
+                        id="approvalFormDocument"
+                        style="display: none"
+                    >
                         <div class="document-heading">
                             <img
                                 class="evertec-logo"
@@ -820,7 +827,11 @@
                         <nav class="options-menu" id="optionsMenu"></nav>
                     </section>
 
-                    <form class="parameter-search" id="parameterSearchForm" hidden>
+                    <form
+                        class="parameter-search"
+                        id="parameterSearchForm"
+                        style="display: none"
+                    >
                         <input
                             id="parameterSearchInput"
                             type="search"
@@ -829,7 +840,11 @@
                         <button class="primary-button" type="submit">Buscar</button>
                     </form>
 
-                    <section class="parameters-toolbar" id="approvalParametersToolbar" hidden>
+                    <section
+                        class="parameters-toolbar"
+                        id="approvalParametersToolbar"
+                        style="display: none"
+                    >
                         <div>
                             <strong id="recordCount">Cargando parámetros...</strong>
                             <small id="currentOptionText">Opción 05</small>
@@ -853,7 +868,11 @@
                         </div>
                     </section>
 
-                    <section class="parameters-panel" id="approvalParametersPanel" hidden>
+                    <section
+                        class="parameters-panel"
+                        id="approvalParametersPanel"
+                        style="display: none"
+                    >
                         <header class="parameters-panel-header">
                             <h2 id="parametersTitle">
                                 Parámetros generales del emisor
@@ -1627,6 +1646,17 @@
                 if (!request) return;
                 selectedRequestId = requestId;
                 selectedRequest = request;
+                document.getElementById("approvalFormDocument").style.display =
+                    "block";
+                document.getElementById("parameterSearchForm").style.display =
+                    "grid";
+                document.getElementById(
+                    "approvalParametersToolbar",
+                ).style.display = "flex";
+                document.getElementById(
+                    "approvalParametersPanel",
+                ).style.display = "block";
+                document.getElementById("approvalActionsPanel").hidden = false;
                 currentOption = request.opcion || "05";
                 document.getElementById("clientName").value = request.cliente || "";
                 document.getElementById("issuerName").value = request.emisor || "";
@@ -1642,10 +1672,6 @@
                     .forEach((control) => {
                         control.disabled = true;
                     });
-                document.getElementById("approvalFormDocument").hidden = false;
-                document.getElementById("parameterSearchForm").hidden = false;
-                document.getElementById("approvalParametersToolbar").hidden = false;
-                document.getElementById("approvalParametersPanel").hidden = false;
                 loadOption(currentOption).then(() => {
                     const submitted = request.parametros || [];
                     allParameters = allParameters
