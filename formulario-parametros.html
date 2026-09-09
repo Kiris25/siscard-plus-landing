@@ -823,7 +823,6 @@
                     <div class="toolbar-actions">
                         <button class="tertiary-button" id="hideAllButton" type="button">Esconder todos</button>
                         <button class="tertiary-button" id="showAllButton" type="button">Mostrar todos</button>
-                        <button class="tertiary-button" id="loadLastTemplateButton" type="button">Cargar últimos datos</button>
                         <button class="tertiary-button" id="exportExcelButton" type="button">Exportar Excel</button>
                         <button class="tertiary-button" id="exportPdfButton" type="button">Exportar PDF</button>
                         <button class="primary-button" id="saveButton" type="button">Enviar solicitud</button>
@@ -847,13 +846,13 @@
     <div class="template-overlay" id="templateOverlay" hidden>
         <section class="template-dialog" role="dialog" aria-modal="true" aria-labelledby="templateTitle">
             <header class="template-header">
-                <h2 id="templateTitle">Cargar últimos datos</h2>
-                <p>Se encontró información de la última solicitud registrada.</p>
+                <h2 id="templateTitle">Información anterior encontrada</h2>
+                <p>¿Desea utilizar esta información para completar el formulario?</p>
             </header>
             <div class="template-summary" id="templateSummary"></div>
             <footer class="template-actions">
                 <button class="tertiary-button" id="startBlankButton" type="button">Iniciar en blanco</button>
-                <button class="primary-button" id="loadTemplateButton" type="button">Cargar datos anteriores</button>
+                <button class="primary-button" id="loadTemplateButton" type="button">Utilizar información anterior</button>
             </footer>
         </section>
     </div>
@@ -1534,29 +1533,73 @@
                 console.info("No se cargaron valores predeterminados.", error);
             }
         }
-        function readLastTemplate() {
+        function setLastTemplate(template) {
+            lastTemplate = template || null;
+            lastTemplateParameters = Array.isArray(template?.parametros)
+                ? template.parametros
+                : [];
+            return lastTemplate;
+        }
+        function readLocalTemplate() {
             try {
-                const storedTemplate = JSON.parse(
+                return setLastTemplate(JSON.parse(
                     localStorage.getItem("siscardLastTemplate") || "null"
-                );
-                lastTemplate = storedTemplate;
-                lastTemplateParameters = Array.isArray(storedTemplate?.parametros)
-                    ? storedTemplate.parametros
-                    : [];
-                return storedTemplate;
+                ));
             } catch (error) {
-                console.warn("No fue posible leer los últimos datos guardados.", error);
-                lastTemplate = null;
-                lastTemplateParameters = [];
+                console.warn("No fue posible leer la información local anterior.", error);
+                return setLastTemplate(null);
+            }
+        }
+        function remoteTemplateUrl() {
+            return `${GITHUB_SETTINGS.path}?v=${Date.now()}`;
+        }
+        function requestTimestamp(request) {
+            const value = request?.fechaActualizacion || request?.fechaCreacion || "";
+            const timestamp = Date.parse(value);
+            return Number.isFinite(timestamp) ? timestamp : 0;
+        }
+        async function readRemoteTemplate() {
+            try {
+                const response = await fetch(remoteTemplateUrl(), { cache: "no-store" });
+                if (!response.ok) return null;
+                const requests = await response.json();
+                if (!Array.isArray(requests)) return null;
+                const compatible = requests
+                    .filter((request) =>
+                        request &&
+                        request.tipo === "formulario-parametros" &&
+                        String(request.opcion || "") === String(currentOption) &&
+                        Array.isArray(request.parametros)
+                    )
+                    .sort((a, b) => requestTimestamp(b) - requestTimestamp(a));
+                const latest = compatible[0];
+                if (!latest) return null;
+                const template = {
+                    cliente: latest.cliente || "",
+                    emisor: latest.emisor || "",
+                    accion: latest.accion || "",
+                    producto: latest.producto || "Todos",
+                    fechaRequerida: latest.fechaRequerida || "",
+                    opcion: latest.opcion || currentOption,
+                    parametros: latest.parametros
+                };
+                localStorage.setItem("siscardLastTemplate", JSON.stringify(template));
+                return setLastTemplate(template);
+            } catch (error) {
+                console.info("No fue posible recuperar información anterior.", error);
                 return null;
             }
         }
-        function openTemplateDialog() {
-            const template = readLastTemplate();
-            if (!template) {
-                showToast("Todavía no hay datos anteriores para cargar.");
-                return;
+        async function findPreviousTemplate() {
+            const local = readLocalTemplate();
+            if (local && String(local.opcion || "") === String(currentOption)) {
+                return local;
             }
+            return readRemoteTemplate();
+        }
+        function openTemplateDialog() {
+            const template = lastTemplate;
+            if (!template) return;
             const completed = lastTemplateParameters.filter((item) => item.valor).length;
             document.getElementById("templateSummary").innerHTML = `
                 <div class="confirmation-item">
@@ -1593,7 +1636,7 @@
         }
         function startBlank() {
             templateLoadRequested = false;
-            lastTemplateParameters = [];
+            setLastTemplate(null);
             document.getElementById("clientName").value = "";
             document.getElementById("issuerName").value = "";
             document.getElementById("requestedAction").value = "";
@@ -1607,9 +1650,9 @@
             showToast("Formulario iniciado en blanco.");
         }
         function loadLastTemplate() {
-            const template = readLastTemplate();
+            const template = lastTemplate;
             if (!template) {
-                showToast("Todavía no hay datos anteriores para cargar.");
+                closeTemplateDialog();
                 return;
             }
             templateLoadRequested = true;
@@ -1618,24 +1661,19 @@
             document.getElementById("requestedAction").value = template.accion || "";
             document.getElementById("productFilter").value = template.producto || "Todos";
             document.getElementById("requiredDateTime").value = template.fechaRequerida || "";
-            if (String(template.opcion || "") === String(currentOption)) {
-                allParameters = allParameters.map((parameter) => {
-                    const previous = lastTemplateParameters.find((item) =>
-                        String(item.id) === String(parameter.id)
-                    );
-                    return {
-                        ...parameter,
-                        value: previous?.valor || ""
-                    };
-                });
-                renderParameters();
-                showToast("Se cargaron los datos de la última solicitud.");
-            } else {
-                showToast(
-                    `Se cargó la información general. Los parámetros guardados pertenecen a OP${template.opcion}.`
+            allParameters = allParameters.map((parameter) => {
+                const previous = lastTemplateParameters.find((item) =>
+                    String(item.id) === String(parameter.id)
                 );
-            }
+                return {
+                    ...parameter,
+                    value: previous?.valor || ""
+                };
+            });
+            renderParameters();
+            localStorage.setItem("siscardLastTemplate", JSON.stringify(template));
             closeTemplateDialog();
+            showToast("Se utilizó la información anterior.");
         }
         function consecutivePart(value) {
             return String(value || "")
@@ -2089,7 +2127,6 @@
             collapsedCards.clear();
             renderParameters();
         });
-        document.getElementById("loadLastTemplateButton").addEventListener("click", openTemplateDialog);
         document.getElementById("loadTemplateButton").addEventListener("click", loadLastTemplate);
         document.getElementById("startBlankButton").addEventListener("click", startBlank);
         document.getElementById("templateOverlay").addEventListener("click", (event) => {
@@ -2126,7 +2163,7 @@
 
         loadConfiguration().finally(async () => {
             await loadOption(currentOption);
-            if (readLastTemplate()) {
+            if (await findPreviousTemplate()) {
                 openTemplateDialog();
             }
         });
