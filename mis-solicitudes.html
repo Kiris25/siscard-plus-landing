@@ -701,14 +701,9 @@
                         type="search"
                         placeholder="Buscar por solicitud, cliente, emisor u opción"
                     >
-                    <select id="requestState">
-                        <option value="">Todos los estados</option>
-                        <option value="Enviada">Enviada</option>
-                        <option value="En revisión">En revisión</option>
-                        <option value="Requiere información">Requiere información</option>
-                        <option value="Aprobada">Aprobada</option>
-                        <option value="Completada">Completada</option>
-                        <option value="Rechazada">Rechazada</option>
+                    <select id="requestScope" aria-label="Vista de solicitudes">
+                        <option value="all">Todas</option>
+                        <option value="corrections">Por corregir</option>
                     </select>
                     <button class="tertiary-button refresh-button" id="refreshButton" type="button">
                         Actualizar
@@ -831,6 +826,9 @@
 
     <script src="js/layout.js"></script>
     <script src="js/app.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script>
         "use strict";
 
@@ -953,9 +951,10 @@
 
         function filteredRequests() {
             const query = normalize(document.getElementById("requestSearch").value);
-            const state = document.getElementById("requestState").value;
+            const scope = document.getElementById("requestScope").value;
             return allRequests.filter((request) => {
-                const stateMatches = !state || request.estado === state;
+                const scopeMatches = scope !== "corrections" ||
+                    request.estado === "Requiere información";
                 const searchable = normalize([
                     request.id,
                     request.cliente,
@@ -964,7 +963,7 @@
                     request.accion,
                     request.producto
                 ].join(" "));
-                return stateMatches && (!query || searchable.includes(query));
+                return scopeMatches && (!query || searchable.includes(query));
             });
         }
 
@@ -1124,17 +1123,15 @@
                 historyMarkup(request.historial) || '<div class="empty-state">No hay movimientos registrados.</div>';
             document.getElementById("detailActionsPanel").innerHTML = correctionMode
                 ? `
-                    <button class="tertiary-button" id="cancelCorrectionButton" type="button">
-                        Cancelar
-                    </button>
-                    <button class="primary-button" id="submitCorrectionButton" type="button">
-                        Enviar corrección
-                    </button>
+                    <button class="tertiary-button" id="exportPdfButton" type="button">PDF</button>
+                    <button class="tertiary-button" id="exportExcelButton" type="button">Excel</button>
+                    <button class="tertiary-button" id="cancelCorrectionButton" type="button">Cancelar</button>
+                    <button class="primary-button" id="submitCorrectionButton" type="button">Enviar corrección</button>
                 `
                 : `
-                    <button class="tertiary-button" id="closeDetailFooterButton" type="button">
-                        Volver a Mis solicitudes
-                    </button>
+                    <button class="tertiary-button" id="exportPdfButton" type="button">PDF</button>
+                    <button class="tertiary-button" id="exportExcelButton" type="button">Excel</button>
+                    <button class="tertiary-button" id="closeDetailFooterButton" type="button">Volver</button>
                 `;
             attachDetailActions();
             window.scrollTo({ top: 0, behavior: "smooth" });
@@ -1148,7 +1145,150 @@
             window.scrollTo({ top: 0, behavior: "smooth" });
         }
 
+        function exportPdf() {
+            if (!selectedRequest || !window.jspdf) {
+                showToast("No fue posible generar el PDF.");
+                return;
+            }
+            const { jsPDF } = window.jspdf;
+            const documentPdf = new jsPDF({
+                orientation: "portrait",
+                unit: "mm",
+                format: "a4"
+            });
+            const request = selectedRequest;
+            documentPdf.setFillColor(255, 108, 12);
+            documentPdf.rect(0, 0, 210, 8, "F");
+            documentPdf.setTextColor(88, 89, 91);
+            documentPdf.setFontSize(18);
+            documentPdf.text("Evertec Costa Rica", 14, 20);
+            documentPdf.setFontSize(11);
+            documentPdf.text("Parametros del emisor - TRT08SN0", 14, 27);
+            documentPdf.setFontSize(9);
+            documentPdf.text(`Solicitud: ${request.id || ""}`, 14, 35);
+            documentPdf.text(`Estado: ${request.estado || "Enviada"}`, 110, 35);
+            documentPdf.autoTable({
+                startY: 41,
+                theme: "grid",
+                head: [["Dato", "Valor", "Dato", "Valor"]],
+                body: [
+                    ["Cliente", request.cliente || "", "Emisor", request.emisor || ""],
+                    ["Opcion", `OP${request.opcion || ""}`, "Accion", request.accion || ""],
+                    ["Producto", request.producto || "Todos", "Fecha de envio", formatDateTime(request.fechaCreacion || request.fechaSolicitud)],
+                    ["Fecha requerida", request.fechaRequerida ? formatDateTime(request.fechaRequerida) : "No indicada", "Ultima actualizacion", formatDateTime(request.fechaActualizacion)]
+                ],
+                styles: {
+                    fontSize: 8,
+                    cellPadding: 2.5
+                },
+                headStyles: {
+                    fillColor: [88, 89, 91]
+                },
+                alternateRowStyles: {
+                    fillColor: [247, 247, 247]
+                }
+            });
+            documentPdf.autoTable({
+                startY: documentPdf.lastAutoTable.finalY + 7,
+                theme: "grid",
+                head: [["#", "Parametro", "Producto", "Valor", "Revision", "Observacion"]],
+                body: (request.parametros || []).map((parameter, index) => [
+                    index + 1,
+                    parameter.nombre || parameter.id || "",
+                    parameter.producto || "Todos",
+                    parameter.valor || "",
+                    parameter.revision || "Pendiente",
+                    parameter.notaAprobador || ""
+                ]),
+                styles: {
+                    fontSize: 7,
+                    cellPadding: 2,
+                    overflow: "linebreak"
+                },
+                headStyles: {
+                    fillColor: [255, 108, 12]
+                },
+                columnStyles: {
+                    0: { cellWidth: 8 },
+                    1: { cellWidth: 42 },
+                    2: { cellWidth: 23 },
+                    3: { cellWidth: 42 },
+                    4: { cellWidth: 25 },
+                    5: { cellWidth: 42 }
+                },
+                didDrawPage: (data) => {
+                    documentPdf.setFontSize(7);
+                    documentPdf.setTextColor(120);
+                    documentPdf.text(
+                        `Siscard+ | ${request.id || "Solicitud"} | Pagina ${data.pageNumber}`,
+                        14,
+                        291
+                    );
+                }
+            });
+            documentPdf.save(`${request.id || "solicitud"}.pdf`);
+        }
+
+        function exportExcel() {
+            if (!selectedRequest || !window.XLSX) {
+                showToast("No fue posible generar el Excel.");
+                return;
+            }
+            const request = selectedRequest;
+            const generalData = [
+                ["Solicitud", request.id || ""],
+                ["Estado", request.estado || "Enviada"],
+                ["Cliente", request.cliente || ""],
+                ["Emisor", request.emisor || ""],
+                ["Opcion", `OP${request.opcion || ""}`],
+                ["Accion", request.accion || ""],
+                ["Producto", request.producto || "Todos"],
+                ["Fecha de envio", formatDateTime(request.fechaCreacion || request.fechaSolicitud)],
+                ["Fecha requerida", request.fechaRequerida ? formatDateTime(request.fechaRequerida) : "No indicada"],
+                ["Ultima actualizacion", formatDateTime(request.fechaActualizacion)]
+            ];
+            const parameters = (request.parametros || []).map((parameter, index) => ({
+                Numero: index + 1,
+                Parametro: parameter.nombre || parameter.id || "",
+                Producto: parameter.producto || "Todos",
+                Valor: parameter.valor || "",
+                Revision: parameter.revision || "Pendiente",
+                Observacion: parameter.notaAprobador || ""
+            }));
+            const history = (request.historial || []).map((movement) => ({
+                Estado: movement.estado || "Actualizacion",
+                Fecha: formatDateTime(movement.fecha),
+                Usuario: movement.usuario || "",
+                Comentario: movement.comentario || ""
+            }));
+            const workbook = XLSX.utils.book_new();
+            const generalSheet = XLSX.utils.aoa_to_sheet(generalData);
+            const parameterSheet = XLSX.utils.json_to_sheet(parameters);
+            const historySheet = XLSX.utils.json_to_sheet(history);
+            generalSheet["!cols"] = [{ wch: 24 }, { wch: 45 }];
+            parameterSheet["!cols"] = [
+                { wch: 10 },
+                { wch: 40 },
+                { wch: 18 },
+                { wch: 35 },
+                { wch: 22 },
+                { wch: 45 }
+            ];
+            historySheet["!cols"] = [
+                { wch: 22 },
+                { wch: 22 },
+                { wch: 24 },
+                { wch: 55 }
+            ];
+            XLSX.utils.book_append_sheet(workbook, generalSheet, "Solicitud");
+            XLSX.utils.book_append_sheet(workbook, parameterSheet, "Parametros");
+            XLSX.utils.book_append_sheet(workbook, historySheet, "Historial");
+            XLSX.writeFile(workbook, `${request.id || "solicitud"}.xlsx`);
+        }
+
         function attachDetailActions() {
+            document.getElementById("exportPdfButton")?.addEventListener("click", exportPdf);
+            document.getElementById("exportExcelButton")?.addEventListener("click", exportExcel);
             document.getElementById("closeDetailFooterButton")?.addEventListener("click", closeDetail);
             document.getElementById("cancelCorrectionButton")?.addEventListener("click", closeDetail);
             document.getElementById("submitCorrectionButton")?.addEventListener("click", prepareCorrection);
@@ -1314,7 +1454,7 @@
         }
 
         document.getElementById("requestSearch").addEventListener("input", renderRequests);
-        document.getElementById("requestState").addEventListener("change", renderRequests);
+        document.getElementById("requestScope").addEventListener("change", renderRequests);
         document.getElementById("refreshButton").addEventListener("click", loadRequests);
 
         requestsBody.addEventListener("click", (event) => {
