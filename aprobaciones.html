@@ -690,6 +690,77 @@
                 padding: 7px 9px;
                 border-radius: var(--radius);
             }
+            .toolbar-actions {
+                width: 100%;
+                display: grid;
+                grid-template-columns: auto auto minmax(190px, 1fr) auto;
+                gap: 8px;
+                align-items: center;
+            }
+            .toolbar-group {
+                display: inline-flex;
+                align-items: center;
+                gap: 4px;
+                padding: 4px;
+                border: 1px solid var(--line);
+                border-radius: var(--radius);
+                background: var(--surface-soft);
+            }
+            .toolbar-group button,
+            .approval-buttons button {
+                min-height: 30px;
+                padding: 5px 8px;
+                font-size: 10px;
+                line-height: 1;
+                white-space: nowrap;
+            }
+            .approval-toolbar-comment {
+                min-width: 0;
+            }
+            .approval-toolbar-comment input {
+                min-height: 34px;
+                font-size: 11px;
+            }
+            .approval-buttons {
+                display: inline-flex;
+                flex-wrap: nowrap;
+                gap: 4px;
+                justify-content: flex-end;
+            }
+            .approval-action-approve {
+                border-color: var(--green) !important;
+                background: var(--green) !important;
+                color: #ffffff !important;
+            }
+            .approval-action-fix {
+                border-color: var(--orange) !important;
+                color: var(--orange-dark) !important;
+            }
+            .approval-action-reject {
+                border-color: #c84630 !important;
+                color: #a12f20 !important;
+            }
+            @media (max-width: 1100px) {
+                .toolbar-actions {
+                    grid-template-columns: 1fr 1fr;
+                }
+                .approval-toolbar-comment {
+                    grid-column: 1 / -1;
+                }
+            }
+            @media (max-width: 650px) {
+                .toolbar-actions {
+                    grid-template-columns: 1fr;
+                }
+                .toolbar-group,
+                .approval-buttons {
+                    width: 100%;
+                    flex-wrap: wrap;
+                }
+                .approval-toolbar-comment {
+                    grid-column: auto;
+                }
+            }
             .credential-overlay {
                 position: fixed;
                 inset: 0;
@@ -954,31 +1025,17 @@
                         </div>
 
                         <div class="toolbar-actions">
-                            <button
-                                class="tertiary-button"
-                                id="hideAllButton"
-                                type="button"
-                            >
-                                Esconder todos
-                            </button>
-                            <button
-                                class="tertiary-button"
-                                id="showAllButton"
-                                type="button"
-                            >
-                                Mostrar todos
-                            </button>
-                            <button
-                                class="tertiary-button"
-                                id="toggleEmptyButton"
-                                type="button"
-                            >
-                                Mostrar campos vacíos
-                            </button>
-                            <button class="tertiary-button" id="exportExcelButton" type="button">Exportar Excel</button>
-                            <button class="tertiary-button" id="exportPdfButton" type="button">Exportar PDF</button>
+                            <div class="toolbar-group" aria-label="Vista de parámetros">
+                                <button class="tertiary-button" id="hideAllButton" type="button" title="Esconder todos">− Todos</button>
+                                <button class="tertiary-button" id="showAllButton" type="button" title="Mostrar todos">+ Todos</button>
+                                <button class="tertiary-button" id="toggleEmptyButton" type="button">Vacíos</button>
+                            </div>
+                            <div class="toolbar-group" aria-label="Exportación">
+                                <button class="tertiary-button" id="exportExcelButton" type="button">Excel</button>
+                                <button class="tertiary-button" id="exportPdfButton" type="button">PDF</button>
+                            </div>
                             <div class="approval-toolbar-comment">
-                                <input id="approvalGeneralComment" placeholder="Comentario general para el solicitante">
+                                <input id="approvalGeneralComment" placeholder="Comentario para el solicitante">
                             </div>
                             <div class="approval-buttons" id="approvalButtons"></div>
                         </div>
@@ -1886,8 +1943,7 @@
                 selectedRequestId = requestId;
                 selectedRequest = request;
                 showEmptyParameters = false;
-                document.getElementById("toggleEmptyButton").textContent =
-                    "Mostrar campos vacíos";
+                document.getElementById("toggleEmptyButton").textContent = "Vacíos";
                 document.getElementById("approvalFormDocument").style.display =
                     "block";
                 document.getElementById("parameterSearchForm").style.display =
@@ -1962,10 +2018,28 @@
                 }
                 if (selectedRequest.estado === "En revisión") {
                     container.innerHTML = `
-                    <button class="primary-button" data-approval-state="Aprobada">Aceptar</button>
-                    <button class="tertiary-button" data-approval-state="Requiere información">Requiere información</button>
-                    <button class="tertiary-button" data-approval-state="Rechazada">Rechazar</button>
-                `;
+                        <button
+                            class="primary-button approval-action-approve"
+                            data-approval-state="Aprobada"
+                            title="Marcar todos los parámetros como correctos y aprobar"
+                        >
+                            ✓ Aprobar
+                        </button>
+                        <button
+                            class="tertiary-button approval-action-fix"
+                            data-approval-state="Requiere información"
+                            title="Solicitar correcciones al solicitante"
+                        >
+                            ⚠ Ajuste
+                        </button>
+                        <button
+                            class="tertiary-button approval-action-reject"
+                            data-approval-state="Rechazada"
+                            title="Rechazar solicitud"
+                        >
+                            × Rechazar
+                        </button>
+                    `;
                     return;
                 }
                 if (selectedRequest.estado === "Aprobada") {
@@ -1976,15 +2050,18 @@
                 container.innerHTML = "";
             }
             async function changeApprovalState(nextState) {
+                if (nextState === "Aprobada") {
+                    allParameters.forEach((parameter) => {
+                        parameter.reviewStatus = "Correcto";
+                        parameter.approvalNote = "";
+                    });
+                    renderParameters();
+                }
                 saveCurrentReview();
                 const request = requestStore.find((item) => item.id === selectedRequestId);
                 if (!request) return;
                 const comment = document.getElementById("approvalGeneralComment").value.trim();
                 const adjustmentItems = (request.parametros || []).filter((item) => item.revision === "Requiere ajuste");
-                if (nextState === "Aprobada" && (request.parametros || []).some((item) => item.revision !== "Correcto")) {
-                    showToast("Marque todos los registros como Correcto antes de aprobar.");
-                    return;
-                }
                 if (nextState === "Requiere información" && !adjustmentItems.length) {
                     showToast("Marque al menos un registro como Requiere ajuste.");
                     return;
@@ -2234,9 +2311,7 @@
             document.getElementById("toggleEmptyButton").addEventListener("click", () => {
                 showEmptyParameters = !showEmptyParameters;
                 document.getElementById("toggleEmptyButton").textContent =
-                    showEmptyParameters
-                        ? "Ocultar campos vacíos"
-                        : "Mostrar campos vacíos";
+                    showEmptyParameters ? "Sin vacíos" : "Vacíos";
                 renderParameters();
             });
             document
