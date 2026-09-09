@@ -12,7 +12,7 @@
     "estado": "En revisión",
     "aprobador": "Seguridad",
     "fechaCreacion": "2026-09-09T20:50:54.581Z",
-    "fechaActualizacion": "2026-09-09T22:05:48.972Z",
+    "fechaActualizacion": "2026-09-09T22:06:14.192Z",
     "comentarios": [],
     "historial": [
       {
@@ -41,7 +41,7 @@
       },
       {
         "estado": "En revisión",
-        "fecha": "2026-09-09T22:05:48.972Z",
+        "fecha": "2026-09-09T22:06:14.192Z",
         "usuario": "Seguridad",
         "comentario": "Solicitud actualizada a En revisión."
       }
