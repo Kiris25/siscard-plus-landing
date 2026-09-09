@@ -7,6 +7,8 @@
         <title>Aprobaciones | Landing Siscard+</title>
         <link rel="stylesheet" href="css/styles.css" />
         <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
         <style>
             [hidden] {
                 display: none !important;
@@ -674,6 +676,82 @@
                     grid-template-columns: 1fr;
                 }
             }
+            .parameters-toolbar {
+                top: 0;
+                border-radius: var(--radius);
+            }
+            .approval-toolbar-comment {
+                min-width: 245px;
+                flex: 1 1 245px;
+            }
+            .approval-toolbar-comment input {
+                width: 100%;
+                min-height: 36px;
+                padding: 7px 9px;
+                border-radius: var(--radius);
+            }
+            .credential-overlay {
+                position: fixed;
+                inset: 0;
+                z-index: 1400;
+                display: grid;
+                place-items: center;
+                padding: 22px;
+                background: rgba(25, 25, 25, 0.72);
+                backdrop-filter: blur(4px);
+            }
+            .credential-dialog {
+                width: min(500px, 100%);
+                overflow: hidden;
+                border-radius: var(--radius-large);
+                background: #ffffff;
+                box-shadow: 0 24px 70px rgba(0, 0, 0, 0.30);
+            }
+            .credential-header {
+                padding: 22px 24px 16px;
+                border-top: 5px solid var(--orange);
+            }
+            .credential-header h2 {
+                margin: 0;
+                color: var(--sidebar);
+                font-weight: 400;
+            }
+            .credential-header p {
+                margin: 7px 0 0;
+                color: var(--muted);
+            }
+            .credential-body {
+                padding: 0 24px 20px;
+            }
+            .credential-body label {
+                display: block;
+                margin-bottom: 7px;
+                color: var(--sidebar);
+                font-size: 11px;
+                font-weight: 850;
+                text-transform: uppercase;
+            }
+            .credential-body input {
+                width: 100%;
+                min-height: 44px;
+                padding: 9px 11px;
+                border-radius: var(--radius);
+            }
+            .credential-message {
+                display: block;
+                min-height: 18px;
+                margin-top: 7px;
+                color: var(--red);
+                font-size: 11px;
+            }
+            .credential-actions {
+                display: flex;
+                justify-content: flex-end;
+                gap: 8px;
+                padding: 16px 24px;
+                border-top: 1px solid var(--line);
+                background: var(--surface-soft);
+            }
             @media print {
                 @page {
                     size: A4 landscape;
@@ -897,6 +975,12 @@
                             >
                                 Mostrar campos vacíos
                             </button>
+                            <button class="tertiary-button" id="exportExcelButton" type="button">Exportar Excel</button>
+                            <button class="tertiary-button" id="exportPdfButton" type="button">Exportar PDF</button>
+                            <div class="approval-toolbar-comment">
+                                <input id="approvalGeneralComment" placeholder="Comentario general para el solicitante">
+                            </div>
+                            <div class="approval-buttons" id="approvalButtons"></div>
                         </div>
                     </section>
 
@@ -914,27 +998,28 @@
                             <div class="empty-state">Cargando parámetros...</div>
                         </div>
                     </section>
-                    <section
-                        class="approval-actions-panel"
-                        id="approvalActionsPanel"
-                        hidden
-                    >
-                        <div class="approval-general-comment">
-                            <label for="approvalGeneralComment"
-                                >Comentario general de la revisión</label
-                            >
-                            <textarea
-                                id="approvalGeneralComment"
-                                placeholder="Comentario visible para el solicitante"
-                            ></textarea>
-                        </div>
-                        <div class="approval-buttons" id="approvalButtons"></div>
-                    </section>
                 </main>
                 <div id="footer-container"></div>
             </div>
         </div>
 
+        <div class="credential-overlay" id="credentialOverlay" hidden>
+            <section class="credential-dialog" role="dialog" aria-modal="true" aria-labelledby="credentialTitle">
+                <header class="credential-header">
+                    <h2 id="credentialTitle">Autenticación requerida</h2>
+                    <p>Ingrese la credencial de acceso para guardar la revisión.</p>
+                </header>
+                <div class="credential-body">
+                    <label for="accessCredential">Credencial de acceso</label>
+                    <input id="accessCredential" type="password" autocomplete="off" placeholder="Ingrese la credencial">
+                    <small class="credential-message" id="credentialMessage"></small>
+                </div>
+                <footer class="credential-actions">
+                    <button class="tertiary-button" id="cancelCredentialButton" type="button">Cancelar</button>
+                    <button class="primary-button" id="continueCredentialButton" type="button">Continuar</button>
+                </footer>
+            </section>
+        </div>
         <aside class="parameter-tooltip" id="parameterTooltip" hidden></aside>
         <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
@@ -955,6 +1040,9 @@
                 path: "data/solicitudes.json",
             };
 
+            const ACCESS_CREDENTIAL_KEY = "siscardAccessCredential";
+            let requestStore = [];
+            let pendingRemoteAction = null;
             const OPTIONS = [
                 ["05", "Consultar"],
                 ["12", "Trabajar con"],
@@ -1660,10 +1748,96 @@
                 }).format(date);
             }
             function loadRequests() {
-                return JSON.parse(localStorage.getItem("siscardRequests") || "[]");
+                return requestStore;
             }
-            function storeRequests(requests) {
-                localStorage.setItem("siscardRequests", JSON.stringify(requests));
+            function githubApiUrl() {
+                const path = GITHUB_SETTINGS.path
+                    .split("/")
+                    .map((part) => encodeURIComponent(part))
+                    .join("/");
+                return `https://api.github.com/repos/${GITHUB_SETTINGS.owner}/${GITHUB_SETTINGS.repository}/contents/${path}`;
+            }
+            function githubHeaders(credential) {
+                return {
+                    Accept: "application/vnd.github+json",
+                    Authorization: `Bearer ${credential}`,
+                    "X-GitHub-Api-Version": "2022-11-28"
+                };
+            }
+            function base64ToUtf8(value) {
+                const binary = atob(String(value || "").replace(/\s/g, ""));
+                const bytes = Uint8Array.from(binary, (character) => character.charCodeAt(0));
+                return new TextDecoder().decode(bytes);
+            }
+            async function fetchRemoteRequests(credential = "") {
+                if (!credential) {
+                    const response = await fetch(`${GITHUB_SETTINGS.path}?v=${Date.now()}`, { cache: "no-store" });
+                    if (!response.ok) throw new Error(`READ_FAILED_${response.status}`);
+                    const requests = await response.json();
+                    if (!Array.isArray(requests)) throw new Error("INVALID_STRUCTURE");
+                    return { requests, sha: "" };
+                }
+                const response = await fetch(`${githubApiUrl()}?ref=${encodeURIComponent(GITHUB_SETTINGS.branch)}&v=${Date.now()}`, {
+                    headers: githubHeaders(credential),
+                    cache: "no-store"
+                });
+                if (response.status === 401 || response.status === 403) throw new Error("CREDENTIAL_INVALID");
+                if (!response.ok) throw new Error(`READ_FAILED_${response.status}`);
+                const file = await response.json();
+                const requests = JSON.parse(base64ToUtf8(file.content || "[]"));
+                if (!Array.isArray(requests)) throw new Error("INVALID_STRUCTURE");
+                return { requests, sha: file.sha };
+            }
+            async function storeRequests(requests, credential, retry = true) {
+                const current = await fetchRemoteRequests(credential);
+                const response = await fetch(githubApiUrl(), {
+                    method: "PUT",
+                    headers: {
+                        ...githubHeaders(credential),
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        message: `Actualizar solicitud ${selectedRequestId || "Siscard+"}`,
+                        content: utf8ToBase64(`${JSON.stringify(requests, null, 2)}\n`),
+                        sha: current.sha,
+                        branch: GITHUB_SETTINGS.branch
+                    })
+                });
+                if (response.status === 409 && retry) return storeRequests(requests, credential, false);
+                if (response.status === 401 || response.status === 403) throw new Error("CREDENTIAL_INVALID");
+                if (!response.ok) throw new Error(`WRITE_FAILED_${response.status}`);
+                requestStore = requests;
+                localStorage.setItem(ACCESS_CREDENTIAL_KEY, credential);
+            }
+            async function initializeRequests() {
+                try {
+                    const remote = await fetchRemoteRequests();
+                    requestStore = remote.requests.sort((a, b) => (Date.parse(b.fechaActualizacion || b.fechaCreacion || "") || 0) - (Date.parse(a.fechaActualizacion || a.fechaCreacion || "") || 0));
+                    renderApprovalRequestList();
+                } catch (error) {
+                    console.error(error);
+                    document.getElementById("approvalRequestList").innerHTML = '<div class="error-state">No fue posible cargar las solicitudes.</div>';
+                }
+            }
+            function openCredentialDialog(action, message = "") {
+                pendingRemoteAction = action;
+                document.getElementById("credentialMessage").textContent = message;
+                document.getElementById("accessCredential").value = "";
+                document.getElementById("credentialOverlay").hidden = false;
+                document.getElementById("accessCredential").focus();
+            }
+            function closeCredentialDialog() {
+                document.getElementById("credentialOverlay").hidden = true;
+                document.getElementById("credentialMessage").textContent = "";
+                document.getElementById("accessCredential").value = "";
+            }
+            async function withCredential(action) {
+                const saved = localStorage.getItem(ACCESS_CREDENTIAL_KEY) || "";
+                if (!saved) {
+                    openCredentialDialog(action);
+                    return;
+                }
+                await action(saved);
             }
             function renderApprovalRequestList() {
                 const requests = loadRequests();
@@ -1724,7 +1898,6 @@
                 document.getElementById(
                     "approvalParametersPanel",
                 ).style.display = "block";
-                document.getElementById("approvalActionsPanel").hidden = false;
                 currentOption = request.opcion || "05";
                 document.getElementById("clientName").value = request.cliente || "";
                 document.getElementById("issuerName").value = request.emisor || "";
@@ -1760,15 +1933,13 @@
                             };
                         });
                     renderParameters();
-                    document.getElementById("approvalActionsPanel").hidden = false;
-                    renderApprovalButtons();
+                        renderApprovalButtons();
                     renderApprovalRequestList();
                 });
             }
             function saveCurrentReview() {
                 if (!selectedRequestId) return;
-                const requests = loadRequests();
-                const request = requests.find((item) => item.id === selectedRequestId);
+                const request = requestStore.find((item) => item.id === selectedRequestId);
                 if (!request) return;
                 request.parametros = allParameters.map((parameter) => ({
                     id: parameter.id,
@@ -1777,9 +1948,9 @@
                     obligatorio: parameter.required,
                     valor: parameter.value,
                     revision: parameter.reviewStatus || "Pendiente",
-                    notaAprobador: parameter.approvalNote || "",
+                    notaAprobador: parameter.approvalNote || ""
                 }));
-                storeRequests(requests);
+                selectedRequest = request;
             }
             function renderApprovalButtons() {
                 if (!selectedRequest) return;
@@ -1804,63 +1975,68 @@
                 }
                 container.innerHTML = "";
             }
-            function changeApprovalState(nextState) {
+            async function changeApprovalState(nextState) {
                 saveCurrentReview();
-                const requests = loadRequests();
-                const request = requests.find((item) => item.id === selectedRequestId);
+                const request = requestStore.find((item) => item.id === selectedRequestId);
                 if (!request) return;
-                const comment = document
-                    .getElementById("approvalGeneralComment")
-                    .value.trim();
-                const adjustmentItems = (request.parametros || []).filter(
-                    (item) => item.revision === "Requiere ajuste",
-                );
-                if (
-                    nextState === "Aprobada" &&
-                    (request.parametros || []).some(
-                        (item) => item.revision !== "Correcto",
-                    )
-                ) {
-                    showToast(
-                        "Marque todos los registros como Correcto antes de aprobar.",
-                    );
+                const comment = document.getElementById("approvalGeneralComment").value.trim();
+                const adjustmentItems = (request.parametros || []).filter((item) => item.revision === "Requiere ajuste");
+                if (nextState === "Aprobada" && (request.parametros || []).some((item) => item.revision !== "Correcto")) {
+                    showToast("Marque todos los registros como Correcto antes de aprobar.");
                     return;
                 }
                 if (nextState === "Requiere información" && !adjustmentItems.length) {
                     showToast("Marque al menos un registro como Requiere ajuste.");
                     return;
                 }
-                if (
-                    ["Requiere información", "Rechazada"].includes(nextState) &&
-                    !comment &&
-                    !adjustmentItems.some((item) => item.notaAprobador)
-                ) {
+                if (["Requiere información", "Rechazada"].includes(nextState) && !comment && !adjustmentItems.some((item) => item.notaAprobador)) {
                     showToast("Incluya una nota o comentario para continuar.");
                     return;
                 }
-                request.estado = nextState;
-                request.fechaActualizacion = new Date().toISOString();
-                request.aprobador = "Seguridad";
-                request.historial = request.historial || [];
-                request.historial.push({
-                    estado: nextState,
-                    fecha: request.fechaActualizacion,
-                    usuario: "Seguridad",
-                    comentario: comment || `Solicitud actualizada a ${nextState}.`,
+                await withCredential(async (credential) => {
+                    const now = new Date().toISOString();
+                    request.estado = nextState;
+                    request.fechaActualizacion = now;
+                    request.aprobador = "Seguridad";
+                    if (nextState === "En revisión" && !request.fechaToma) request.fechaToma = now;
+                    if (["Aprobada", "Requiere información", "Rechazada", "Completada"].includes(nextState)) request.fechaRevision = now;
+                    request.historial = request.historial || [];
+                    request.historial.push({
+                        estado: nextState,
+                        fecha: now,
+                        usuario: "Seguridad",
+                        comentario: comment || `Solicitud actualizada a ${nextState}.`
+                    });
+                    try {
+                        await storeRequests(requestStore, credential);
+                        selectedRequest = request;
+                        document.getElementById("approvalGeneralComment").value = "";
+                        renderApprovalRequestList();
+                        renderApprovalButtons();
+                        closeCredentialDialog();
+                        showToast(`Solicitud actualizada a ${nextState}.`);
+                    } catch (error) {
+                        console.error(error);
+                        if (error.message === "CREDENTIAL_INVALID") {
+                            localStorage.removeItem(ACCESS_CREDENTIAL_KEY);
+                            openCredentialDialog((newCredential) => changeApprovalStateWithCredential(nextState, newCredential), "No fue posible validar la credencial.");
+                        } else {
+                            showToast("No fue posible guardar la revisión.");
+                        }
+                    }
                 });
-                storeRequests(requests);
-                selectedRequest = request;
-                document.getElementById("approvalGeneralComment").value = "";
-                renderApprovalRequestList();
-                renderApprovalButtons();
-                showToast(`Solicitud actualizada a ${nextState}.`);
             }
-            function takeRequest(requestId) {
+            async function changeApprovalStateWithCredential(nextState, credential) {
+                localStorage.setItem(ACCESS_CREDENTIAL_KEY, credential);
+                closeCredentialDialog();
+                await changeApprovalState(nextState);
+            }
+            async function takeRequest(requestId) {
                 selectedRequestId = requestId;
                 selectedRequest = loadRequests().find((item) => item.id === requestId) || null;
                 if (!selectedRequest) return;
                 if (["Enviada", "Pendiente"].includes(selectedRequest.estado)) {
-                    changeApprovalState("En revisión");
+                    await changeApprovalState("En revisión");
                 }
                 selectApprovalRequest(requestId);
             }
@@ -1910,87 +2086,6 @@
                 const stamp = new Date().toISOString().slice(0, 10).replaceAll("-", "");
                 XLSX.writeFile(workbook, `historial_aprobaciones_${stamp}.xlsx`);
             }
-            function requestPayload() {
-                return {
-                    id: `SOL-${Date.now()}`,
-                    tipo: "formulario-parametros",
-                    opcion: currentOption,
-                    cliente: document.getElementById("clientName").value.trim(),
-                    emisor: document.getElementById("issuerName").value.trim(),
-                    accion: document.getElementById("requestedAction").value,
-                    producto: document.getElementById("productFilter").value,
-                    fechaSolicitud: document.getElementById("requestDate").value,
-                    fechaRequerida: document.getElementById("requiredDateTime").value,
-                    estado: "Enviada",
-                    aprobador: "Seguridad",
-                    fechaCreacion: new Date().toISOString(),
-                    fechaActualizacion: new Date().toISOString(),
-                    comentarios: [],
-                    historial: [
-                        {
-                            estado: "Enviada",
-                            fecha: new Date().toISOString(),
-                            usuario:
-                                document.getElementById("clientName").value.trim() ||
-                                "Solicitante",
-                            comentario: "Solicitud enviada para revisión.",
-                        },
-                    ],
-                    parametros: allParameters
-                        .filter((parameter) => parameter.value)
-                        .map((parameter) => ({
-                            id: parameter.id,
-                            nombre: parameter.name,
-                            producto: parameter.product,
-                            obligatorio: parameter.required,
-                            valor: parameter.value,
-                            revision: "Pendiente",
-                            notaAprobador: "",
-                        })),
-                };
-            }
-
-            function showToast(message) {
-                const toast = document.getElementById("toast");
-                toast.textContent = message;
-                toast.classList.add("show");
-                window.setTimeout(() => toast.classList.remove("show"), 2800);
-            }
-
-            function validateHeader() {
-                const form = document.getElementById("requestForm");
-                if (!form.reportValidity()) return false;
-                return true;
-            }
-            async function saveRequest() {
-                if (!validateHeader()) return;
-
-                const invalidRequired = allParameters
-                    .map((parameter) =>
-                        document.querySelector(`[data-entry-id="${parameter.id}"]`),
-                    )
-                    .filter((control) => control && !control.checkValidity());
-
-                if (invalidRequired.length) {
-                    invalidRequired[0].reportValidity();
-                    invalidRequired[0].scrollIntoView({
-                        behavior: "smooth",
-                        block: "center",
-                    });
-                    showToast("Complete los campos obligatorios antes de enviar.");
-                    return;
-                }
-
-                const payload = requestPayload();
-                const requests = JSON.parse(
-                    localStorage.getItem("siscardRequests") || "[]",
-                );
-                requests.unshift(payload);
-                localStorage.setItem("siscardRequests", JSON.stringify(requests));
-                localStorage.setItem("siscardLastRequest", JSON.stringify(payload));
-                showToast(`Solicitud ${payload.id} enviada a Seguridad.`);
-            }
-
             function utf8ToBase64(value) {
                 const bytes = new TextEncoder().encode(value);
                 let binary = "";
@@ -2000,7 +2095,11 @@
 
             function exportExcel() {
                 if (!validateHeader()) return;
-                const payload = requestPayload();
+                if (!selectedRequest) {
+                    showToast("Seleccione una solicitud para exportar.");
+                    return;
+                }
+                const payload = selectedRequest;
                 const selected = allParameters.filter((parameter) => parameter.value);
                 const rows = [
                     ["EVERTEC COSTA RICA"],
@@ -2046,24 +2145,56 @@
                 XLSX.writeFile(workbook, `${payload.id}_op${currentOption}.xlsx`);
             }
             function exportPdf() {
-                if (!validateHeader()) return;
-                const originalTitle = document.title;
-                const payload = requestPayload();
-                const cards = Array.from(document.querySelectorAll(".parameter-card"));
-                cards.forEach((card) => {
-                    const parameter = allParameters.find(
-                        (item) => String(item.id) === String(card.dataset.cardId),
-                    );
-                    card.dataset.printHidden = card.style.display || "";
-                    if (!parameter?.value) card.style.display = "none";
+                if (!selectedRequest || !window.jspdf) {
+                    showToast("Seleccione una solicitud para exportar.");
+                    return;
+                }
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+                const request = selectedRequest;
+                pdf.setFillColor(255, 108, 12);
+                pdf.rect(0, 0, 210, 8, "F");
+                pdf.setTextColor(88, 89, 91);
+                pdf.setFontSize(18);
+                pdf.text("Evertec Costa Rica", 14, 20);
+                pdf.setFontSize(11);
+                pdf.text("Revision de parametros del emisor - TRT08SN0", 14, 27);
+                pdf.setFontSize(9);
+                pdf.text(`Solicitud: ${request.id || ""}`, 14, 35);
+                pdf.text(`Estado: ${request.estado || ""}`, 110, 35);
+                pdf.autoTable({
+                    startY: 41,
+                    theme: "grid",
+                    head: [["Dato", "Valor", "Dato", "Valor"]],
+                    body: [
+                        ["Cliente", request.cliente || "", "Emisor", request.emisor || ""],
+                        ["Opcion", `OP${request.opcion || ""}`, "Accion", request.accion || ""],
+                        ["Producto", request.producto || "Todos", "Aprobador", request.aprobador || "Seguridad"],
+                        ["Creacion", formatDateTime(request.fechaCreacion), "Actualizacion", formatDateTime(request.fechaActualizacion)]
+                    ],
+                    styles: { fontSize: 8, cellPadding: 2.5 },
+                    headStyles: { fillColor: [88, 89, 91] }
                 });
-                document.title = `${payload.id}_OP${currentOption}`;
-                window.print();
-                document.title = originalTitle;
-                cards.forEach((card) => {
-                    card.style.display = card.dataset.printHidden || "";
-                    delete card.dataset.printHidden;
+                pdf.autoTable({
+                    startY: pdf.lastAutoTable.finalY + 7,
+                    theme: "grid",
+                    head: [["#", "Parametro", "Producto", "Valor", "Revision", "Observacion"]],
+                    body: (request.parametros || []).map((parameter, index) => [
+                        index + 1,
+                        parameter.nombre || parameter.id || "",
+                        parameter.producto || "Todos",
+                        parameter.valor || "",
+                        parameter.revision || "Pendiente",
+                        parameter.notaAprobador || ""
+                    ]),
+                    styles: { fontSize: 7, cellPadding: 2, overflow: "linebreak" },
+                    headStyles: { fillColor: [255, 108, 12] },
+                    columnStyles: {
+                        0: { cellWidth: 8 }, 1: { cellWidth: 42 }, 2: { cellWidth: 23 },
+                        3: { cellWidth: 42 }, 4: { cellWidth: 25 }, 5: { cellWidth: 42 }
+                    }
                 });
+                pdf.save(`${request.id || "solicitud"}_revision.pdf`);
             }
             document
                 .getElementById("optionsMenu")
@@ -2098,6 +2229,8 @@
                 collapsedCards.clear();
                 renderParameters();
             });
+            document.getElementById("exportExcelButton").addEventListener("click", exportExcel);
+            document.getElementById("exportPdfButton").addEventListener("click", exportPdf);
             document.getElementById("toggleEmptyButton").addEventListener("click", () => {
                 showEmptyParameters = !showEmptyParameters;
                 document.getElementById("toggleEmptyButton").textContent =
@@ -2135,7 +2268,17 @@
                 .toISOString()
                 .slice(0, 10);
 
-            renderApprovalRequestList();
+            document.getElementById("cancelCredentialButton").addEventListener("click", closeCredentialDialog);
+            document.getElementById("continueCredentialButton").addEventListener("click", async () => {
+                const credential = document.getElementById("accessCredential").value.trim();
+                if (!credential) {
+                    document.getElementById("credentialMessage").textContent = "Ingrese la credencial de acceso.";
+                    return;
+                }
+                const action = pendingRemoteAction;
+                if (action) await action(credential);
+            });
+            initializeRequests();
             document
                 .querySelectorAll("#requestForm input, #requestForm select")
                 .forEach((control) => {
