@@ -1291,10 +1291,10 @@
     "producto": "Corporativo",
     "fechaSolicitud": "2026-09-09",
     "fechaRequerida": "2026-09-09T14:49",
-    "estado": "Requiere información",
+    "estado": "Enviada",
     "aprobador": "Seguridad",
     "fechaCreacion": "2026-09-09T20:50:54.581Z",
-    "fechaActualizacion": "2026-09-09T21:42:28.453Z",
+    "fechaActualizacion": "2026-09-09T21:49:14.734Z",
     "comentarios": [],
     "historial": [
       {
@@ -1314,6 +1314,12 @@
         "fecha": "2026-09-09T21:42:28.453Z",
         "usuario": "Seguridad",
         "comentario": "Solicitud actualizada a Requiere información."
+      },
+      {
+        "estado": "Enviada",
+        "fecha": "2026-09-09T21:49:14.734Z",
+        "usuario": "PRUEBA",
+        "comentario": "Solicitud corregida y enviada nuevamente para revisión."
       }
     ],
     "parametros": [
@@ -1349,9 +1355,9 @@
         "nombre": "Tarjeta Corporativa",
         "producto": "Crédito Corporativo",
         "obligatorio": true,
-        "valor": "S = Sí",
-        "revision": "Requiere ajuste",
-        "notaAprobador": "NO SIRVE"
+        "valor": "N=No",
+        "revision": "Pendiente",
+        "notaAprobador": ""
       },
       {
         "id": "f218524d-261a-45ae-83ba-ceb1878efb51",
