@@ -48,10 +48,10 @@
     "producto": "Corporativo",
     "fechaSolicitud": "2026-09-09",
     "fechaRequerida": "2026-09-09T14:49",
-    "estado": "En revisión",
+    "estado": "Requiere información",
     "aprobador": "Seguridad",
     "fechaCreacion": "2026-09-09T20:50:54.581Z",
-    "fechaActualizacion": "2026-09-09T21:42:16.171Z",
+    "fechaActualizacion": "2026-09-09T21:42:28.453Z",
     "comentarios": [],
     "historial": [
       {
@@ -65,6 +65,12 @@
         "fecha": "2026-09-09T21:42:16.171Z",
         "usuario": "Seguridad",
         "comentario": "Solicitud actualizada a En revisión."
+      },
+      {
+        "estado": "Requiere información",
+        "fecha": "2026-09-09T21:42:28.453Z",
+        "usuario": "Seguridad",
+        "comentario": "Solicitud actualizada a Requiere información."
       }
     ],
     "parametros": [
@@ -101,8 +107,8 @@
         "producto": "Crédito Corporativo",
         "obligatorio": true,
         "valor": "S = Sí",
-        "revision": "Pendiente",
-        "notaAprobador": ""
+        "revision": "Requiere ajuste",
+        "notaAprobador": "NO SIRVE"
       },
       {
         "id": "f218524d-261a-45ae-83ba-ceb1878efb51",
@@ -1311,7 +1317,8 @@
         "notaAprobador": ""
       }
     ],
-    "fechaToma": "2026-09-09T21:42:16.171Z"
+    "fechaToma": "2026-09-09T21:42:16.171Z",
+    "fechaRevision": "2026-09-09T21:42:28.453Z"
   },
   {
     "id": "PRUEBAPRUEBA5090926",
