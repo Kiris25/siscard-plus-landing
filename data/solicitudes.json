@@ -9,10 +9,10 @@
     "producto": "Corporativo",
     "fechaSolicitud": "2026-09-09",
     "fechaRequerida": "2026-09-09T14:49",
-    "estado": "En revisión",
+    "estado": "Rechazada",
     "aprobador": "Seguridad",
     "fechaCreacion": "2026-09-09T20:51:21.470Z",
-    "fechaActualizacion": "2026-09-09T21:41:28.094Z",
+    "fechaActualizacion": "2026-09-09T21:42:07.846Z",
     "comentarios": [],
     "historial": [
       {
@@ -26,10 +26,17 @@
         "fecha": "2026-09-09T21:41:28.094Z",
         "usuario": "Seguridad",
         "comentario": "Solicitud actualizada a En revisión."
+      },
+      {
+        "estado": "Rechazada",
+        "fecha": "2026-09-09T21:42:07.846Z",
+        "usuario": "Seguridad",
+        "comentario": "NO TIENE DATOS"
       }
     ],
     "parametros": [],
-    "fechaToma": "2026-09-09T21:41:28.094Z"
+    "fechaToma": "2026-09-09T21:41:28.094Z",
+    "fechaRevision": "2026-09-09T21:42:07.846Z"
   },
   {
     "id": "PRUEBAPRUEBA1090926",
