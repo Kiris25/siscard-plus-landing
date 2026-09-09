@@ -525,6 +525,93 @@
             backdrop-filter: blur(4px);
         }
         .confirmation-overlay[hidden] { display: none !important; }
+        .access-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 1200;
+            display: grid;
+            place-items: center;
+            padding: 22px;
+            background: rgba(25, 25, 25, 0.72);
+            backdrop-filter: blur(4px);
+        }
+        .access-overlay[hidden] {
+            display: none !important;
+        }
+        .access-dialog {
+            width: min(500px, 100%);
+            overflow: hidden;
+            border-radius: var(--radius-large);
+            background: #ffffff;
+            box-shadow: 0 24px 70px rgba(0, 0, 0, 0.30);
+        }
+        .access-header {
+            padding: 22px 24px 16px;
+            border-top: 5px solid var(--orange);
+        }
+        .access-header h2 {
+            margin: 0;
+            color: var(--sidebar);
+        }
+        .access-header p {
+            margin: 7px 0 0;
+            color: var(--muted);
+            line-height: 1.5;
+        }
+        .access-body {
+            padding: 0 24px 22px;
+        }
+        .access-body label {
+            display: block;
+            margin-bottom: 7px;
+            color: var(--sidebar);
+            font-size: 11px;
+            font-weight: 850;
+            text-transform: uppercase;
+        }
+        .access-input-wrap {
+            position: relative;
+        }
+        .access-input-wrap input {
+            width: 100%;
+            min-height: 45px;
+            padding: 10px 48px 10px 12px;
+            border-radius: var(--radius);
+        }
+        .access-visibility {
+            position: absolute;
+            top: 50%;
+            right: 8px;
+            width: 34px;
+            height: 34px;
+            transform: translateY(-50%);
+            border: 0;
+            border-radius: 50%;
+            background: transparent;
+            color: var(--muted);
+            cursor: pointer;
+        }
+        .access-visibility:hover,
+        .access-visibility:focus {
+            background: var(--orange-soft);
+            color: var(--orange);
+            outline: none;
+        }
+        .access-message {
+            display: block;
+            min-height: 18px;
+            margin-top: 7px;
+            color: var(--red);
+            font-size: 11px;
+        }
+        .access-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+            padding: 16px 24px;
+            border-top: 1px solid var(--line);
+            background: var(--surface-soft);
+        }
         .template-overlay {
             position: fixed;
             inset: 0;
@@ -615,7 +702,7 @@
             @page { size: A4 landscape; margin: 10mm; }
             body { background: #fff; }
             .sidebar,.topbar,.options-area,.parameter-search,.parameters-toolbar,
-            .parameter-help,.footer,.toast,.parameter-tooltip { display:none !important; }
+            .parameter-help,.footer,.toast,.parameter-tooltip,.access-overlay { display:none !important; }
             .app-shell { display:block; }
             .main-area,.content { width:100%; margin:0; padding:0; }
             .form-document,.parameters-panel { border:1px solid #999; border-radius:0; box-shadow:none; }
@@ -783,6 +870,45 @@
             </footer>
         </section>
     </div>
+    <div class="access-overlay" id="accessOverlay" hidden>
+        <section
+            class="access-dialog"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="accessTitle"
+        >
+            <header class="access-header">
+                <h2 id="accessTitle">Autenticación requerida</h2>
+                <p>Para continuar con el envío, ingrese la credencial de acceso. Esta validación solo se solicitará una vez en este navegador.</p>
+            </header>
+            <div class="access-body">
+                <label for="accessCredential">Credencial de acceso</label>
+                <div class="access-input-wrap">
+                    <input
+                        id="accessCredential"
+                        type="password"
+                        autocomplete="off"
+                        spellcheck="false"
+                        placeholder="Ingrese la credencial"
+                    >
+                    <button
+                        class="access-visibility"
+                        id="toggleCredentialButton"
+                        type="button"
+                        title="Mostrar u ocultar credencial"
+                        aria-label="Mostrar u ocultar credencial"
+                    >
+                        ◉
+                    </button>
+                </div>
+                <small class="access-message" id="accessMessage"></small>
+            </div>
+            <footer class="access-actions">
+                <button class="tertiary-button" id="cancelAccessButton" type="button">Cancelar</button>
+                <button class="primary-button" id="continueAccessButton" type="button">Continuar</button>
+            </footer>
+        </section>
+    </div>
     <aside class="parameter-tooltip" id="parameterTooltip" hidden></aside>
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
@@ -802,6 +928,8 @@
             branch: "main",
             path: "data/solicitudes.json"
         };
+        const ACCESS_CREDENTIAL_KEY = "siscardAccessCredential";
+        let pendingRequestPayload = null;
 
         const OPTIONS = [
             ["05", "Consultar"], ["12", "Trabajar con"],
@@ -1595,7 +1723,8 @@
                 showToast("Complete los campos obligatorios antes de enviar.");
                 return;
             }
-            const payload = requestPayload();
+            pendingRequestPayload = requestPayload();
+            const payload = pendingRequestPayload;
             const completed = payload.parametros.filter((item) => item.valor).length;
             document.getElementById("confirmationSummary").innerHTML = `
                 <div class="confirmation-item"><strong>Cliente</strong><span>${escapeHtml(payload.cliente)}</span></div>
@@ -1612,26 +1741,209 @@
             document.getElementById("confirmationOverlay").hidden = true;
             document.body.style.overflow = "";
         }
-        async function saveRequest() {
-            const payload = requestPayload();
-            const requests = JSON.parse(localStorage.getItem("siscardRequests") || "[]");
-            requests.unshift(payload);
-            localStorage.setItem("siscardRequests", JSON.stringify(requests));
-            localStorage.setItem("siscardLastRequest", JSON.stringify(payload));
+        function githubApiUrl() {
+            const path = GITHUB_SETTINGS.path
+                .split("/")
+                .map((part) => encodeURIComponent(part))
+                .join("/");
+            return `https://api.github.com/repos/${GITHUB_SETTINGS.owner}/${GITHUB_SETTINGS.repository}/contents/${path}`;
+        }
+        function githubHeaders(credential) {
+            return {
+                Accept: "application/vnd.github+json",
+                Authorization: `Bearer ${credential}`,
+                "X-GitHub-Api-Version": "2022-11-28"
+            };
+        }
+        function base64ToUtf8(value) {
+            const binary = atob(String(value || "").replace(/\s/g, ""));
+            const bytes = Uint8Array.from(binary, (character) => character.charCodeAt(0));
+            return new TextDecoder().decode(bytes);
+        }
+        function readCredential() {
+            return localStorage.getItem(ACCESS_CREDENTIAL_KEY) || "";
+        }
+        function openAccessDialog(message = "") {
+            closeConfirmation();
+            const overlay = document.getElementById("accessOverlay");
+            const input = document.getElementById("accessCredential");
+            document.getElementById("accessMessage").textContent = message;
+            input.value = "";
+            input.type = "password";
+            overlay.hidden = false;
+            document.body.style.overflow = "hidden";
+            window.setTimeout(() => input.focus(), 50);
+        }
+        function closeAccessDialog() {
+            document.getElementById("accessOverlay").hidden = true;
+            document.getElementById("accessMessage").textContent = "";
+            document.getElementById("accessCredential").value = "";
+            document.body.style.overflow = "";
+        }
+        function saveLocalCopies(payload) {
+            const requests = JSON.parse(
+                localStorage.getItem("siscardRequests") || "[]"
+            );
+            const withoutDuplicate = requests.filter(
+                (item) => String(item.id) !== String(payload.id)
+            );
+            withoutDuplicate.unshift(payload);
+            localStorage.setItem(
+                "siscardRequests",
+                JSON.stringify(withoutDuplicate)
+            );
+            localStorage.setItem(
+                "siscardLastRequest",
+                JSON.stringify(payload)
+            );
             localStorage.setItem(
                 "siscardLastTemplate",
                 JSON.stringify({
                     cliente: payload.cliente,
                     emisor: payload.emisor,
                     accion: payload.accion,
-                    producto: payload.producto, 
+                    producto: payload.producto,
                     fechaRequerida: payload.fechaRequerida,
                     opcion: payload.opcion,
                     parametros: payload.parametros
                 })
             );
-            closeConfirmation();
-            showToast(`Solicitud ${payload.id} enviada a Seguridad.`);
+            localStorage.removeItem("siscardPendingRequest");
+        }
+        async function readRemoteRequests(credential) {
+            const response = await fetch(
+                `${githubApiUrl()}?ref=${encodeURIComponent(GITHUB_SETTINGS.branch)}&v=${Date.now()}`,
+                {
+                    method: "GET",
+                    headers: githubHeaders(credential),
+                    cache: "no-store"
+                }
+            );
+            if (response.status === 404) {
+                return { requests: [], sha: "" };
+            }
+            if (response.status === 401 || response.status === 403) {
+                throw new Error("CREDENTIAL_INVALID");
+            }
+            if (!response.ok) {
+                throw new Error(`READ_FAILED_${response.status}`);
+            }
+            const file = await response.json();
+            const content = base64ToUtf8(file.content || "").trim();
+            let requests = [];
+            if (content) {
+                requests = JSON.parse(content);
+            }
+            if (!Array.isArray(requests)) {
+                throw new Error("INVALID_JSON_STRUCTURE");
+            }
+            return { requests, sha: file.sha || "" };
+        }
+        async function writeRemoteRequests(credential, requests, sha) {
+            const body = {
+                message: `Registrar solicitud ${pendingRequestPayload.id}`,
+                content: utf8ToBase64(`${JSON.stringify(requests, null, 2)}\n`),
+                branch: GITHUB_SETTINGS.branch
+            };
+            if (sha) body.sha = sha;
+            return fetch(githubApiUrl(), {
+                method: "PUT",
+                headers: {
+                    ...githubHeaders(credential),
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(body)
+            });
+        }
+        async function persistRequest(credential, retryOnConflict = true) {
+            const current = await readRemoteRequests(credential);
+            const requests = current.requests.filter(
+                (item) => String(item.id) !== String(pendingRequestPayload.id)
+            );
+            requests.unshift(pendingRequestPayload);
+            const response = await writeRemoteRequests(
+                credential,
+                requests,
+                current.sha
+            );
+            if (response.status === 409 && retryOnConflict) {
+                return persistRequest(credential, false);
+            }
+            if (response.status === 401 || response.status === 403) {
+                throw new Error("CREDENTIAL_INVALID");
+            }
+            if (!response.ok) {
+                throw new Error(`WRITE_FAILED_${response.status}`);
+            }
+            return response.json();
+        }
+        function setSendingState(isSending) {
+            const confirmButton = document.getElementById("confirmSendButton");
+            const continueButton = document.getElementById("continueAccessButton");
+            confirmButton.disabled = isSending;
+            continueButton.disabled = isSending;
+            confirmButton.textContent = isSending
+                ? "Enviando..."
+                : "Sí, enviar solicitud";
+            continueButton.textContent = isSending
+                ? "Validando..."
+                : "Continuar";
+        }
+        async function completeRemoteSave(credential) {
+            setSendingState(true);
+            localStorage.setItem(
+                "siscardPendingRequest",
+                JSON.stringify(pendingRequestPayload)
+            );
+            try {
+                await persistRequest(credential);
+                localStorage.setItem(ACCESS_CREDENTIAL_KEY, credential);
+                saveLocalCopies(pendingRequestPayload);
+                const savedId = pendingRequestPayload.id;
+                pendingRequestPayload = null;
+                closeAccessDialog();
+                closeConfirmation();
+                showToast(`Solicitud ${savedId} enviada a Seguridad.`);
+            } catch (error) {
+                console.error(error);
+                if (error.message === "CREDENTIAL_INVALID") {
+                    localStorage.removeItem(ACCESS_CREDENTIAL_KEY);
+                    openAccessDialog(
+                        "No fue posible validar la credencial. Revise el dato e inténtelo nuevamente."
+                    );
+                } else if (error.message === "INVALID_JSON_STRUCTURE") {
+                    closeAccessDialog();
+                    showToast("El archivo de solicitudes no tiene una estructura válida.");
+                } else {
+                    closeAccessDialog();
+                    showToast("No fue posible guardar la solicitud. La información permanece en pantalla.");
+                }
+            } finally {
+                setSendingState(false);
+            }
+        }
+        async function saveRequest() {
+            if (!pendingRequestPayload) {
+                pendingRequestPayload = requestPayload();
+            }
+            const credential = readCredential();
+            if (!credential) {
+                openAccessDialog();
+                return;
+            }
+            await completeRemoteSave(credential);
+        }
+        async function continueWithCredential() {
+            const input = document.getElementById("accessCredential");
+            const credential = input.value.trim();
+            if (!credential) {
+                document.getElementById("accessMessage").textContent =
+                    "Ingrese la credencial de acceso para continuar.";
+                input.focus();
+                return;
+            }
+            document.getElementById("accessMessage").textContent = "";
+            await completeRemoteSave(credential);
         }
         function utf8ToBase64(value) {
             const bytes = new TextEncoder().encode(value);
@@ -1788,6 +2100,22 @@
         document.getElementById("saveButton").addEventListener("click", openConfirmation);
         document.getElementById("cancelSendButton").addEventListener("click", closeConfirmation);
         document.getElementById("confirmSendButton").addEventListener("click", saveRequest);
+        document.getElementById("cancelAccessButton").addEventListener("click", closeAccessDialog);
+        document.getElementById("continueAccessButton").addEventListener("click", continueWithCredential);
+        document.getElementById("toggleCredentialButton").addEventListener("click", () => {
+            const input = document.getElementById("accessCredential");
+            input.type = input.type === "password" ? "text" : "password";
+            input.focus();
+        });
+        document.getElementById("accessCredential").addEventListener("keydown", (event) => {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                continueWithCredential();
+            }
+        });
+        document.getElementById("accessOverlay").addEventListener("click", (event) => {
+            if (event.target.id === "accessOverlay") closeAccessDialog();
+        });
         document.getElementById("confirmationOverlay").addEventListener("click", (event) => {
             if (event.target.id === "confirmationOverlay") closeConfirmation();
         });
