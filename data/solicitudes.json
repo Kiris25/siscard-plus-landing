@@ -1330,10 +1330,10 @@
     "producto": "Prepago",
     "fechaSolicitud": "2026-09-09",
     "fechaRequerida": "2026-09-09T14:38",
-    "estado": "Enviada",
-    "aprobador": "",
+    "estado": "En revisión",
+    "aprobador": "Seguridad",
     "fechaCreacion": "2026-09-09T20:45:15.162Z",
-    "fechaActualizacion": "2026-09-09T20:45:15.162Z",
+    "fechaActualizacion": "2026-09-09T21:42:35.655Z",
     "comentarios": [],
     "historial": [
       {
@@ -1341,6 +1341,12 @@
         "fecha": "2026-09-09T20:45:15.162Z",
         "usuario": "PRUEBA",
         "comentario": "Solicitud enviada para revisión."
+      },
+      {
+        "estado": "En revisión",
+        "fecha": "2026-09-09T21:42:35.655Z",
+        "usuario": "Seguridad",
+        "comentario": "Solicitud actualizada a En revisión."
       }
     ],
     "parametros": [
@@ -1358,7 +1364,7 @@
         "nombre": "Franquicia",
         "producto": "Todos",
         "obligatorio": true,
-        "valor": "PRUEBA",
+        "valor": "KK",
         "revision": "Pendiente",
         "notaAprobador": ""
       },
@@ -1376,9 +1382,9 @@
         "nombre": "Tarjeta Corporativa",
         "producto": "Crédito Corporativo",
         "obligatorio": true,
-        "valor": "",
-        "revision": "Pendiente",
-        "notaAprobador": ""
+        "valor": "S = Sí",
+        "revision": "Requiere ajuste",
+        "notaAprobador": "NO SIRVE"
       },
       {
         "id": "f218524d-261a-45ae-83ba-ceb1878efb51",
@@ -1493,7 +1499,7 @@
         "nombre": "Línea de Emisor",
         "producto": "Todos",
         "obligatorio": true,
-        "valor": "Oro",
+        "valor": "Propietaria",
         "revision": "Pendiente",
         "notaAprobador": ""
       },
@@ -1520,7 +1526,7 @@
         "nombre": "Clase de Tarjeta",
         "producto": "Todos",
         "obligatorio": true,
-        "valor": "TA Tarjeta aduanal",
+        "valor": "ST ST",
         "revision": "Pendiente",
         "notaAprobador": ""
       },
@@ -1655,7 +1661,7 @@
         "nombre": "Estado en q/Nace la Cuenta",
         "producto": "Todos",
         "obligatorio": true,
-        "valor": "00 = Activa",
+        "valor": "02 = Cuenta Nueva",
         "revision": "Pendiente",
         "notaAprobador": ""
       },
@@ -1844,7 +1850,7 @@
         "nombre": "Generación de Cuentas",
         "producto": "Todos",
         "obligatorio": true,
-        "valor": "A = Aleatorio",
+        "valor": "C = Consecutivo",
         "revision": "Pendiente",
         "notaAprobador": ""
       },
@@ -1988,7 +1994,7 @@
         "nombre": "Pin Aleatorio",
         "producto": "Todos",
         "obligatorio": true,
-        "valor": "N = No",
+        "valor": "S = Sí",
         "revision": "Pendiente",
         "notaAprobador": ""
       },
@@ -1997,7 +2003,7 @@
         "nombre": "Genera Pin en Renovación",
         "producto": "Todos",
         "obligatorio": true,
-        "valor": "S = Sí",
+        "valor": "N = No",
         "revision": "Pendiente",
         "notaAprobador": ""
       },
@@ -2087,7 +2093,7 @@
         "nombre": "Permite Autorización Manual",
         "producto": "Todos",
         "obligatorio": true,
-        "valor": "N = No",
+        "valor": "S = Sí",
         "revision": "Pendiente",
         "notaAprobador": ""
       },
@@ -2249,7 +2255,7 @@
         "nombre": "Monitoreo Denegación",
         "producto": "Todos",
         "obligatorio": true,
-        "valor": "S = Sí",
+        "valor": "N = NO",
         "revision": "Pendiente",
         "notaAprobador": ""
       },
@@ -2429,7 +2435,7 @@
         "nombre": "Estado en que nace el Pin",
         "producto": "Todos",
         "obligatorio": true,
-        "valor": "No aplica",
+        "valor": "Activo",
         "revision": "Pendiente",
         "notaAprobador": ""
       },
@@ -2456,7 +2462,7 @@
         "nombre": "Valida Información del Ente Generación de Embozado",
         "producto": "Prepago",
         "obligatorio": true,
-        "valor": "S = Sí",
+        "valor": "",
         "revision": "Pendiente",
         "notaAprobador": ""
       },
@@ -2555,7 +2561,7 @@
         "nombre": "Cambio Diseño al Renovar.",
         "producto": "Todos",
         "obligatorio": true,
-        "valor": "S = Sí",
+        "valor": "N = No",
         "revision": "Pendiente",
         "notaAprobador": ""
       },
@@ -2586,6 +2592,7 @@
         "revision": "Pendiente",
         "notaAprobador": ""
       }
-    ]
+    ],
+    "fechaToma": "2026-09-09T21:42:35.655Z"
   }
 ]
