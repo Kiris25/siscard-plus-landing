@@ -1,25 +1,49 @@
 [
   {
-    "id": "PRUEBA2PRUEBA22090926",
+    "id": "PRUEBAPRUEBA1090926",
     "tipo": "formulario-parametros",
     "opcion": "05",
-    "cliente": "PRUEBA2",
-    "emisor": "PRUEBA2",
+    "cliente": "PRUEBA",
+    "emisor": "PRUEBA",
     "accion": "Agregar",
     "producto": "Corporativo",
     "fechaSolicitud": "2026-09-09",
     "fechaRequerida": "2026-09-09T14:49",
-    "estado": "Enviada",
-    "aprobador": "",
-    "fechaCreacion": "2026-09-09T22:05:00.607Z",
-    "fechaActualizacion": "2026-09-09T22:05:00.607Z",
+    "estado": "En revisión",
+    "aprobador": "Seguridad",
+    "fechaCreacion": "2026-09-09T20:50:54.581Z",
+    "fechaActualizacion": "2026-09-09T22:05:17.175Z",
     "comentarios": [],
     "historial": [
       {
         "estado": "Enviada",
-        "fecha": "2026-09-09T22:05:00.607Z",
-        "usuario": "PRUEBA2",
+        "fecha": "2026-09-09T20:50:54.581Z",
+        "usuario": "PRUEBA",
         "comentario": "Solicitud enviada para revisión."
+      },
+      {
+        "estado": "En revisión",
+        "fecha": "2026-09-09T21:42:16.171Z",
+        "usuario": "Seguridad",
+        "comentario": "Solicitud actualizada a En revisión."
+      },
+      {
+        "estado": "Requiere información",
+        "fecha": "2026-09-09T21:42:28.453Z",
+        "usuario": "Seguridad",
+        "comentario": "Solicitud actualizada a Requiere información."
+      },
+      {
+        "estado": "Enviada",
+        "fecha": "2026-09-09T21:49:14.734Z",
+        "usuario": "PRUEBA",
+        "comentario": "Solicitud corregida y enviada nuevamente para revisión."
+      },
+      {
+        "estado": "En revisión",
+        "fecha": "2026-09-09T22:05:17.175Z",
+        "usuario": "Seguridad",
+        "comentario": "Solicitud actualizada a En revisión."
       }
     ],
     "parametros": [
@@ -55,7 +79,7 @@
         "nombre": "Tarjeta Corporativa",
         "producto": "Crédito Corporativo",
         "obligatorio": true,
-        "valor": "S = Sí",
+        "valor": "N=No",
         "revision": "Pendiente",
         "notaAprobador": ""
       },
@@ -1265,56 +1289,7 @@
         "revision": "Pendiente",
         "notaAprobador": ""
       }
-    ]
-  },
-  {
-    "id": "PRUEBAPRUEBA1090926",
-    "tipo": "formulario-parametros",
-    "opcion": "05",
-    "cliente": "PRUEBA",
-    "emisor": "PRUEBA",
-    "accion": "Agregar",
-    "producto": "Corporativo",
-    "fechaSolicitud": "2026-09-09",
-    "fechaRequerida": "2026-09-09T14:49",
-    "estado": "En revisión",
-    "aprobador": "Seguridad",
-    "fechaCreacion": "2026-09-09T20:50:54.581Z",
-    "fechaActualizacion": "2026-09-09T22:04:23.645Z",
-    "comentarios": [],
-    "historial": [
-      {
-        "estado": "Enviada",
-        "fecha": "2026-09-09T20:50:54.581Z",
-        "usuario": "PRUEBA",
-        "comentario": "Solicitud enviada para revisión."
-      },
-      {
-        "estado": "En revisión",
-        "fecha": "2026-09-09T21:42:16.171Z",
-        "usuario": "Seguridad",
-        "comentario": "Solicitud actualizada a En revisión."
-      },
-      {
-        "estado": "Requiere información",
-        "fecha": "2026-09-09T21:42:28.453Z",
-        "usuario": "Seguridad",
-        "comentario": "Solicitud actualizada a Requiere información."
-      },
-      {
-        "estado": "Enviada",
-        "fecha": "2026-09-09T21:49:14.734Z",
-        "usuario": "PRUEBA",
-        "comentario": "Solicitud corregida y enviada nuevamente para revisión."
-      },
-      {
-        "estado": "En revisión",
-        "fecha": "2026-09-09T22:04:23.645Z",
-        "usuario": "Seguridad",
-        "comentario": "Solicitud actualizada a En revisión."
-      }
     ],
-    "parametros": [],
     "fechaToma": "2026-09-09T21:42:16.171Z",
     "fechaRevision": "2026-09-09T21:42:28.453Z"
   },
