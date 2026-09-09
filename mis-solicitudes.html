@@ -159,6 +159,11 @@
             color: #8a5b00;
         }
 
+        .status-badge[data-state="Enviada a corregir"] {
+            background: #e8f1ff;
+            color: #18599a;
+        }
+
         .status-badge[data-state="En revisión"] {
             background: #e8f1ff;
             color: #18599a;
@@ -672,6 +677,33 @@
         }
 
 
+        .detail-toolbar-actions button,
+        .row-actions button {
+            min-height: 30px;
+            padding: 5px 8px;
+            font-size: 10px;
+            line-height: 1;
+            white-space: nowrap;
+        }
+
+        .detail-value-box select {
+            width: 100%;
+            min-height: 38px;
+            padding: 8px 10px;
+            border-radius: var(--radius);
+            background: #ffffff;
+        }
+
+        .confirmation-summary {
+            margin-top: 12px;
+            padding: 11px;
+            border: 1px solid var(--request-line);
+            border-left: 4px solid var(--request-orange);
+            border-radius: var(--radius);
+            background: var(--request-soft);
+            color: var(--request-gray);
+        }
+
         @media (max-width: 850px) {
             .detail-grid {
                 grid-template-columns: 1fr;
@@ -786,22 +818,25 @@
                         <div class="detail-toolbar-actions">
                             <span class="status-badge" id="detailStatusBadge"></span>
                             <button class="tertiary-button" id="hideAllButton" type="button">
-                                Esconder todos
+                                − Todos
                             </button>
                             <button class="tertiary-button" id="showAllButton" type="button">
-                                Mostrar todos
+                                + Todos
                             </button>
                             <button class="tertiary-button" id="exportExcelButton" type="button">
-                                Exportar Excel
+                                Excel
                             </button>
                             <button class="tertiary-button" id="exportPdfButton" type="button">
-                                Exportar PDF
+                                PDF
+                            </button>
+                            <button class="tertiary-button" id="scrollTopButton" type="button" title="Volver arriba">
+                                ↑ Arriba
                             </button>
                             <button class="tertiary-button" id="detailBackButton" type="button">
                                 Volver
                             </button>
                             <button class="primary-button" id="submitCorrectionButton" type="button" hidden>
-                                Enviar corrección
+                                Enviar
                             </button>
                         </div>
                     </section>
@@ -824,6 +859,25 @@
             </main>
             <div id="footer-container"></div>
         </div>
+    </div>
+
+    <div class="modal-overlay" id="correctionConfirmationOverlay" hidden>
+        <section class="modal-dialog compact" role="dialog" aria-modal="true" aria-labelledby="correctionConfirmationTitle">
+            <header class="modal-header">
+                <div>
+                    <span class="section-kicker">Confirmación</span>
+                    <h2 id="correctionConfirmationTitle">Enviar corrección</h2>
+                </div>
+            </header>
+            <div class="modal-body">
+                <p>La solicitud será enviada nuevamente para revisión.</p>
+                <div class="confirmation-summary" id="correctionConfirmationSummary"></div>
+            </div>
+            <footer class="modal-footer">
+                <button class="tertiary-button" id="cancelCorrectionConfirmationButton" type="button">Cancelar</button>
+                <button class="primary-button" id="confirmCorrectionButton" type="button">Sí, enviar</button>
+            </footer>
+        </section>
     </div>
 
     <div class="modal-overlay" id="credentialOverlay" hidden>
@@ -872,6 +926,7 @@
         };
 
         const ACCESS_CREDENTIAL_KEY = "siscardAccessCredential";
+        const PARAMETER_BASE_URL = "https://kiris25.github.io/parametros-emisor-v2/data/externo/";
         let allRequests = [];
         let selectedRequest = null;
         let pendingCorrection = null;
@@ -1059,6 +1114,69 @@
             `;
         }
 
+        function allowedValuesFromRecord(record) {
+            const raw = String(
+                record?.valoresPermitidos ??
+                record?.valores ??
+                record?.opciones ??
+                record?.allowedValues ??
+                ""
+            ).trim();
+            if (!raw) return [];
+            return [...new Set(
+                raw
+                    .split(/\s*(?:\r?\n|[;,|/])\s*/)
+                    .map((value) => value.replace(/^[•*-]\s*/, "").trim())
+                    .filter((value) => value && value.length <= 100)
+            )];
+        }
+
+        async function enrichCorrectionParameters(request) {
+            try {
+                const response = await fetch(
+                    `${PARAMETER_BASE_URL}op${request.opcion}.json?v=${Date.now()}`,
+                    { cache: "no-store" }
+                );
+                if (!response.ok) return;
+                const catalog = await response.json();
+                if (!Array.isArray(catalog)) return;
+                request.parametros.forEach((parameter, index) => {
+                    const catalogItem = catalog.find((item) =>
+                        String(item.id ?? item.numero ?? item.codigo ?? item.orden ?? "") === String(parameter.id)
+                    ) || catalog[index];
+                    parameter.valoresPermitidos = allowedValuesFromRecord(catalogItem);
+                });
+            } catch (error) {
+                console.info("No se cargaron listas de valores para la corrección.", error);
+            }
+        }
+
+        function correctionControl(parameter) {
+            const values = Array.isArray(parameter.valoresPermitidos)
+                ? parameter.valoresPermitidos
+                : [];
+            if (values.length > 1) {
+                const options = values.map((value) => `
+                    <option value="${escapeHtml(value)}" ${String(value) === String(parameter.valor || "") ? "selected" : ""}>
+                        ${escapeHtml(value)}
+                    </option>
+                `).join("");
+                return `
+                    <select data-correction-id="${escapeHtml(parameter.id)}">
+                        <option value="">Seleccione un valor</option>
+                        ${options}
+                    </select>
+                `;
+            }
+            return `
+                <input
+                    data-correction-id="${escapeHtml(parameter.id)}"
+                    value="${escapeHtml(parameter.valor || "")}"
+                    placeholder="Ingrese el valor corregido"
+                >
+            `;
+        }
+
         function parameterMarkup(parameter, editable, index) {
             const requiresAdjustment = parameter.revision === "Requiere ajuste";
             const canEdit = editable && requiresAdjustment;
@@ -1083,13 +1201,7 @@
                     <div class="detail-parameter-body">
                         <div class="detail-value-box">
                             <label>${canEdit ? "Valor corregido" : "Valor enviado"}</label>
-                            ${canEdit ? `
-                                <input
-                                    data-correction-id="${escapeHtml(parameter.id)}"
-                                    value="${escapeHtml(parameter.valor || "")}"
-                                    placeholder="Ingrese el valor corregido"
-                                >
-                            ` : `
+                            ${canEdit ? correctionControl(parameter) : `
                                 <input value="${escapeHtml(parameter.valor || "Sin respuesta")}" readonly>
                             `}
                             ${parameter.notaAprobador ? `
@@ -1114,13 +1226,17 @@
             `).join("");
         }
 
-        function openDetail(requestId, correctionMode = false) {
+        async function openDetail(requestId, correctionMode = false) {
             const request = allRequests.find(
                 (item) => String(item.id) === String(requestId)
             );
             if (!request) return;
             selectedRequest = structuredClone(request);
             pendingCorrection = correctionMode ? selectedRequest : null;
+            if (correctionMode && pendingCorrection) {
+                await enrichCorrectionParameters(pendingCorrection);
+                selectedRequest = pendingCorrection;
+            }
             document.getElementById("requestsListView").hidden = true;
             const detailView = document.getElementById("requestDetailView");
             detailView.classList.add("active");
@@ -1141,9 +1257,13 @@
             const parameters = request.parametros || [];
             document.getElementById("detailParameterCount").textContent =
                 `${parameters.length} parámetro${parameters.length === 1 ? "" : "s"} enviados`;
+            const adjustmentCount = parameters.filter(
+                (parameter) => parameter.revision === "Requiere ajuste"
+            ).length;
+            const correctCount = parameters.length - adjustmentCount;
             document.getElementById("detailStatusText").textContent =
                 correctionMode
-                    ? "Complete únicamente los campos indicados por la revisión."
+                    ? `${adjustmentCount} por corregir · ${correctCount} ya correctos`
                     : `Última actualización: ${formatDateTime(request.fechaActualizacion)}`;
             const statusBadge = document.getElementById("detailStatusBadge");
             statusBadge.dataset.state = request.estado || "Enviada";
@@ -1325,6 +1445,9 @@
             document.getElementById("showAllButton").onclick = () => {
                 setAllParametersCollapsed(false);
             };
+            document.getElementById("scrollTopButton").onclick = () => {
+                window.scrollTo({ top: 0, behavior: "smooth" });
+            };
             document.getElementById("detailBackButton").onclick = closeDetail;
             document.getElementById("submitCorrectionButton").onclick = prepareCorrection;
             document.querySelectorAll("[data-parameter-toggle]").forEach((heading) => {
@@ -1334,42 +1457,67 @@
             });
         }
 
-        function prepareCorrection() {
-            if (!pendingCorrection) return;
-            const editableFields = Array.from(document.querySelectorAll("[data-correction-id]"));
+        function collectCorrectionValues() {
+            if (!pendingCorrection) return false;
+            const editableFields = Array.from(
+                document.querySelectorAll("[data-correction-id]")
+            );
             if (!editableFields.length) {
                 showToast("La revisión no contiene campos marcados para corrección.");
-                return;
+                return false;
             }
-            let invalid = false;
-            editableFields.forEach((control) => {
+            for (const control of editableFields) {
                 const value = control.value.trim();
+                if (!value) {
+                    control.focus();
+                    showToast("Complete todos los campos solicitados para continuar.");
+                    return false;
+                }
                 const parameter = pendingCorrection.parametros.find(
                     (item) => String(item.id) === String(control.dataset.correctionId)
                 );
-                if (!value) {
-                    control.focus();
-                    invalid = true;
-                    return;
-                }
                 if (parameter) {
                     parameter.valor = value;
                     parameter.revision = "Pendiente";
                     parameter.notaAprobador = "";
                 }
-            });
-            if (invalid) {
-                showToast("Complete todos los campos solicitados para continuar.");
-                return;
             }
-            pendingCorrection.estado = "Enviada";
+            pendingCorrection.parametros.forEach((parameter) => {
+                if (parameter.revision !== "Pendiente") {
+                    parameter.revision = "Correcto";
+                }
+            });
+            return true;
+        }
+
+        function prepareCorrection() {
+            if (!collectCorrectionValues()) return;
+            const corrected = pendingCorrection.parametros.filter(
+                (parameter) => parameter.revision === "Pendiente"
+            ).length;
+            document.getElementById("correctionConfirmationSummary").innerHTML = `
+                <strong>${escapeHtml(pendingCorrection.id)}</strong><br>
+                ${corrected} parámetro${corrected === 1 ? "" : "s"} corregido${corrected === 1 ? "" : "s"}.
+            `;
+            document.getElementById("correctionConfirmationOverlay").hidden = false;
+            document.body.style.overflow = "hidden";
+        }
+
+        function closeCorrectionConfirmation() {
+            document.getElementById("correctionConfirmationOverlay").hidden = true;
+            document.body.style.overflow = "";
+        }
+
+        function confirmCorrection() {
+            closeCorrectionConfirmation();
+            pendingCorrection.estado = "Enviada a corregir";
             pendingCorrection.fechaActualizacion = new Date().toISOString();
             pendingCorrection.historial = pendingCorrection.historial || [];
             pendingCorrection.historial.push({
-                estado: "Enviada",
+                estado: "Enviada a corregir",
                 fecha: pendingCorrection.fechaActualizacion,
                 usuario: pendingCorrection.cliente || "Solicitante",
-                comentario: "Solicitud corregida y enviada nuevamente para revisión."
+                comentario: "Correcciones enviadas nuevamente para revisión."
             });
             const credential = localStorage.getItem(ACCESS_CREDENTIAL_KEY) || "";
             if (!credential) {
@@ -1459,9 +1607,9 @@
                 }
                 localStorage.setItem(ACCESS_CREDENTIAL_KEY, credential);
                 closeCredentialDialog();
+                await loadRequests();
                 closeDetail();
                 showToast("La corrección fue enviada nuevamente para revisión.");
-                await loadRequests();
             } catch (error) {
                 console.error(error);
                 if (error.message === "CREDENTIAL_INVALID") {
@@ -1474,7 +1622,7 @@
             } finally {
                 if (submitButton) {
                     submitButton.disabled = false;
-                    submitButton.textContent = "Enviar corrección";
+                    submitButton.textContent = "Enviar";
                 }
                 continueButton.disabled = false;
                 continueButton.textContent = "Continuar";
@@ -1509,6 +1657,13 @@
             }
         });
 
+        document.getElementById("cancelCorrectionConfirmationButton").addEventListener("click", closeCorrectionConfirmation);
+        document.getElementById("confirmCorrectionButton").addEventListener("click", confirmCorrection);
+        document.getElementById("correctionConfirmationOverlay").addEventListener("click", (event) => {
+            if (event.target.id === "correctionConfirmationOverlay") {
+                closeCorrectionConfirmation();
+            }
+        });
         document.getElementById("cancelCredentialButton").addEventListener("click", closeCredentialDialog);
         document.getElementById("continueCredentialButton").addEventListener("click", continueWithCredential);
         document.getElementById("accessCredential").addEventListener("keydown", (event) => {
