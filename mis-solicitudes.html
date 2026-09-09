@@ -3,58 +3,439 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Seguimiento de solicitudes Siscard+">
     <title>Mis solicitudes | Landing Siscard+</title>
     <link rel="stylesheet" href="css/styles.css">
     <style>
-        :root { --orange:#ff6c0c; --gray:#58595b; --line:#dedede; --soft:#f6f6f6; --green:#1f7a4d; --red:#b42318; --blue:#2563a8; }
-        * { box-sizing:border-box; }
-        body { margin:0; font-family:Segoe UI,Arial,sans-serif; color:#2f3133; background:#f5f5f5; }
-        .app-shell { display:grid; grid-template-columns:var(--sidebar-width,260px) minmax(0,1fr); min-height:100vh; }
-        .main-area { min-width:0; }
-        .content { padding:24px; }
-        .hero,.panel { border:1px solid var(--line); border-radius:14px; background:#fff; box-shadow:0 8px 24px rgba(0,0,0,.06); }
-        .hero { padding:26px; border-top:5px solid var(--orange); }
-        .hero h1 { margin:5px 0 8px; color:var(--gray); font-weight:400; }
-        .hero p { margin:0; color:#6c6d70; }
-        .kicker { color:var(--orange); font-size:12px; font-weight:800; text-transform:uppercase; }
-        .filters { display:flex; flex-wrap:wrap; gap:10px; margin:18px 0; }
-        input,select,textarea,button { font:inherit; }
-        input,select,textarea { min-height:42px; padding:9px 11px; border:1px solid #c9c9c9; border-radius:8px; background:#fff; }
-        .filters input { flex:1 1 260px; }
-        button { cursor:pointer; }
-        .btn { min-height:38px; padding:8px 13px; border:1px solid var(--orange); border-radius:8px; background:#fff; color:#b94700; font-weight:700; }
-        .btn.primary { background:var(--orange); color:#fff; }
-        .btn.danger { border-color:var(--red); color:var(--red); }
-        .stats { display:grid; grid-template-columns:repeat(6,minmax(120px,1fr)); gap:9px; margin:18px 0; }
-        .stat { padding:12px; border:1px solid var(--line); border-radius:10px; background:#fff; }
-        .stat strong,.stat span { display:block; }
-        .stat strong { font-size:22px; color:var(--gray); }
-        .stat span { color:#777; font-size:12px; }
-        .panel { overflow:hidden; }
-        .table-wrap { overflow:auto; }
-        table { width:100%; border-collapse:collapse; }
-        th,td { padding:12px; border-bottom:1px solid #e8e8e8; text-align:left; vertical-align:top; }
-        th { background:var(--soft); color:var(--gray); font-size:12px; text-transform:uppercase; }
-        .badge { display:inline-flex; padding:5px 9px; border-radius:999px; font-size:11px; font-weight:800; background:#eee; }
-        .badge[data-state="Enviada"] { background:#fff2d6; color:#8a5b00; }
-        .badge[data-state="En revisión"] { background:#e8f1ff; color:#18599a; }
-        .badge[data-state="Requiere información"] { background:#fff0df; color:#a64b00; }
-        .badge[data-state="Aprobada"] { background:#e4f7ec; color:#17663e; }
-        .badge[data-state="Completada"] { background:#dff5ee; color:#0f684c; }
-        .badge[data-state="Rechazada"] { background:#fde7e7; color:#a12626; }
-        .actions { display:flex; flex-wrap:wrap; gap:6px; }
-        .empty { padding:42px; text-align:center; color:#777; }
-        dialog { width:min(760px,calc(100vw - 28px)); max-height:88vh; overflow:auto; border:0; border-radius:14px; box-shadow:0 24px 70px rgba(0,0,0,.3); }
-        dialog::backdrop { background:rgba(0,0,0,.45); }
-        .dialog-head { display:flex; justify-content:space-between; gap:12px; align-items:center; border-bottom:1px solid var(--line); padding-bottom:12px; }
-        .detail-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; margin:14px 0; }
-        .detail { padding:10px; border:1px solid var(--line); border-radius:8px; background:var(--soft); }
-        .detail small,.detail strong { display:block; }
-        .detail small { color:#777; }
-        .parameter-row,.history-row { padding:10px 0; border-bottom:1px solid #eee; }
-        .comment-box { width:100%; min-height:90px; margin-top:12px; }
-        @media(max-width:900px){ .app-shell{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}.detail-grid{grid-template-columns:1fr}.content{padding:14px} }
-</style>
+        [hidden] {
+            display: none !important;
+        }
+
+        :root {
+            --request-orange: #ff6c0c;
+            --request-gray: #58595b;
+            --request-line: #dedede;
+            --request-soft: #f6f6f6;
+            --request-green: #1f7a4d;
+            --request-red: #b42318;
+            --request-blue: #2563a8;
+        }
+
+        .requests-hero,
+        .requests-panel {
+            border: 1px solid var(--request-line);
+            border-radius: var(--radius-large);
+            background: #ffffff;
+            box-shadow: var(--shadow-small);
+        }
+
+        .requests-hero {
+            padding: 26px;
+            border-top: 5px solid var(--request-orange);
+        }
+
+        .requests-hero h1 {
+            margin: 5px 0 8px;
+            color: var(--request-gray);
+            font-weight: 400;
+        }
+
+        .requests-hero p {
+            margin: 0;
+            color: var(--muted);
+        }
+
+        .requests-toolbar {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+            margin: 18px 0;
+        }
+
+        .requests-toolbar input {
+            flex: 1 1 280px;
+            min-height: 42px;
+            padding: 9px 11px;
+            border-radius: var(--radius);
+        }
+
+        .requests-toolbar select {
+            min-width: 210px;
+            min-height: 42px;
+            padding: 9px 11px;
+            border-radius: var(--radius);
+        }
+
+        .refresh-button {
+            min-height: 42px;
+        }
+
+        .requests-summary {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--request-line);
+            background: var(--surface-soft);
+        }
+
+        .requests-summary strong,
+        .requests-summary small {
+            display: block;
+        }
+
+        .requests-summary small {
+            margin-top: 3px;
+            color: var(--muted);
+        }
+
+        .requests-panel {
+            overflow: hidden;
+        }
+
+        .table-wrap {
+            overflow-x: auto;
+        }
+
+        .requests-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .requests-table th,
+        .requests-table td {
+            padding: 12px;
+            border-bottom: 1px solid #e8e8e8;
+            text-align: left;
+            vertical-align: middle;
+        }
+
+        .requests-table th {
+            background: var(--request-soft);
+            color: var(--request-gray);
+            font-size: 11px;
+            font-weight: 850;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        .requests-table tbody tr:hover {
+            background: #fffaf6;
+        }
+
+        .request-id {
+            color: var(--request-orange);
+            font-size: 12px;
+            font-weight: 850;
+            white-space: nowrap;
+        }
+
+        .request-option strong,
+        .request-option small {
+            display: block;
+        }
+
+        .request-option small {
+            margin-top: 3px;
+            color: var(--muted);
+        }
+
+        .status-badge {
+            display: inline-flex;
+            padding: 5px 9px;
+            border-radius: 999px;
+            background: #eeeeee;
+            font-size: 11px;
+            font-weight: 850;
+            white-space: nowrap;
+        }
+
+        .status-badge[data-state="Enviada"],
+        .status-badge[data-state="Pendiente"] {
+            background: #fff2d6;
+            color: #8a5b00;
+        }
+
+        .status-badge[data-state="En revisión"] {
+            background: #e8f1ff;
+            color: #18599a;
+        }
+
+        .status-badge[data-state="Requiere información"] {
+            background: #fff0df;
+            color: #a64b00;
+        }
+
+        .status-badge[data-state="Aprobada"] {
+            background: #e4f7ec;
+            color: #17663e;
+        }
+
+        .status-badge[data-state="Completada"] {
+            background: #dff5ee;
+            color: #0f684c;
+        }
+
+        .status-badge[data-state="Rechazada"] {
+            background: #fde7e7;
+            color: #a12626;
+        }
+
+        .row-actions {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .row-actions button {
+            min-height: 34px;
+            padding: 6px 10px;
+            font-size: 11px;
+        }
+
+        .empty-state,
+        .loading-state,
+        .error-state {
+            padding: 42px;
+            text-align: center;
+        }
+
+        .empty-state,
+        .loading-state {
+            color: var(--muted);
+        }
+
+        .error-state {
+            color: var(--request-red);
+        }
+
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 1200;
+            display: grid;
+            place-items: center;
+            padding: 22px;
+            background: rgba(25, 25, 25, 0.72);
+            backdrop-filter: blur(4px);
+        }
+
+        .modal-dialog {
+            width: min(900px, 100%);
+            max-height: calc(100vh - 44px);
+            overflow: hidden;
+            border-radius: var(--radius-large);
+            background: #ffffff;
+            box-shadow: 0 24px 70px rgba(0, 0, 0, 0.30);
+        }
+
+        .modal-dialog.compact {
+            width: min(500px, 100%);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            gap: 16px;
+            align-items: flex-start;
+            padding: 20px 24px 16px;
+            border-top: 5px solid var(--request-orange);
+            border-bottom: 1px solid var(--request-line);
+        }
+
+        .modal-header h2 {
+            margin: 4px 0 0;
+            color: var(--sidebar);
+            font-weight: 400;
+        }
+
+        .modal-close {
+            width: 36px;
+            height: 36px;
+            border: 1px solid var(--request-line);
+            border-radius: 50%;
+            background: #ffffff;
+            color: var(--request-gray);
+            cursor: pointer;
+        }
+
+        .modal-body {
+            max-height: calc(100vh - 190px);
+            overflow-y: auto;
+            padding: 20px 24px;
+        }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 10px;
+        }
+
+        .detail-item {
+            padding: 11px;
+            border: 1px solid var(--request-line);
+            border-radius: var(--radius);
+            background: var(--request-soft);
+        }
+
+        .detail-item strong,
+        .detail-item span {
+            display: block;
+        }
+
+        .detail-item strong {
+            color: var(--muted);
+            font-size: 10px;
+            text-transform: uppercase;
+        }
+
+        .detail-item span {
+            margin-top: 4px;
+            color: var(--sidebar);
+            font-weight: 750;
+        }
+
+        .detail-section {
+            margin-top: 20px;
+        }
+
+        .detail-section h3 {
+            margin: 0 0 10px;
+            color: var(--sidebar);
+            font-weight: 500;
+        }
+
+        .parameter-item,
+        .history-item {
+            padding: 12px;
+            border: 1px solid var(--request-line);
+            border-radius: var(--radius);
+            background: #ffffff;
+        }
+
+        .parameter-item + .parameter-item,
+        .history-item + .history-item {
+            margin-top: 8px;
+        }
+
+        .parameter-heading {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            align-items: flex-start;
+        }
+
+        .parameter-heading strong,
+        .parameter-heading small {
+            display: block;
+        }
+
+        .parameter-heading small {
+            margin-top: 3px;
+            color: var(--muted);
+        }
+
+        .parameter-value {
+            margin-top: 8px;
+            color: var(--sidebar);
+            font-weight: 750;
+        }
+
+        .review-note {
+            margin-top: 9px;
+            padding: 9px 11px;
+            border-left: 4px solid var(--request-orange);
+            background: var(--orange-soft);
+            color: var(--request-gray);
+        }
+
+        .correction-field {
+            width: 100%;
+            min-height: 42px;
+            margin-top: 8px;
+            padding: 9px 11px;
+            border-radius: var(--radius);
+        }
+
+        .history-item strong,
+        .history-item small,
+        .history-item span {
+            display: block;
+        }
+
+        .history-item small {
+            margin-top: 3px;
+            color: var(--muted);
+        }
+
+        .history-item span {
+            margin-top: 7px;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+            padding: 16px 24px;
+            border-top: 1px solid var(--request-line);
+            background: var(--request-soft);
+        }
+
+        .credential-field label {
+            display: block;
+            margin-bottom: 7px;
+            color: var(--sidebar);
+            font-size: 11px;
+            font-weight: 850;
+            text-transform: uppercase;
+        }
+
+        .credential-field input {
+            width: 100%;
+            min-height: 45px;
+            padding: 10px 12px;
+            border-radius: var(--radius);
+        }
+
+        .credential-message {
+            display: block;
+            min-height: 18px;
+            margin-top: 7px;
+            color: var(--request-red);
+            font-size: 11px;
+        }
+
+        @media (max-width: 850px) {
+            .detail-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .requests-table th:nth-child(3),
+            .requests-table td:nth-child(3),
+            .requests-table th:nth-child(6),
+            .requests-table td:nth-child(6) {
+                display: none;
+            }
+        }
+
+        @media (max-width: 620px) {
+            .content {
+                padding: 14px;
+            }
+
+            .requests-toolbar select {
+                width: 100%;
+            }
+
+            .requests-table th:nth-child(4),
+            .requests-table td:nth-child(4) {
+                display: none;
+            }
+        }
+    </style>
 </head>
 <body data-page-title="Mis solicitudes" data-page-subtitle="Seguimiento de gestiones">
     <div class="app-shell">
@@ -62,17 +443,599 @@
         <div class="main-area">
             <div id="topbar-container"></div>
             <main class="content">
-<section class="hero"><span class="kicker">Seguimiento</span><h1>Mis solicitudes</h1><p>Consulte el estado, el responsable y el historial de las solicitudes enviadas.</p></section>
-<div class="filters"><input id="search" type="search" placeholder="Buscar por ID, emisor u opción"><select id="state"><option value="">Todos los estados</option><option>Enviada</option><option>En revisión</option><option>Requiere información</option><option>Aprobada</option><option>Completada</option><option>Rechazada</option></select></div>
-<section class="panel"><div id="cards"></div><div class="empty" id="empty" hidden>No hay solicitudes registradas en este navegador.</div></section></main>
+                <section class="requests-hero">
+                    <span class="section-kicker">Seguimiento</span>
+                    <h1>Mis solicitudes</h1>
+                    <p>Consulte las solicitudes enviadas, su estado actual y las observaciones de la revisión.</p>
+                </section>
+
+                <section class="requests-toolbar" aria-label="Filtros de solicitudes">
+                    <input
+                        id="requestSearch"
+                        type="search"
+                        placeholder="Buscar por solicitud, cliente, emisor u opción"
+                    >
+                    <select id="requestState">
+                        <option value="">Todos los estados</option>
+                        <option value="Enviada">Enviada</option>
+                        <option value="En revisión">En revisión</option>
+                        <option value="Requiere información">Requiere información</option>
+                        <option value="Aprobada">Aprobada</option>
+                        <option value="Completada">Completada</option>
+                        <option value="Rechazada">Rechazada</option>
+                    </select>
+                    <button class="tertiary-button refresh-button" id="refreshButton" type="button">
+                        Actualizar
+                    </button>
+                </section>
+
+                <section class="requests-panel">
+                    <header class="requests-summary">
+                        <div>
+                            <strong id="requestCount">Cargando solicitudes...</strong>
+                            <small>Información sincronizada con el registro central.</small>
+                        </div>
+                    </header>
+                    <div class="table-wrap">
+                        <table class="requests-table">
+                            <thead>
+                                <tr>
+                                    <th>Solicitud</th>
+                                    <th>Fecha de envío</th>
+                                    <th>Cliente</th>
+                                    <th>Emisor / opción</th>
+                                    <th>Estado</th>
+                                    <th>Última actualización</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="requestsBody"></tbody>
+                        </table>
+                    </div>
+                    <div class="loading-state" id="loadingState">Cargando solicitudes...</div>
+                    <div class="empty-state" id="emptyState" hidden>No hay solicitudes para mostrar.</div>
+                    <div class="error-state" id="errorState" hidden>No fue posible cargar las solicitudes.</div>
+                </section>
+            </main>
             <div id="footer-container"></div>
         </div>
     </div>
+
+    <div class="modal-overlay" id="detailOverlay" hidden>
+        <section class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="detailTitle">
+            <header class="modal-header">
+                <div>
+                    <span class="section-kicker">Detalle de la gestión</span>
+                    <h2 id="detailTitle">Solicitud</h2>
+                </div>
+                <button class="modal-close" id="closeDetailButton" type="button" aria-label="Cerrar">×</button>
+            </header>
+            <div class="modal-body" id="detailBody"></div>
+            <footer class="modal-footer" id="detailFooter">
+                <button class="tertiary-button" id="closeDetailFooterButton" type="button">Cerrar</button>
+            </footer>
+        </section>
+    </div>
+
+    <div class="modal-overlay" id="credentialOverlay" hidden>
+        <section class="modal-dialog compact" role="dialog" aria-modal="true" aria-labelledby="credentialTitle">
+            <header class="modal-header">
+                <div>
+                    <span class="section-kicker">Validación</span>
+                    <h2 id="credentialTitle">Autenticación requerida</h2>
+                </div>
+            </header>
+            <div class="modal-body">
+                <div class="credential-field">
+                    <label for="accessCredential">Credencial de acceso</label>
+                    <input
+                        id="accessCredential"
+                        type="password"
+                        autocomplete="off"
+                        spellcheck="false"
+                        placeholder="Ingrese la credencial"
+                    >
+                    <small class="credential-message" id="credentialMessage"></small>
+                </div>
+            </div>
+            <footer class="modal-footer">
+                <button class="tertiary-button" id="cancelCredentialButton" type="button">Cancelar</button>
+                <button class="primary-button" id="continueCredentialButton" type="button">Continuar</button>
+            </footer>
+        </section>
+    </div>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
     <script src="js/layout.js"></script>
     <script src="js/app.js"></script>
     <script>
-"use strict";
-const esc=(v)=>String(v??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-function render(){const q=search.value.toLowerCase();const st=state.value;const items=JSON.parse(localStorage.getItem("siscardRequests")||"[]").filter(i=>(!st||i.estado===st)&&[i.id,i.emisor,i.opcion,i.cliente].join(" ").toLowerCase().includes(q));cards.innerHTML=items.map(i=>`<article style="padding:18px;border-bottom:1px solid #e6e6e6"><div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap"><div><span class="kicker">${esc(i.id)}</span><h2 style="margin:5px 0">OP${esc(i.opcion)} · ${esc(i.emisor)}</h2><small>${esc(i.cliente)} · Aprobador: ${esc(i.aprobador||"Seguridad")}</small></div><span class="badge" data-state="${esc(i.estado)}">${esc(i.estado)}</span></div><div class="detail-grid">${(i.parametros||[]).map(p=>`<div class="detail"><small>${esc(p.nombre||p.id)}</small><strong>${esc(p.valor)}</strong></div>`).join("")}</div><h3>Historial</h3>${(i.historial||[]).map(h=>`<div class="history-row"><strong>${esc(h.estado)}</strong> · ${esc(h.usuario||"")}<br><small>${esc(h.fecha||"")}</small><br>${esc(h.comentario||"")}</div>`).join("")}</article>`).join("");empty.hidden=items.length>0;}search.addEventListener("input",render);state.addEventListener("change",render);window.addEventListener("storage",render);render();</script>
+        "use strict";
+
+        const GITHUB_SETTINGS = {
+            owner: "Kiris25",
+            repository: "siscard-plus-landing",
+            branch: "main",
+            path: "data/solicitudes.json"
+        };
+
+        const ACCESS_CREDENTIAL_KEY = "siscardAccessCredential";
+        let allRequests = [];
+        let selectedRequest = null;
+        let pendingCorrection = null;
+
+        const requestsBody = document.getElementById("requestsBody");
+        const loadingState = document.getElementById("loadingState");
+        const emptyState = document.getElementById("emptyState");
+        const errorState = document.getElementById("errorState");
+
+        function escapeHtml(value) {
+            const temporary = document.createElement("div");
+            temporary.textContent = String(value ?? "");
+            return temporary.innerHTML;
+        }
+
+        function normalize(value) {
+            return String(value ?? "")
+                .toLowerCase()
+                .normalize("NFD")
+                .replace(/[\u0300-\u036f]/g, "")
+                .trim();
+        }
+
+        function formatDateTime(value) {
+            if (!value) return "Sin fecha";
+            const date = new Date(value);
+            if (Number.isNaN(date.getTime())) return String(value);
+            return new Intl.DateTimeFormat("es-CR", {
+                dateStyle: "short",
+                timeStyle: "short"
+            }).format(date);
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById("toast");
+            toast.textContent = message;
+            toast.classList.add("show");
+            window.setTimeout(() => toast.classList.remove("show"), 3000);
+        }
+
+        function publicRequestsUrl() {
+            return `${GITHUB_SETTINGS.path}?v=${Date.now()}`;
+        }
+
+        function githubApiUrl() {
+            const path = GITHUB_SETTINGS.path
+                .split("/")
+                .map((part) => encodeURIComponent(part))
+                .join("/");
+            return `https://api.github.com/repos/${GITHUB_SETTINGS.owner}/${GITHUB_SETTINGS.repository}/contents/${path}`;
+        }
+
+        function githubHeaders(credential) {
+            return {
+                Accept: "application/vnd.github+json",
+                Authorization: `Bearer ${credential}`,
+                "X-GitHub-Api-Version": "2022-11-28"
+            };
+        }
+
+        function utf8ToBase64(value) {
+            const bytes = new TextEncoder().encode(value);
+            let binary = "";
+            bytes.forEach((byte) => {
+                binary += String.fromCharCode(byte);
+            });
+            return btoa(binary);
+        }
+
+        function base64ToUtf8(value) {
+            const binary = atob(String(value || "").replace(/\s/g, ""));
+            const bytes = Uint8Array.from(
+                binary,
+                (character) => character.charCodeAt(0)
+            );
+            return new TextDecoder().decode(bytes);
+        }
+
+        async function loadRequests() {
+            loadingState.hidden = false;
+            emptyState.hidden = true;
+            errorState.hidden = true;
+            requestsBody.innerHTML = "";
+            try {
+                const response = await fetch(publicRequestsUrl(), {
+                    cache: "no-store"
+                });
+                if (!response.ok) {
+                    throw new Error(`HTTP_${response.status}`);
+                }
+                const data = await response.json();
+                if (!Array.isArray(data)) {
+                    throw new Error("INVALID_STRUCTURE");
+                }
+                allRequests = data.sort((a, b) => {
+                    const first = Date.parse(a.fechaCreacion || "") || 0;
+                    const second = Date.parse(b.fechaCreacion || "") || 0;
+                    return second - first;
+                });
+                renderRequests();
+            } catch (error) {
+                console.error(error);
+                document.getElementById("requestCount").textContent = "Sin información disponible";
+                errorState.hidden = false;
+            } finally {
+                loadingState.hidden = true;
+            }
+        }
+
+        function filteredRequests() {
+            const query = normalize(document.getElementById("requestSearch").value);
+            const state = document.getElementById("requestState").value;
+            return allRequests.filter((request) => {
+                const stateMatches = !state || request.estado === state;
+                const searchable = normalize([
+                    request.id,
+                    request.cliente,
+                    request.emisor,
+                    request.opcion,
+                    request.accion,
+                    request.producto
+                ].join(" "));
+                return stateMatches && (!query || searchable.includes(query));
+            });
+        }
+
+        function renderRequests() {
+            const requests = filteredRequests();
+            document.getElementById("requestCount").textContent =
+                `${requests.length} solicitud${requests.length === 1 ? "" : "es"}`;
+            requestsBody.innerHTML = requests.map((request) => {
+                const needsCorrection = request.estado === "Requiere información";
+                return `
+                    <tr>
+                        <td>
+                            <span class="request-id">${escapeHtml(request.id || "Sin ID")}</span>
+                        </td>
+                        <td>${escapeHtml(formatDateTime(request.fechaCreacion || request.fechaSolicitud))}</td>
+                        <td>${escapeHtml(request.cliente || "Sin información")}</td>
+                        <td>
+                            <div class="request-option">
+                                <strong>${escapeHtml(request.emisor || "Sin emisor")}</strong>
+                                <small>OP${escapeHtml(request.opcion || "")} · ${escapeHtml(request.accion || "")}</small>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="status-badge" data-state="${escapeHtml(request.estado || "Enviada")}">
+                                ${escapeHtml(request.estado || "Enviada")}
+                            </span>
+                        </td>
+                        <td>${escapeHtml(formatDateTime(request.fechaActualizacion))}</td>
+                        <td>
+                            <div class="row-actions">
+                                <button
+                                    class="tertiary-button"
+                                    type="button"
+                                    data-view-id="${escapeHtml(request.id)}"
+                                >
+                                    Ver detalle
+                                </button>
+                                ${needsCorrection ? `
+                                    <button
+                                        class="primary-button"
+                                        type="button"
+                                        data-correct-id="${escapeHtml(request.id)}"
+                                    >
+                                        Corregir
+                                    </button>
+                                ` : ""}
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join("");
+            emptyState.hidden = requests.length > 0;
+        }
+
+        function detailItem(label, value) {
+            return `
+                <div class="detail-item">
+                    <strong>${escapeHtml(label)}</strong>
+                    <span>${escapeHtml(value || "Sin información")}</span>
+                </div>
+            `;
+        }
+
+        function parameterMarkup(parameter, editable) {
+            const requiresAdjustment = parameter.revision === "Requiere ajuste";
+            const canEdit = editable && requiresAdjustment;
+            return `
+                <article class="parameter-item">
+                    <div class="parameter-heading">
+                        <div>
+                            <strong>${escapeHtml(parameter.nombre || parameter.id)}</strong>
+                            <small>${escapeHtml(parameter.producto || "Todos")}</small>
+                        </div>
+                        <span class="status-badge" data-state="${requiresAdjustment ? "Requiere información" : "Aprobada"}">
+                            ${escapeHtml(parameter.revision || "Pendiente")}
+                        </span>
+                    </div>
+                    ${canEdit ? `
+                        <input
+                            class="correction-field"
+                            data-correction-id="${escapeHtml(parameter.id)}"
+                            value="${escapeHtml(parameter.valor || "")}"
+                            placeholder="Ingrese el valor corregido"
+                        >
+                    ` : `
+                        <div class="parameter-value">${escapeHtml(parameter.valor || "Sin respuesta")}</div>
+                    `}
+                    ${parameter.notaAprobador ? `
+                        <div class="review-note">
+                            <strong>Observación de la revisión</strong><br>
+                            ${escapeHtml(parameter.notaAprobador)}
+                        </div>
+                    ` : ""}
+                </article>
+            `;
+        }
+
+        function historyMarkup(history) {
+            return (history || []).slice().reverse().map((movement) => `
+                <article class="history-item">
+                    <strong>${escapeHtml(movement.estado || "Actualización")}</strong>
+                    <small>${escapeHtml(formatDateTime(movement.fecha))} · ${escapeHtml(movement.usuario || "")}</small>
+                    <span>${escapeHtml(movement.comentario || "Sin comentario")}</span>
+                </article>
+            `).join("");
+        }
+
+        function openDetail(requestId, correctionMode = false) {
+            const request = allRequests.find((item) => String(item.id) === String(requestId));
+            if (!request) return;
+            selectedRequest = structuredClone(request);
+            pendingCorrection = correctionMode ? selectedRequest : null;
+            document.getElementById("detailTitle").textContent = correctionMode
+                ? `Corregir ${request.id}`
+                : `Solicitud ${request.id}`;
+            document.getElementById("detailBody").innerHTML = `
+                <div class="detail-grid">
+                    ${detailItem("Cliente", request.cliente)}
+                    ${detailItem("Emisor", request.emisor)}
+                    ${detailItem("Opción", `OP${request.opcion || ""}`)}
+                    ${detailItem("Acción", request.accion)}
+                    ${detailItem("Producto", request.producto)}
+                    ${detailItem("Estado", request.estado)}
+                    ${detailItem("Fecha de envío", formatDateTime(request.fechaCreacion || request.fechaSolicitud))}
+                    ${detailItem("Última actualización", formatDateTime(request.fechaActualizacion))}
+                    ${detailItem("Responsable", request.aprobador || "Seguridad")}
+                </div>
+                <section class="detail-section">
+                    <h3>${correctionMode ? "Campos por corregir" : "Parámetros enviados"}</h3>
+                    ${(request.parametros || []).map((parameter) =>
+                        parameterMarkup(parameter, correctionMode)
+                    ).join("") || '<div class="empty-state">No hay parámetros registrados.</div>'}
+                </section>
+                <section class="detail-section">
+                    <h3>Historial</h3>
+                    ${historyMarkup(request.historial) || '<div class="empty-state">No hay movimientos registrados.</div>'}
+                </section>
+            `;
+            document.getElementById("detailFooter").innerHTML = correctionMode
+                ? `
+                    <button class="tertiary-button" id="cancelCorrectionButton" type="button">Cancelar</button>
+                    <button class="primary-button" id="submitCorrectionButton" type="button">Enviar corrección</button>
+                `
+                : `
+                    <button class="tertiary-button" id="closeDetailFooterButton" type="button">Cerrar</button>
+                `;
+            document.getElementById("detailOverlay").hidden = false;
+            document.body.style.overflow = "hidden";
+            attachDetailActions();
+        }
+
+        function closeDetail() {
+            document.getElementById("detailOverlay").hidden = true;
+            document.body.style.overflow = "";
+            selectedRequest = null;
+            pendingCorrection = null;
+        }
+
+        function attachDetailActions() {
+            document.getElementById("closeDetailFooterButton")?.addEventListener("click", closeDetail);
+            document.getElementById("cancelCorrectionButton")?.addEventListener("click", closeDetail);
+            document.getElementById("submitCorrectionButton")?.addEventListener("click", prepareCorrection);
+        }
+
+        function prepareCorrection() {
+            if (!pendingCorrection) return;
+            const editableFields = Array.from(document.querySelectorAll("[data-correction-id]"));
+            if (!editableFields.length) {
+                showToast("La revisión no contiene campos marcados para corrección.");
+                return;
+            }
+            let invalid = false;
+            editableFields.forEach((control) => {
+                const value = control.value.trim();
+                const parameter = pendingCorrection.parametros.find(
+                    (item) => String(item.id) === String(control.dataset.correctionId)
+                );
+                if (!value) {
+                    control.focus();
+                    invalid = true;
+                    return;
+                }
+                if (parameter) {
+                    parameter.valor = value;
+                    parameter.revision = "Pendiente";
+                    parameter.notaAprobador = "";
+                }
+            });
+            if (invalid) {
+                showToast("Complete todos los campos solicitados para continuar.");
+                return;
+            }
+            pendingCorrection.estado = "Enviada";
+            pendingCorrection.fechaActualizacion = new Date().toISOString();
+            pendingCorrection.historial = pendingCorrection.historial || [];
+            pendingCorrection.historial.push({
+                estado: "Enviada",
+                fecha: pendingCorrection.fechaActualizacion,
+                usuario: pendingCorrection.cliente || "Solicitante",
+                comentario: "Solicitud corregida y enviada nuevamente para revisión."
+            });
+            const credential = localStorage.getItem(ACCESS_CREDENTIAL_KEY) || "";
+            if (!credential) {
+                openCredentialDialog();
+                return;
+            }
+            saveCorrection(credential);
+        }
+
+        function openCredentialDialog(message = "") {
+            document.getElementById("credentialMessage").textContent = message;
+            document.getElementById("accessCredential").value = "";
+            document.getElementById("credentialOverlay").hidden = false;
+            document.getElementById("accessCredential").focus();
+        }
+
+        function closeCredentialDialog() {
+            document.getElementById("credentialOverlay").hidden = true;
+            document.getElementById("credentialMessage").textContent = "";
+            document.getElementById("accessCredential").value = "";
+        }
+
+        async function readRemoteRequests(credential) {
+            const response = await fetch(
+                `${githubApiUrl()}?ref=${encodeURIComponent(GITHUB_SETTINGS.branch)}&v=${Date.now()}`,
+                {
+                    headers: githubHeaders(credential),
+                    cache: "no-store"
+                }
+            );
+            if (response.status === 401 || response.status === 403) {
+                throw new Error("CREDENTIAL_INVALID");
+            }
+            if (!response.ok) {
+                throw new Error(`READ_FAILED_${response.status}`);
+            }
+            const file = await response.json();
+            const requests = JSON.parse(base64ToUtf8(file.content || "[]"));
+            if (!Array.isArray(requests)) {
+                throw new Error("INVALID_STRUCTURE");
+            }
+            return {
+                requests,
+                sha: file.sha
+            };
+        }
+
+        async function saveCorrection(credential, retry = true) {
+            const submitButton = document.getElementById("submitCorrectionButton");
+            const continueButton = document.getElementById("continueCredentialButton");
+            if (submitButton) {
+                submitButton.disabled = true;
+                submitButton.textContent = "Enviando...";
+            }
+            continueButton.disabled = true;
+            continueButton.textContent = "Validando...";
+            try {
+                const current = await readRemoteRequests(credential);
+                const index = current.requests.findIndex(
+                    (item) => String(item.id) === String(pendingCorrection.id)
+                );
+                if (index < 0) {
+                    throw new Error("REQUEST_NOT_FOUND");
+                }
+                current.requests[index] = pendingCorrection;
+                const response = await fetch(githubApiUrl(), {
+                    method: "PUT",
+                    headers: {
+                        ...githubHeaders(credential),
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        message: `Corregir solicitud ${pendingCorrection.id}`,
+                        content: utf8ToBase64(`${JSON.stringify(current.requests, null, 2)}\n`),
+                        sha: current.sha,
+                        branch: GITHUB_SETTINGS.branch
+                    })
+                });
+                if (response.status === 409 && retry) {
+                    return saveCorrection(credential, false);
+                }
+                if (response.status === 401 || response.status === 403) {
+                    throw new Error("CREDENTIAL_INVALID");
+                }
+                if (!response.ok) {
+                    throw new Error(`WRITE_FAILED_${response.status}`);
+                }
+                localStorage.setItem(ACCESS_CREDENTIAL_KEY, credential);
+                closeCredentialDialog();
+                closeDetail();
+                showToast("La corrección fue enviada nuevamente para revisión.");
+                await loadRequests();
+            } catch (error) {
+                console.error(error);
+                if (error.message === "CREDENTIAL_INVALID") {
+                    localStorage.removeItem(ACCESS_CREDENTIAL_KEY);
+                    openCredentialDialog("No fue posible validar la credencial. Revise el dato e inténtelo nuevamente.");
+                } else {
+                    closeCredentialDialog();
+                    showToast("No fue posible guardar la corrección. La información permanece en pantalla.");
+                }
+            } finally {
+                if (submitButton) {
+                    submitButton.disabled = false;
+                    submitButton.textContent = "Enviar corrección";
+                }
+                continueButton.disabled = false;
+                continueButton.textContent = "Continuar";
+            }
+        }
+
+        function continueWithCredential() {
+            const input = document.getElementById("accessCredential");
+            const credential = input.value.trim();
+            if (!credential) {
+                document.getElementById("credentialMessage").textContent =
+                    "Ingrese la credencial de acceso para continuar.";
+                input.focus();
+                return;
+            }
+            saveCorrection(credential);
+        }
+
+        document.getElementById("requestSearch").addEventListener("input", renderRequests);
+        document.getElementById("requestState").addEventListener("change", renderRequests);
+        document.getElementById("refreshButton").addEventListener("click", loadRequests);
+
+        requestsBody.addEventListener("click", (event) => {
+            const viewButton = event.target.closest("[data-view-id]");
+            const correctButton = event.target.closest("[data-correct-id]");
+            if (correctButton) {
+                openDetail(correctButton.dataset.correctId, true);
+                return;
+            }
+            if (viewButton) {
+                openDetail(viewButton.dataset.viewId, false);
+            }
+        });
+
+        document.getElementById("closeDetailButton").addEventListener("click", closeDetail);
+        document.getElementById("detailOverlay").addEventListener("click", (event) => {
+            if (event.target.id === "detailOverlay") closeDetail();
+        });
+        document.getElementById("cancelCredentialButton").addEventListener("click", closeCredentialDialog);
+        document.getElementById("continueCredentialButton").addEventListener("click", continueWithCredential);
+        document.getElementById("accessCredential").addEventListener("keydown", (event) => {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                continueWithCredential();
+            }
+        });
+
+        loadRequests();
+    </script>
 </body>
 </html>
