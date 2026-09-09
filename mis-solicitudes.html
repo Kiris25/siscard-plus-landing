@@ -408,6 +408,251 @@
             font-size: 11px;
         }
 
+        .detail-page {
+            display: none;
+        }
+
+        .detail-page.active {
+            display: block;
+        }
+
+        .detail-back {
+            margin-bottom: 14px;
+        }
+
+        .form-document,
+        .parameters-panel,
+        .history-panel {
+            overflow: hidden;
+            border: 1px solid var(--request-line);
+            border-radius: var(--radius-large);
+            background: #ffffff;
+            box-shadow: var(--shadow-small);
+        }
+
+        .document-heading {
+            display: grid;
+            grid-template-columns: 270px minmax(0, 1fr) 180px;
+            gap: 22px;
+            align-items: center;
+            padding: 22px 25px;
+        }
+
+        .evertec-logo {
+            display: block;
+            width: min(245px, 100%);
+            height: auto;
+        }
+
+        .document-title {
+            text-align: center;
+        }
+
+        .document-title strong,
+        .document-title span,
+        .document-code strong,
+        .document-code span {
+            display: block;
+        }
+
+        .document-title strong {
+            color: var(--sidebar);
+            font-size: 20px;
+        }
+
+        .document-title span {
+            margin-top: 4px;
+            color: var(--muted);
+            font-size: 14px;
+        }
+
+        .document-code {
+            padding: 12px;
+            border: 1px solid var(--request-line);
+            border-top: 4px solid var(--request-orange);
+            background: var(--request-soft);
+            text-align: center;
+        }
+
+        .document-code span {
+            margin-top: 3px;
+            color: var(--muted);
+            font-size: 11px;
+        }
+
+        .category-band {
+            padding: 10px 18px;
+            background: var(--request-orange);
+            color: #ffffff;
+            text-align: center;
+            font-size: 13px;
+            font-weight: 800;
+        }
+
+        .request-fields {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 15px;
+            padding: 20px 25px 24px;
+        }
+
+        .request-field label {
+            display: block;
+            margin-bottom: 6px;
+            color: var(--sidebar);
+            font-size: 11px;
+            font-weight: 850;
+            text-transform: uppercase;
+        }
+
+        .request-field input {
+            width: 100%;
+            min-height: 43px;
+            padding: 10px 12px;
+            border-radius: var(--radius);
+            background: var(--request-soft);
+        }
+
+        .detail-toolbar {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+            margin: 14px 0 11px;
+            padding: 10px 13px;
+            border: 1px solid var(--request-line);
+            border-radius: var(--radius);
+            background: #ffffff;
+            box-shadow: var(--shadow-small);
+        }
+
+        .detail-toolbar strong,
+        .detail-toolbar small {
+            display: block;
+        }
+
+        .detail-toolbar small {
+            margin-top: 3px;
+            color: var(--muted);
+        }
+
+        .parameters-panel-header,
+        .history-panel-header {
+            padding: 14px 17px;
+            border-bottom: 1px solid var(--request-line);
+            background: var(--request-soft);
+        }
+
+        .parameters-panel-header h2,
+        .history-panel-header h2 {
+            margin: 0;
+            color: var(--sidebar);
+            font-weight: 400;
+        }
+
+        .detail-parameter-list {
+            max-width: 920px;
+            margin: 0 auto;
+            padding: 0 12px;
+        }
+
+        .detail-parameter-card {
+            border-bottom: 1px solid var(--request-line);
+        }
+
+        .detail-parameter-card:last-child {
+            border-bottom: 0;
+        }
+
+        .detail-parameter-heading {
+            display: grid;
+            grid-template-columns: 40px minmax(0, 1fr) auto;
+            gap: 8px;
+            align-items: center;
+            min-height: 58px;
+        }
+
+        .detail-parameter-number {
+            display: grid;
+            place-items: center;
+            width: 34px;
+            height: 34px;
+            border: 1px solid var(--request-line);
+            border-top: 3px solid var(--request-orange);
+            border-radius: var(--radius);
+            background: var(--request-soft);
+            color: var(--sidebar);
+            font-weight: 850;
+        }
+
+        .detail-parameter-name strong,
+        .detail-parameter-name small {
+            display: block;
+        }
+
+        .detail-parameter-name strong {
+            color: var(--sidebar);
+            font-size: 15px;
+        }
+
+        .detail-parameter-name small {
+            margin-top: 3px;
+            color: var(--muted);
+        }
+
+        .detail-parameter-body {
+            max-width: 720px;
+            padding: 0 0 14px 40px;
+        }
+
+        .detail-value-box {
+            padding: 10px;
+            border: 1px solid var(--request-line);
+            border-top: 3px solid #b7b7b7;
+            border-radius: var(--radius);
+            background: var(--request-soft);
+        }
+
+        .detail-value-box label {
+            display: block;
+            margin-bottom: 7px;
+            color: var(--sidebar);
+            font-size: 11px;
+            font-weight: 850;
+            text-transform: uppercase;
+        }
+
+        .detail-value-box input {
+            width: 100%;
+            min-height: 38px;
+            padding: 8px 10px;
+            border-radius: var(--radius);
+        }
+
+        .history-panel {
+            margin-top: 14px;
+        }
+
+        .history-list {
+            padding: 12px 17px 17px;
+        }
+
+        .detail-actions-panel {
+            position: sticky;
+            bottom: 0;
+            z-index: 90;
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+            margin-top: 14px;
+            padding: 12px;
+            border: 1px solid var(--request-line);
+            border-radius: var(--radius);
+            background: rgba(255, 255, 255, 0.98);
+            box-shadow: 0 -8px 18px rgba(0, 0, 0, 0.08);
+        }
+
         @media (max-width: 850px) {
             .detail-grid {
                 grid-template-columns: 1fr;
@@ -443,6 +688,7 @@
         <div class="main-area">
             <div id="topbar-container"></div>
             <main class="content">
+                <div id="requestsListView">
                 <section class="requests-hero">
                     <span class="section-kicker">Seguimiento</span>
                     <h1>Mis solicitudes</h1>
@@ -496,25 +742,61 @@
                     <div class="empty-state" id="emptyState" hidden>No hay solicitudes para mostrar.</div>
                     <div class="error-state" id="errorState" hidden>No fue posible cargar las solicitudes.</div>
                 </section>
+                </div>
+
+                <section class="detail-page" id="requestDetailView">
+                    <div class="detail-back">
+                        <button class="tertiary-button" id="backToRequestsButton" type="button">
+                            ← Volver a Mis solicitudes
+                        </button>
+                    </div>
+
+                    <section class="form-document">
+                        <div class="document-heading">
+                            <img class="evertec-logo" src="assets/logo-evertec.png" alt="Evertec">
+                            <div class="document-title">
+                                <strong>Evertec Costa Rica</strong>
+                                <span>Parámetros del emisor - TRT08SN0</span>
+                                <span id="detailOptionTitle">Solicitud de parámetros</span>
+                            </div>
+                            <div class="document-code">
+                                <strong id="detailRequestCode">Solicitud</strong>
+                                <span id="detailOptionCode">Opción</span>
+                            </div>
+                        </div>
+                        <div class="category-band">
+                            Incluir en Categoría: CR.TRAMITES.Parametros Siscard
+                        </div>
+                        <div class="request-fields" id="detailRequestFields"></div>
+                    </section>
+
+                    <section class="detail-toolbar">
+                        <div>
+                            <strong id="detailParameterCount">Parámetros enviados</strong>
+                            <small id="detailStatusText">Estado de la solicitud</small>
+                        </div>
+                        <span class="status-badge" id="detailStatusBadge"></span>
+                    </section>
+
+                    <section class="parameters-panel">
+                        <header class="parameters-panel-header">
+                            <h2 id="detailParametersTitle">Parámetros de la solicitud</h2>
+                        </header>
+                        <div class="detail-parameter-list" id="detailParameterList"></div>
+                    </section>
+
+                    <section class="history-panel">
+                        <header class="history-panel-header">
+                            <h2>Historial</h2>
+                        </header>
+                        <div class="history-list" id="detailHistoryList"></div>
+                    </section>
+
+                    <section class="detail-actions-panel" id="detailActionsPanel"></section>
+                </section>
             </main>
             <div id="footer-container"></div>
         </div>
-    </div>
-
-    <div class="modal-overlay" id="detailOverlay" hidden>
-        <section class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="detailTitle">
-            <header class="modal-header">
-                <div>
-                    <span class="section-kicker">Detalle de la gestión</span>
-                    <h2 id="detailTitle">Solicitud</h2>
-                </div>
-                <button class="modal-close" id="closeDetailButton" type="button" aria-label="Cerrar">×</button>
-            </header>
-            <div class="modal-body" id="detailBody"></div>
-            <footer class="modal-footer" id="detailFooter">
-                <button class="tertiary-button" id="closeDetailFooterButton" type="button">Cerrar</button>
-            </footer>
-        </section>
     </div>
 
     <div class="modal-overlay" id="credentialOverlay" hidden>
@@ -737,45 +1019,53 @@
             emptyState.hidden = requests.length > 0;
         }
 
-        function detailItem(label, value) {
+        function detailField(label, value) {
             return `
-                <div class="detail-item">
-                    <strong>${escapeHtml(label)}</strong>
-                    <span>${escapeHtml(value || "Sin información")}</span>
+                <div class="request-field">
+                    <label>${escapeHtml(label)}</label>
+                    <input value="${escapeHtml(value || "Sin información")}" readonly>
                 </div>
             `;
         }
 
-        function parameterMarkup(parameter, editable) {
+        function parameterMarkup(parameter, editable, index) {
             const requiresAdjustment = parameter.revision === "Requiere ajuste";
             const canEdit = editable && requiresAdjustment;
             return `
-                <article class="parameter-item">
-                    <div class="parameter-heading">
-                        <div>
+                <article class="detail-parameter-card">
+                    <header class="detail-parameter-heading">
+                        <span class="detail-parameter-number">${index + 1}</span>
+                        <div class="detail-parameter-name">
                             <strong>${escapeHtml(parameter.nombre || parameter.id)}</strong>
                             <small>${escapeHtml(parameter.producto || "Todos")}</small>
                         </div>
-                        <span class="status-badge" data-state="${requiresAdjustment ? "Requiere información" : "Aprobada"}">
+                        <span
+                            class="status-badge"
+                            data-state="${requiresAdjustment ? "Requiere información" : "Aprobada"}"
+                        >
                             ${escapeHtml(parameter.revision || "Pendiente")}
                         </span>
-                    </div>
-                    ${canEdit ? `
-                        <input
-                            class="correction-field"
-                            data-correction-id="${escapeHtml(parameter.id)}"
-                            value="${escapeHtml(parameter.valor || "")}"
-                            placeholder="Ingrese el valor corregido"
-                        >
-                    ` : `
-                        <div class="parameter-value">${escapeHtml(parameter.valor || "Sin respuesta")}</div>
-                    `}
-                    ${parameter.notaAprobador ? `
-                        <div class="review-note">
-                            <strong>Observación de la revisión</strong><br>
-                            ${escapeHtml(parameter.notaAprobador)}
+                    </header>
+                    <div class="detail-parameter-body">
+                        <div class="detail-value-box">
+                            <label>${canEdit ? "Valor corregido" : "Valor enviado"}</label>
+                            ${canEdit ? `
+                                <input
+                                    data-correction-id="${escapeHtml(parameter.id)}"
+                                    value="${escapeHtml(parameter.valor || "")}"
+                                    placeholder="Ingrese el valor corregido"
+                                >
+                            ` : `
+                                <input value="${escapeHtml(parameter.valor || "Sin respuesta")}" readonly>
+                            `}
+                            ${parameter.notaAprobador ? `
+                                <div class="review-note">
+                                    <strong>Observación de la revisión</strong><br>
+                                    ${escapeHtml(parameter.notaAprobador)}
+                                </div>
+                            ` : ""}
                         </div>
-                    ` : ""}
+                    </div>
                 </article>
             `;
         }
@@ -791,54 +1081,71 @@
         }
 
         function openDetail(requestId, correctionMode = false) {
-            const request = allRequests.find((item) => String(item.id) === String(requestId));
+            const request = allRequests.find(
+                (item) => String(item.id) === String(requestId)
+            );
             if (!request) return;
             selectedRequest = structuredClone(request);
             pendingCorrection = correctionMode ? selectedRequest : null;
-            document.getElementById("detailTitle").textContent = correctionMode
-                ? `Corregir ${request.id}`
-                : `Solicitud ${request.id}`;
-            document.getElementById("detailBody").innerHTML = `
-                <div class="detail-grid">
-                    ${detailItem("Cliente", request.cliente)}
-                    ${detailItem("Emisor", request.emisor)}
-                    ${detailItem("Opción", `OP${request.opcion || ""}`)}
-                    ${detailItem("Acción", request.accion)}
-                    ${detailItem("Producto", request.producto)}
-                    ${detailItem("Estado", request.estado)}
-                    ${detailItem("Fecha de envío", formatDateTime(request.fechaCreacion || request.fechaSolicitud))}
-                    ${detailItem("Última actualización", formatDateTime(request.fechaActualizacion))}
-                    ${detailItem("Responsable", request.aprobador || "Seguridad")}
-                </div>
-                <section class="detail-section">
-                    <h3>${correctionMode ? "Campos por corregir" : "Parámetros enviados"}</h3>
-                    ${(request.parametros || []).map((parameter) =>
-                        parameterMarkup(parameter, correctionMode)
-                    ).join("") || '<div class="empty-state">No hay parámetros registrados.</div>'}
-                </section>
-                <section class="detail-section">
-                    <h3>Historial</h3>
-                    ${historyMarkup(request.historial) || '<div class="empty-state">No hay movimientos registrados.</div>'}
-                </section>
-            `;
-            document.getElementById("detailFooter").innerHTML = correctionMode
+            document.getElementById("requestsListView").hidden = true;
+            const detailView = document.getElementById("requestDetailView");
+            detailView.classList.add("active");
+            document.getElementById("detailOptionTitle").textContent =
+                `OPC${request.opcion || ""} · Solicitud de parámetros`;
+            document.getElementById("detailRequestCode").textContent =
+                request.id || "Solicitud";
+            document.getElementById("detailOptionCode").textContent =
+                `Opción ${request.opcion || ""}`;
+            document.getElementById("detailRequestFields").innerHTML = [
+                detailField("Cliente", request.cliente),
+                detailField("Fecha de solicitud", formatDateTime(request.fechaCreacion || request.fechaSolicitud)),
+                detailField("Emisor", request.emisor),
+                detailField("Acción por realizar", request.accion),
+                detailField("Producto", request.producto),
+                detailField("Fecha requerida", request.fechaRequerida ? formatDateTime(request.fechaRequerida) : "No indicada")
+            ].join("");
+            const parameters = request.parametros || [];
+            document.getElementById("detailParameterCount").textContent =
+                `${parameters.length} parámetro${parameters.length === 1 ? "" : "s"} enviados`;
+            document.getElementById("detailStatusText").textContent =
+                correctionMode
+                    ? "Complete únicamente los campos indicados por la revisión."
+                    : `Última actualización: ${formatDateTime(request.fechaActualizacion)}`;
+            const statusBadge = document.getElementById("detailStatusBadge");
+            statusBadge.dataset.state = request.estado || "Enviada";
+            statusBadge.textContent = request.estado || "Enviada";
+            document.getElementById("detailParametersTitle").textContent =
+                correctionMode ? "Campos por corregir" : "Parámetros de la solicitud";
+            document.getElementById("detailParameterList").innerHTML =
+                parameters.map((parameter, index) =>
+                    parameterMarkup(parameter, correctionMode, index)
+                ).join("") || '<div class="empty-state">No hay parámetros registrados.</div>';
+            document.getElementById("detailHistoryList").innerHTML =
+                historyMarkup(request.historial) || '<div class="empty-state">No hay movimientos registrados.</div>';
+            document.getElementById("detailActionsPanel").innerHTML = correctionMode
                 ? `
-                    <button class="tertiary-button" id="cancelCorrectionButton" type="button">Cancelar</button>
-                    <button class="primary-button" id="submitCorrectionButton" type="button">Enviar corrección</button>
+                    <button class="tertiary-button" id="cancelCorrectionButton" type="button">
+                        Cancelar
+                    </button>
+                    <button class="primary-button" id="submitCorrectionButton" type="button">
+                        Enviar corrección
+                    </button>
                 `
                 : `
-                    <button class="tertiary-button" id="closeDetailFooterButton" type="button">Cerrar</button>
+                    <button class="tertiary-button" id="closeDetailFooterButton" type="button">
+                        Volver a Mis solicitudes
+                    </button>
                 `;
-            document.getElementById("detailOverlay").hidden = false;
-            document.body.style.overflow = "hidden";
             attachDetailActions();
+            window.scrollTo({ top: 0, behavior: "smooth" });
         }
 
         function closeDetail() {
-            document.getElementById("detailOverlay").hidden = true;
-            document.body.style.overflow = "";
+            document.getElementById("requestDetailView").classList.remove("active");
+            document.getElementById("requestsListView").hidden = false;
             selectedRequest = null;
             pendingCorrection = null;
+            window.scrollTo({ top: 0, behavior: "smooth" });
         }
 
         function attachDetailActions() {
@@ -1022,10 +1329,7 @@
             }
         });
 
-        document.getElementById("closeDetailButton").addEventListener("click", closeDetail);
-        document.getElementById("detailOverlay").addEventListener("click", (event) => {
-            if (event.target.id === "detailOverlay") closeDetail();
-        });
+        document.getElementById("backToRequestsButton").addEventListener("click", closeDetail);
         document.getElementById("cancelCredentialButton").addEventListener("click", closeCredentialDialog);
         document.getElementById("continueCredentialButton").addEventListener("click", continueWithCredential);
         document.getElementById("accessCredential").addEventListener("keydown", (event) => {
