@@ -934,11 +934,11 @@
             aria-labelledby="accessTitle"
         >
             <header class="access-header">
-                <h2 id="accessTitle">Autenticación requerida</h2>
-                <p>Ingrese la credencial para publicar en el repositorio compartido o active el modo demo para guardar únicamente en este navegador.</p>
+                <h2 id="accessTitle">Seleccione el modo de acceso</h2>
+                <p>Ingrese la credencial personal para trabajar con el registro principal o la credencial de prueba para utilizar el registro exclusivo de pruebas.</p>
             </header>
             <div class="access-body">
-                <label for="accessCredential">Credencial de acceso</label>
+                <label for="accessCredential">Credencial personal o de prueba</label>
                 <div class="access-input-wrap">
                     <input
                         id="accessCredential"
@@ -961,8 +961,8 @@
             </div>
             <footer class="access-actions">
                 <button class="tertiary-button" id="cancelAccessButton" type="button">Cancelar</button>
-                <button class="tertiary-button" id="activateDemoButton" type="button">Activar modo demo</button>
-                <button class="primary-button" id="continueAccessButton" type="button">Ingresar credencial</button>
+                <button class="tertiary-button" id="activateDemoButton" type="button">Activar modo prueba</button>
+                <button class="primary-button" id="continueAccessButton" type="button">Ingresar credencial personal</button>
             </footer>
         </section>
     </div>
@@ -995,13 +995,34 @@
         const INTERNAL_PARAMETER_BASE_URL =
             "https://kiris25.github.io/parametros-emisor-v2/data/interno/";
 
-        const GITHUB_SETTINGS = {
+        const GITHUB_REAL = {
             owner: "Kiris25",
             repository: "siscard-plus-landing",
             branch: "main",
             path: "data/solicitudes.json"
         };
+        const GITHUB_TEST = {
+            owner: "Kiris25",
+            repository: "siscard-plus-landing",
+            branch: "main",
+            path: "data/solicitudes-demo.json"
+        };
         const ACCESS_CREDENTIAL_KEY = "siscardAccessCredential";
+        const TEST_CREDENTIAL_KEY = "siscardTestAccessCredential";
+        const DATA_MODE_KEY = "siscardDataMode";
+        function testModeIsActive() {
+            return localStorage.getItem(DATA_MODE_KEY) === "test";
+        }
+        function currentGithubSettings() {
+            return testModeIsActive()
+                ? GITHUB_TEST
+                : GITHUB_REAL;
+        }
+        function currentCredentialKey() {
+            return testModeIsActive()
+                ? TEST_CREDENTIAL_KEY
+                : ACCESS_CREDENTIAL_KEY;
+        }
         let pendingRequestPayload = null;
 
         const OPTIONS = [
@@ -1625,7 +1646,7 @@
             }
         }
         function remoteTemplateUrl() {
-            return `${GITHUB_SETTINGS.path}?v=${Date.now()}`;
+            return `${currentGithubSettings().path}?v=${Date.now()}`;
         }
         function requestTimestamp(request) {
             const value = request?.fechaActualizacion || request?.fechaCreacion || "";
@@ -1919,11 +1940,12 @@
             document.body.style.overflow = "";
         }
         function githubApiUrl() {
-            const path = GITHUB_SETTINGS.path
+            const settings = currentGithubSettings();
+            const path = settings.path
                 .split("/")
                 .map((part) => encodeURIComponent(part))
                 .join("/");
-            return `https://api.github.com/repos/${GITHUB_SETTINGS.owner}/${GITHUB_SETTINGS.repository}/contents/${path}`;
+            return `https://api.github.com/repos/${settings.owner}/${settings.repository}/contents/${path}`;
         }
         function githubHeaders(credential) {
             return {
@@ -1938,7 +1960,9 @@
             return new TextDecoder().decode(bytes);
         }
         function readCredential() {
-            return (localStorage.getItem(ACCESS_CREDENTIAL_KEY) || "").trim();
+            return (
+                localStorage.getItem(currentCredentialKey()) || ""
+            ).trim();
         }
         function openAccessDialog(message = "") {
             closeConfirmation();
@@ -1989,7 +2013,7 @@
         }
         async function readRemoteRequests(credential) {
             const response = await fetch(
-                `${githubApiUrl()}?ref=${encodeURIComponent(GITHUB_SETTINGS.branch)}&v=${Date.now()}`,
+                `${githubApiUrl()}?ref=${encodeURIComponent(currentGithubSettings().branch)}&v=${Date.now()}`,
                 {
                     method: "GET",
                     headers: githubHeaders(credential),
@@ -2020,7 +2044,7 @@
             const body = {
                 message: `Registrar solicitud ${pendingRequestPayload.id}`,
                 content: utf8ToBase64(`${JSON.stringify(requests, null, 2)}\n`),
-                branch: GITHUB_SETTINGS.branch
+                branch: currentGithubSettings().branch
             };
             if (sha) body.sha = sha;
             return fetch(githubApiUrl(), {
@@ -2033,6 +2057,10 @@
             });
         }
         async function persistRequest(credential, retryOnConflict = true) {
+            if (testModeIsActive()) {
+                pendingRequestPayload.modo = "PRUEBA";
+                pendingRequestPayload.entorno = "DEMO";
+            }
             const current = await readRemoteRequests(credential);
             const requests = current.requests.slice();
             const requestDate = pendingRequestPayload.fechaSolicitud
@@ -2090,7 +2118,10 @@
             );
             try {
                 await persistRequest(credential);
-                localStorage.setItem(ACCESS_CREDENTIAL_KEY, credential.trim());
+                localStorage.setItem(
+                    currentCredentialKey(),
+                    credential.trim()
+                );
                 saveLocalCopies(pendingRequestPayload);
                 const savedRequest = structuredClone(pendingRequestPayload);
                 const savedId = savedRequest.id;
@@ -2098,13 +2129,15 @@
                 closeAccessDialog();
                 closeConfirmation();
                 document.getElementById("successRequestId").textContent =
-                    `Solicitud ${savedId} enviada.`;
+                    testModeIsActive()
+                        ? `Solicitud ${savedId} enviada al entorno de pruebas.`
+                        : `Solicitud ${savedId} enviada.`;
                 document.getElementById("successOverlay").hidden = false;
                 document.body.style.overflow = "hidden";
             } catch (error) {
                 console.error(error);
                 if (error.message === "CREDENTIAL_INVALID") {
-                    localStorage.removeItem(ACCESS_CREDENTIAL_KEY);
+                    localStorage.removeItem(currentCredentialKey());
                     openAccessDialog(
                         "No fue posible validar la credencial. Revise el dato e inténtelo nuevamente."
                     );
@@ -2154,13 +2187,22 @@
             const parameters = new URLSearchParams(window.location.search);
             return (
                 parameters.get("modoDemo") === "true" ||
-                sessionStorage.getItem("siscardGuideMode") === "true" ||
-                sessionStorage.getItem("siscardDemoMode") === "true"
+                sessionStorage.getItem("siscardGuideMode") === "true"
             );
         }
-        function activateDemoMode() {
-            sessionStorage.setItem("siscardDemoMode", "true");
-            completeLocalSave();
+        async function activateDemoMode() {
+            const input = document.getElementById("accessCredential");
+            const credential = input.value.trim();
+            if (!credential) {
+                document.getElementById("accessMessage").textContent =
+                    "Ingrese la credencial de prueba para activar este modo.";
+                input.focus();
+                return;
+            }
+            localStorage.setItem(DATA_MODE_KEY, "test");
+            localStorage.setItem(TEST_CREDENTIAL_KEY, credential);
+            document.getElementById("accessMessage").textContent = "";
+            await completeRemoteSave(credential);
         }
         async function saveRequest() {
             if (!pendingRequestPayload) {
@@ -2186,6 +2228,8 @@
                 input.focus();
                 return;
             }
+            localStorage.setItem(DATA_MODE_KEY, "real");
+            localStorage.setItem(ACCESS_CREDENTIAL_KEY, credential);
             document.getElementById("accessMessage").textContent = "";
             await completeRemoteSave(credential);
         }
