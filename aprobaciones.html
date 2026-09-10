@@ -823,6 +823,66 @@
                 border-top: 1px solid var(--line);
                 background: var(--surface-soft);
             }
+
+            .approval-request-list {
+                display: block;
+                overflow-x: auto;
+                padding-bottom: 0;
+            }
+            .approval-table {
+                width: 100%;
+                min-width: 980px;
+                border-collapse: collapse;
+            }
+            .approval-table th,
+            .approval-table td {
+                padding: 11px 10px;
+                border-bottom: 1px solid var(--line);
+                text-align: left;
+                vertical-align: middle;
+            }
+            .approval-table th {
+                background: var(--surface-soft);
+                color: var(--sidebar);
+                font-size: 10px;
+                font-weight: 850;
+                text-transform: uppercase;
+                white-space: nowrap;
+            }
+            .approval-table tbody tr:hover {
+                background: #fffaf6;
+            }
+            .approval-table tbody tr.active {
+                background: var(--orange-soft);
+            }
+            .approval-table-id {
+                color: var(--orange-dark);
+                font-size: 11px;
+                font-weight: 850;
+                overflow-wrap: anywhere;
+            }
+            .approval-table-primary,
+            .approval-table-secondary {
+                display: block;
+            }
+            .approval-table-secondary {
+                margin-top: 3px;
+                color: var(--muted);
+                font-size: 10px;
+            }
+            .approval-table .approval-state {
+                margin-top: 0;
+                white-space: nowrap;
+            }
+            .approval-table .approval-request-actions {
+                margin-top: 0;
+                flex-wrap: nowrap;
+            }
+            @media (max-width: 850px) {
+                .approval-inbox {
+                    padding: 10px;
+                }
+            }
             @media print {
                 @page {
                     size: A4 landscape;
@@ -1949,43 +2009,96 @@
             function renderApprovalRequestList() {
                 const requests = loadRequests();
                 const container = document.getElementById("approvalRequestList");
-                container.innerHTML = requests.length
-                    ? requests
-                          .map((request) => `
-                    <article
-                        class="approval-request-button ${selectedRequestId === request.id ? "active" : ""}"
-                    >
-                        <strong>${escapeHtml(request.id)}</strong>
-                        <small>${escapeHtml(request.cliente)} · OP${escapeHtml(request.opcion)}</small>
-                        <small>${escapeHtml(request.emisor)}</small>
-                        <span class="approval-state">${escapeHtml(request.estado || "Enviada")}</span>
-                        <div class="approval-request-meta">
-                            <span>Enviada: ${escapeHtml(formatDateTime(request.fechaCreacion))}</span>
-                            <span>Actualizada: ${escapeHtml(formatDateTime(request.fechaActualizacion))}</span>
-                        </div>
-                        <div class="approval-request-actions">
-                            <button
-                                class="tertiary-button"
-                                type="button"
-                                data-view-request-id="${escapeHtml(request.id)}"
-                            >
-                                Ver solicitud
-                            </button>
-                            ${["Enviada", "Pendiente", "Enviada a corregir"].includes(request.estado)
-                                ? `
-                                <button
-                                    class="primary-button"
-                                    type="button"
-                                    data-take-request-id="${escapeHtml(request.id)}"
-                                >
-                                    Tomar solicitud
-                                </button>`
-                                : ""}
-                        </div>
-                    </article>
-                `)
-                          .join("")
-                    : '<div class="empty-state">No hay solicitudes registradas.</div>';
+                if (!requests.length) {
+                    container.innerHTML =
+                        '<div class="empty-state">No hay solicitudes registradas.</div>';
+                    return;
+                }
+                container.innerHTML = `
+                    <table class="approval-table">
+                        <thead>
+                            <tr>
+                                <th>Solicitud</th>
+                                <th>Fecha de envío</th>
+                                <th>Cliente</th>
+                                <th>Emisor / opción</th>
+                                <th>Producto</th>
+                                <th>Estado</th>
+                                <th>Última actualización</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${requests.map((request) => `
+                                <tr class="${selectedRequestId === request.id ? "active" : ""}">
+                                    <td>
+                                        <span class="approval-table-id">
+                                            ${escapeHtml(request.id || "Sin ID")}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        ${escapeHtml(
+                                            formatDateTime(
+                                                request.fechaCreacion || request.fechaSolicitud
+                                            )
+                                        )}
+                                    </td>
+                                    <td>
+                                        <span class="approval-table-primary">
+                                            ${escapeHtml(request.cliente || "Sin información")}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="approval-table-primary">
+                                            ${escapeHtml(request.emisor || "Sin emisor")}
+                                        </span>
+                                        <span class="approval-table-secondary">
+                                            OP${escapeHtml(request.opcion || "")} ·
+                                            ${escapeHtml(request.accion || "")}
+                                        </span>
+                                    </td>
+                                    <td>${escapeHtml(request.producto || "Todos")}</td>
+                                    <td>
+                                        <span class="approval-state">
+                                            ${escapeHtml(request.estado || "Enviada")}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        ${escapeHtml(
+                                            formatDateTime(request.fechaActualizacion)
+                                        )}
+                                    </td>
+                                    <td>
+                                        <div class="approval-request-actions">
+                                            <button
+                                                class="tertiary-button"
+                                                type="button"
+                                                data-view-request-id="${escapeHtml(request.id)}"
+                                            >
+                                                Ver
+                                            </button>
+                                            ${[
+                                                "Enviada",
+                                                "Pendiente",
+                                                "Enviada a corregir"
+                                            ].includes(request.estado)
+                                                ? `
+                                                    <button
+                                                        class="primary-button"
+                                                        type="button"
+                                                        data-take-request-id="${escapeHtml(request.id)}"
+                                                    >
+                                                        Tomar
+                                                    </button>
+                                                `
+                                                : ""}
+                                        </div>
+                                    </td>
+                                </tr>
+                            `).join("")}
+                        </tbody>
+                    </table>
+                `;
             }
             function selectApprovalRequest(requestId) {
                 const request = loadRequests().find((item) => item.id === requestId);
