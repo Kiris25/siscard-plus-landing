@@ -1760,7 +1760,8 @@
             comunicados,
             sha,
             credencial,
-            mensaje
+            mensaje,
+            reintentosDisponibles = 2
         )
         {
             const cuerpo = {
@@ -1783,6 +1784,25 @@
             if (escritura.status === 401 || escritura.status === 403)
             {
                 throw new Error("CREDENTIAL_INVALID");
+            }
+            if (
+                escritura.status === 409 &&
+                reintentosDisponibles > 0
+            )
+            {
+                await new Promise(
+                    resolve => window.setTimeout(resolve, 180)
+                );
+                const archivoActual = await leerArchivoComunicados(
+                    credencial
+                );
+                return escribirArchivoComunicados(
+                    comunicados,
+                    archivoActual.sha,
+                    credencial,
+                    mensaje,
+                    reintentosDisponibles - 1
+                );
             }
             if (!escritura.ok)
             {
