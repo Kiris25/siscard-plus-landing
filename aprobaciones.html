@@ -1059,6 +1059,119 @@
                     grid-column: 1 / -1;
                 }
             }
+
+            .combined-request-filter {
+                position: relative;
+                min-width: 150px;
+            }
+            .combined-filter-panel {
+                position: absolute;
+                top: calc(100% + 5px);
+                left: 0;
+                z-index: 1250;
+                width: min(320px, calc(100vw - 36px));
+                max-height: 290px;
+                overflow: hidden;
+                padding: 10px;
+                border: 1px solid var(--line);
+                border-top: 3px solid var(--orange);
+                border-radius: var(--radius);
+                background: #ffffff;
+                box-shadow: 0 15px 35px rgba(0, 0, 0, 0.18);
+            }
+            .combined-filter-panel[hidden] {
+                display: none !important;
+            }
+            .combined-filter-panel > strong {
+                display: block;
+                margin-bottom: 8px;
+                color: var(--sidebar);
+                font-size: 10px;
+            }
+            .combined-filter-options {
+                display: grid;
+                gap: 5px;
+                max-height: 235px;
+                overflow-y: auto;
+            }
+            .combined-filter-option {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                padding: 6px 7px;
+                border-radius: 5px;
+                color: var(--sidebar);
+                font-size: 10px;
+                cursor: pointer;
+            }
+            .combined-filter-option:hover {
+                background: var(--orange-soft);
+            }
+            .combined-filter-option input {
+                width: 14px;
+                height: 14px;
+                accent-color: var(--orange);
+            }
+            .row-options-wrapper {
+                position: relative;
+                display: inline-flex;
+            }
+            .row-options-button {
+                display: grid;
+                place-items: center;
+                width: 34px;
+                height: 34px;
+                padding: 5px;
+                border: 1px solid var(--line);
+                border-radius: var(--radius);
+                background: #ffffff;
+            }
+            .row-options-button:hover,
+            .row-options-button.active {
+                border-color: var(--orange);
+                background: var(--orange-soft);
+            }
+            .row-options-button img {
+                display: block;
+                width: 20px;
+                height: 20px;
+                object-fit: contain;
+            }
+            .row-options-menu {
+                position: fixed;
+                z-index: 1750;
+                display: grid;
+                min-width: 145px;
+                overflow: hidden;
+                border: 1px solid var(--line);
+                border-top: 3px solid var(--orange);
+                border-radius: var(--radius);
+                background: #ffffff;
+                box-shadow: 0 14px 35px rgba(0, 0, 0, 0.20);
+            }
+            .row-options-menu[hidden] {
+                display: none !important;
+            }
+            .row-options-menu button {
+                padding: 9px 11px;
+                border: 0;
+                border-bottom: 1px solid var(--line);
+                background: #ffffff;
+                color: var(--sidebar);
+                text-align: left;
+                font-size: 11px;
+                font-weight: 750;
+            }
+            .row-options-menu button:last-child {
+                border-bottom: 0;
+            }
+            .row-options-menu button:hover {
+                background: var(--orange-soft);
+                color: var(--orange-dark);
+            }
+            .row-options-menu button[hidden] {
+                display: none !important;
+            }
             @media print {
                 @page {
                     size: A4 landscape;
@@ -1142,7 +1255,25 @@
                             id="approvalStatusSummary"
                         ></div>
                         <div class="approval-filters">
-                            <input class="approval-filter" id="approvalFilterId" placeholder="Solicitud">
+                            <div class="combined-request-filter" id="combinedRequestFilter">
+                                <input
+                                    class="approval-filter"
+                                    id="approvalFilterId"
+                                    placeholder="Solicitud"
+                                    autocomplete="off"
+                                >
+                                <div
+                                    class="combined-filter-panel"
+                                    id="combinedFilterPanel"
+                                    hidden
+                                >
+                                    <strong>CLIENTE / EMISOR</strong>
+                                    <div
+                                        class="combined-filter-options"
+                                        id="combinedFilterOptions"
+                                    ></div>
+                                </div>
+                            </div>
                             <input class="approval-filter" id="approvalFilterDate" type="date" title="Fecha de envío">
                             <select class="approval-filter" id="approvalFilterClient"><option value="">Todos los clientes</option></select>
                             <select class="approval-filter" id="approvalFilterIssuer"><option value="">Todos los emisores</option></select>
@@ -1327,6 +1458,11 @@
                 <button class="primary-button" id="closeApprovalConfirmationButton" type="button">Aceptar</button>
             </section>
         </div>
+        <div class="row-options-menu" id="rowOptionsMenu" hidden>
+            <button type="button" data-menu-action="view">Ver</button>
+            <button type="button" data-menu-action="take">Tomar</button>
+            <button type="button" data-menu-action="history">Ver historial</button>
+        </div>
         <div class="history-popover" id="historyPopover" hidden>
             <div class="history-popover-header">
                 <strong>Historial de estados</strong>
@@ -1448,6 +1584,9 @@
                 key: "fechaCreacion",
                 direction: "desc"
             };
+            let selectedClientIssuerFilters = new Set();
+            let activeOptionsRequestId = "";
+            let activeOptionsAnchor = null;
 
             const parameterContainer = document.getElementById("parameterContainer");
             const parameterTooltip = document.getElementById("parameterTooltip");
@@ -2278,7 +2417,14 @@
                     (
                         !id ||
                         normalize(request.id).includes(id) ||
-                        normalize(request.cliente).includes(id)
+                        normalize(request.cliente).includes(id) ||
+                        normalize(request.emisor).includes(id)
+                    ) &&
+                    (
+                        !selectedClientIssuerFilters.size ||
+                        selectedClientIssuerFilters.has(
+                            clientIssuerKey(request)
+                        )
                     ) &&
                     (
                         !date ||
@@ -2361,6 +2507,87 @@
                     </button>
                 `;
             }
+            function clientIssuerKey(request) {
+                return `${request.cliente || "Sin cliente"}|||${request.emisor || "Sin emisor"}`;
+            }
+            function renderCombinedFilterOptions() {
+                const pairs = [
+                    ...new Map(
+                        requestStore.map((request) => [
+                            clientIssuerKey(request),
+                            {
+                                key: clientIssuerKey(request),
+                                label: `${request.cliente || "Sin cliente"} / ${request.emisor || "Sin emisor"}`
+                            }
+                        ])
+                    ).values()
+                ].sort((first, second) =>
+                    first.label.localeCompare(second.label, "es", {
+                        sensitivity: "base"
+                    })
+                );
+                document.getElementById("combinedFilterOptions").innerHTML =
+                    pairs.map((pair) => `
+                        <label class="combined-filter-option">
+                            <input
+                                type="checkbox"
+                                value="${escapeHtml(pair.key)}"
+                                ${selectedClientIssuerFilters.has(pair.key) ? "checked" : ""}
+                            >
+                            <span>${escapeHtml(pair.label)}</span>
+                        </label>
+                    `).join("");
+            }
+            function openCombinedFilterPanel() {
+                renderCombinedFilterOptions();
+                document.getElementById("combinedFilterPanel").hidden = false;
+            }
+            function closeCombinedFilterPanel() {
+                document.getElementById("combinedFilterPanel").hidden = true;
+            }
+            function closeRowOptionsMenu() {
+                document.getElementById("rowOptionsMenu").hidden = true;
+                activeOptionsRequestId = "";
+                activeOptionsAnchor?.classList.remove("active");
+                activeOptionsAnchor = null;
+            }
+            function openRowOptionsMenu(requestId, anchor) {
+                closeHistoryPopover();
+                if (
+                    activeOptionsRequestId === requestId &&
+                    !document.getElementById("rowOptionsMenu").hidden
+                ) {
+                    closeRowOptionsMenu();
+                    return;
+                }
+                closeRowOptionsMenu();
+                activeOptionsRequestId = requestId;
+                activeOptionsAnchor = anchor;
+                anchor.classList.add("active");
+                const request = requestStore.find(
+                    (item) => String(item.id) === String(requestId)
+                );
+                const menu = document.getElementById("rowOptionsMenu");
+                const takeButton = menu.querySelector('[data-menu-action="take"]');
+                takeButton.hidden = ![
+                    "Enviada",
+                    "Pendiente",
+                    "Enviada a corregir"
+                ].includes(request?.estado);
+                menu.hidden = false;
+                const rect = anchor.getBoundingClientRect();
+                const width = 145;
+                const left = Math.max(
+                    14,
+                    Math.min(rect.right - width, window.innerWidth - width - 14)
+                );
+                let top = rect.bottom + 6;
+                if (top + 130 > window.innerHeight) {
+                    top = Math.max(14, rect.top - 130);
+                }
+                menu.style.left = `${left}px`;
+                menu.style.top = `${top}px`;
+            }
             function populateApprovalFilter(id, values, label) {
                 const select = document.getElementById(id);
                 const selected = select.value;
@@ -2372,6 +2599,7 @@
                 ).join("");
             }
             function refreshApprovalFilters() {
+                renderCombinedFilterOptions();
                 populateApprovalFilter("approvalFilterClient", requestStore.map((item) => item.cliente), "Todos los clientes");
                 populateApprovalFilter("approvalFilterIssuer", requestStore.map((item) => item.emisor), "Todos los emisores");
                 populateApprovalFilter("approvalFilterProduct", requestStore.map((item) => item.producto || "Todos"), "Todos los productos");
@@ -2397,8 +2625,7 @@
                                 <th>${sortHeading("Producto", "producto")}</th>
                                 <th>${sortHeading("Estado", "estado")}</th>
                                 <th>${sortHeading("Última actualización", "fechaActualizacion")}</th>
-                                <th>Historial</th>
-                                <th>Acciones</th>
+                                <th>Opciones</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -2444,39 +2671,21 @@
                                         )}
                                     </td>
                                     <td>
-                                        <button
-                                            class="tertiary-button"
-                                            type="button"
-                                            data-history-request-id="${escapeHtml(request.id)}"
-                                        >
-                                            Ver historial
-                                        </button>
-                                    </td>
-                                    <td>
-                                        <div class="approval-request-actions">
+                                        <span class="row-options-wrapper">
                                             <button
-                                                class="tertiary-button"
+                                                class="row-options-button"
                                                 type="button"
-                                                data-view-request-id="${escapeHtml(request.id)}"
+                                                data-options-request-id="${escapeHtml(request.id)}"
+                                                aria-label="Más opciones"
+                                                title="Más opciones"
                                             >
-                                                Ver
+                                                <img
+                                                    src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAANCAIAAAArLKlOAAACNElEQVR4ATySW0hUQRjHvzn39babbZooRpZSBLuRCNoGRZS2dLGLYYIv9dBLRBSBtbJCCUFUkEbQUy8VGhJBqGXhQ5enQKSQkLKL5LrbxV0Rzzpz9pwZ5+w5ux/f/OH7z/xg5vtGYPkwTZqcpwsxmoxRgzi2OfNR7z+18ugSXUw4jqMCZIORNBm5jYeiePgmfnadPO9lesqcGsejfcru00LVNm7Svz+zZ21xMTo/Tf98V1uvqq0R7XgUIYGM3cu8f6y2nJMCzcqeM9KmBuP1fZZO2RCAi4FlQuEaVFYjeMtRaSXyV9MfE0wpkOqanHMcpgu/aSrulDmMWSgbjguGLu04jASZjPZxhxEdD98R60Li+lpe8sxhRX4rMUte3DLGHxiv+s0vH8QNAe1kD41/w4NRPBARSiuVfWdBlDnD08XEilp5V4c5/c6cHMl8GhMDzeLGepbBUnC/NTcFpqGEOpCsccBJF2PLSTo7IdbUi1v38suw1Jz5+Q1+0mX9mpS2hJCvnLy8yxYTDsPVxXgb2dJ/NXyBt049eFHwlBhvHwreddqxbvXAefXQZYZ1K/6VA066GDBAnhIo9IGkIMUDBV7gTdKK7cdIKtKKkKcYgDoM1xwGlOFlICvcAkqB6FlN2yVjfDz2rl24y8UEfzXfI0+7+W/AgxErMSPt7LT+xfBQj+0MXAFGxbLNLpQfN/JVaO29clO7HGyRG46qR7qUxhNa5w0pGJa3h+XGNq3tGlpblcdWAQAA///xyceHAAAABklEQVQDAD+UBA3+7SoMAAAAAElFTkSuQmCC"
+                                                    alt=""
+                                                    aria-hidden="true"
+                                                >
                                             </button>
-                                            ${[
-                                                "Enviada",
-                                                "Pendiente",
-                                                "Enviada a corregir"
-                                            ].includes(request.estado)
-                                                ? `
-                                                    <button
-                                                        class="primary-button"
-                                                        type="button"
-                                                        data-take-request-id="${escapeHtml(request.id)}"
-                                                    >
-                                                        Tomar
-                                                    </button>
-                                                `
-                                                : ""}
-                                        </div>
+                                        </span>
                                     </td>
                                 </tr>
                             `).join("")}
@@ -3040,11 +3249,9 @@
                 .getElementById("approvalRequestList")
                 .addEventListener("click", (event) => {
                     const sortButton = event.target.closest("[data-sort-key]");
-                    const historyButton = event.target.closest(
-                        "[data-history-request-id]"
+                    const optionsButton = event.target.closest(
+                        "[data-options-request-id]"
                     );
-                    const viewButton = event.target.closest("[data-view-request-id]");
-                    const takeButton = event.target.closest("[data-take-request-id]");
                     if (sortButton) {
                         const key = sortButton.dataset.sortKey;
                         if (approvalSort.key === key) {
@@ -3062,20 +3269,12 @@
                         renderApprovalRequestList();
                         return;
                     }
-                    if (historyButton) {
+                    if (optionsButton) {
                         event.stopPropagation();
-                        openHistoryPopover(
-                            historyButton.dataset.historyRequestId,
-                            historyButton
+                        openRowOptionsMenu(
+                            optionsButton.dataset.optionsRequestId,
+                            optionsButton
                         );
-                        return;
-                    }
-                    if (takeButton) {
-                        takeRequest(takeButton.dataset.takeRequestId);
-                        return;
-                    }
-                    if (viewButton) {
-                        selectApprovalRequest(viewButton.dataset.viewRequestId);
                     }
                 });
             document
@@ -3114,7 +3313,6 @@
                 closeApprovalDetail();
             });
             [
-                "approvalFilterId",
                 "approvalFilterDate",
                 "approvalFilterClient",
                 "approvalFilterIssuer",
@@ -3123,6 +3321,34 @@
             ].forEach((id) => {
                 document.getElementById(id).addEventListener("input", renderApprovalRequestList);
                 document.getElementById(id).addEventListener("change", renderApprovalRequestList);
+            });
+            document.getElementById("approvalFilterId").addEventListener("focus", openCombinedFilterPanel);
+            document.getElementById("approvalFilterId").addEventListener("click", openCombinedFilterPanel);
+            document.getElementById("approvalFilterId").addEventListener("input", renderApprovalRequestList);
+            document.getElementById("combinedFilterOptions").addEventListener("change", (event) => {
+                const checkbox = event.target.closest('input[type="checkbox"]');
+                if (!checkbox) return;
+                if (checkbox.checked) {
+                    selectedClientIssuerFilters.add(checkbox.value);
+                } else {
+                    selectedClientIssuerFilters.delete(checkbox.value);
+                }
+                renderApprovalRequestList();
+            });
+            document.getElementById("rowOptionsMenu").addEventListener("click", async (event) => {
+                const actionButton = event.target.closest("[data-menu-action]");
+                if (!actionButton || !activeOptionsRequestId) return;
+                const action = actionButton.dataset.menuAction;
+                const requestId = activeOptionsRequestId;
+                const anchor = activeOptionsAnchor;
+                closeRowOptionsMenu();
+                if (action === "view") {
+                    await selectApprovalRequest(requestId);
+                } else if (action === "take") {
+                    await takeRequest(requestId);
+                } else if (action === "history") {
+                    openHistoryPopover(requestId, anchor);
+                }
             });
             document.getElementById("clearApprovalFiltersButton").addEventListener("click", () => {
                 [
@@ -3135,6 +3361,8 @@
                 ].forEach((id) => {
                     document.getElementById(id).value = "";
                 });
+                selectedClientIssuerFilters.clear();
+                renderCombinedFilterOptions();
                 renderApprovalRequestList();
             });
             document
@@ -3148,6 +3376,17 @@
                     !event.target.closest("[data-history-request-id]")
                 ) {
                     closeHistoryPopover();
+                }
+                if (
+                    !event.target.closest("#rowOptionsMenu") &&
+                    !event.target.closest("[data-options-request-id]")
+                ) {
+                    closeRowOptionsMenu();
+                }
+                if (
+                    !event.target.closest("#combinedRequestFilter")
+                ) {
+                    closeCombinedFilterPanel();
                 }
             });
             initializeRequests();
