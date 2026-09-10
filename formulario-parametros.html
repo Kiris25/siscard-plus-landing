@@ -1690,20 +1690,24 @@
                 String(date.getFullYear()).slice(-2),
             ].join("");
         }
-        function nextRequestId(client, issuer) {
+        function createUniqueRequestId(client, issuer) {
             const clientCode = consecutivePart(client);
             const issuerCode = consecutivePart(issuer);
             const dateCode = requestDateCode();
-            const counterKey = `siscardCounter:${clientCode}:${issuerCode}:${dateCode}`;
-            const next = Number(localStorage.getItem(counterKey) || "0") + 1;
-            localStorage.setItem(counterKey, String(next));
-            return `${clientCode}${issuerCode}${next}${dateCode}`;
+            const timestamp = Date.now().toString(36).toUpperCase();
+            const randomPart = typeof crypto !== "undefined" && crypto.randomUUID
+                ? crypto.randomUUID().replaceAll("-", "").slice(0, 10).toUpperCase()
+                : Math.random().toString(36).slice(2, 12).toUpperCase();
+            return `${clientCode}${issuerCode}${dateCode}-${timestamp}-${randomPart}`;
         }
-        function requestPayload() {
+        function collectPayloadData(includeDefinitiveId = false) {
             const client = document.getElementById("clientName").value.trim();
             const issuer = document.getElementById("issuerName").value.trim();
+            const now = new Date().toISOString();
             return {
-                id: nextRequestId(client, issuer),
+                id: includeDefinitiveId
+                    ? createUniqueRequestId(client, issuer)
+                    : "BORRADOR",
                 tipo: "formulario-parametros",
                 opcion: currentOption,
                 cliente: client,
@@ -1714,13 +1718,13 @@
                 fechaRequerida: document.getElementById("requiredDateTime").value,
                 estado: "Enviada",
                 aprobador: "",
-                fechaCreacion: new Date().toISOString(),
-                fechaActualizacion: new Date().toISOString(),
+                fechaCreacion: now,
+                fechaActualizacion: now,
                 comentarios: [],
                 historial: [
                     {
                         estado: "Enviada",
-                        fecha: new Date().toISOString(),
+                        fecha: now,
                         usuario: client || "Solicitante",
                         comentario: "Solicitud enviada para revisión."
                     }
@@ -1738,6 +1742,12 @@
             };
         }
 
+        function requestPayload() {
+            return collectPayloadData(true);
+        }
+        function exportPayload() {
+            return collectPayloadData(false);
+        }
         function showToast(message) {
             const toast = document.getElementById("toast");
             toast.textContent = message;
@@ -1759,6 +1769,25 @@
                 invalidRequired[0].reportValidity();
                 invalidRequired[0].scrollIntoView({ behavior: "smooth", block: "center" });
                 showToast("Complete los campos obligatorios antes de enviar.");
+                return;
+            }
+            const answeredParameters = allParameters.filter((parameter) =>
+                String(parameter.value || "").trim()
+            );
+            if (!answeredParameters.length) {
+                showToast("Complete al menos un parámetro antes de enviar.");
+                return;
+            }
+            const missingRequired = allParameters.find((parameter) =>
+                parameter.required && !String(parameter.value || "").trim()
+            );
+            if (missingRequired) {
+                const control = document.querySelector(
+                    `[data-entry-id="${CSS.escape(String(missingRequired.id))}"]`
+                );
+                control?.scrollIntoView({ behavior: "smooth", block: "center" });
+                control?.focus();
+                showToast(`Complete el parámetro obligatorio: ${missingRequired.name}.`);
                 return;
             }
             pendingRequestPayload = requestPayload();
@@ -1895,10 +1924,8 @@
         }
         async function persistRequest(credential, retryOnConflict = true) {
             const current = await readRemoteRequests(credential);
-            const requests = current.requests.filter(
-                (item) => String(item.id) !== String(pendingRequestPayload.id)
-            );
-            requests.unshift(pendingRequestPayload);
+            const requests = current.requests.slice();
+            requests.unshift(structuredClone(pendingRequestPayload));
             const response = await writeRemoteRequests(
                 credential,
                 requests,
@@ -1992,7 +2019,7 @@
 
         function exportExcel() {
             if (!validateHeader()) return;
-            const payload = requestPayload();
+            const payload = exportPayload();
             const selected = payload.parametros.filter((item) => item.valor);
             const rows = [
                 ["EVERTEC COSTA RICA", "", "", ""],
@@ -2030,11 +2057,11 @@
             }));
             const workbook = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(workbook, worksheet, "Solicitud");
-            XLSX.writeFile(workbook, `${payload.id}_OP${currentOption}.xlsx`);
+            XLSX.writeFile(workbook, `borrador_OP${currentOption}.xlsx`);
         }
         function exportPdf() {
             if (!validateHeader()) return;
-            const payload = requestPayload();
+            const payload = exportPayload();
             const selected = payload.parametros.filter((item) => item.valor);
             if (!selected.length) {
                 showToast("Complete al menos un parámetro antes de exportar.");
@@ -2102,7 +2129,7 @@
             pdf.setTextColor(88,89,91);
             pdf.text("Solicitado por", 14, finalY + 17);
             pdf.text("Aprobado por", 108, finalY + 17);
-            pdf.save(`${payload.id}_OP${currentOption}.pdf`);
+            pdf.save(`borrador_OP${currentOption}.pdf`);
         }
         document.getElementById("optionsMenu").addEventListener("click", (event) => {
             const button = event.target.closest("[data-option]");
