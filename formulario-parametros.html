@@ -1762,6 +1762,9 @@
         }
         function openConfirmation() {
             if (!validateHeader()) return;
+            const selectedProduct =
+                document.getElementById("productFilter").value;
+            
             const invalidRequired = allParameters
                 .map((parameter) => document.querySelector(`[data-entry-id="${parameter.id}"]`))
                 .filter((control) => control && !control.checkValidity());
@@ -1778,7 +1781,11 @@
                 showToast("Complete al menos un parámetro antes de enviar.");
                 return;
             }
+            cost selectedProduct =
+                document.getElementById("productFilter").value;
+            
             const missingRequired = allParameters.find((parameter) =>
+                productApplies(parameter.product, selectedProduct) &&
                 parameter.required && !String(parameter.value || "").trim()
             );
             if (missingRequired) {
