@@ -472,6 +472,59 @@
             line-height: 1.6;
         }
 
+
+        .acciones-comunicados
+        {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 14px;
+        }
+        .formulario-comunicado
+        {
+            display: grid;
+            gap: 13px;
+        }
+        .campo-comunicado
+        {
+            display: grid;
+            gap: 6px;
+        }
+        .campo-comunicado label
+        {
+            color: var(--gris);
+            font-size: 11px;
+            font-weight: 850;
+            text-transform: uppercase;
+        }
+        .campo-comunicado input,
+        .campo-comunicado select,
+        .campo-comunicado textarea
+        {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--borde);
+            border-radius: 8px;
+            font: inherit;
+        }
+        .campo-comunicado textarea
+        {
+            min-height: 130px;
+            resize: vertical;
+        }
+        .acciones-formulario
+        {
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+            margin-top: 4px;
+        }
+        .mensaje-formulario
+        {
+            min-height: 18px;
+            color: #b33a2d;
+            font-size: 12px;
+        }
+
         @media (max-width: 1050px)
         {
             .comunicados-encabezado,
@@ -1303,6 +1356,90 @@
         </div>
     </div>
 
+
+    <div
+        class="modal-comunicado"
+        id="modalAgregarComunicado"
+        hidden
+    >
+        <section
+            class="modal-tarjeta"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="tituloAgregarComunicado"
+        >
+            <header class="modal-encabezado">
+                <h2 id="tituloAgregarComunicado">Agregar comunicado</h2>
+                <button
+                    id="cerrarAgregarComunicado"
+                    type="button"
+                    aria-label="Cerrar"
+                >
+                    ×
+                </button>
+            </header>
+            <div class="modal-cuerpo">
+                <form
+                    class="formulario-comunicado"
+                    id="formularioComunicado"
+                >
+                    <div class="campo-comunicado">
+                        <label for="tituloComunicado">Título</label>
+                        <input id="tituloComunicado" required maxlength="160">
+                    </div>
+                    <div class="campo-comunicado">
+                        <label for="categoriaComunicado">Categoría</label>
+                        <select id="categoriaComunicado" required>
+                            <option value="">Seleccione una categoría</option>
+                            <option value="documentación">Documentación</option>
+                            <option value="parámetros">Parámetros</option>
+                            <option value="seguridad">Seguridad</option>
+                            <option value="operaciones">Operaciones</option>
+                            <option value="portal">Portal Siscard+</option>
+                        </select>
+                    </div>
+                    <div class="campo-comunicado">
+                        <label for="resumenComunicado">Resumen</label>
+                        <textarea id="resumenComunicado" required maxlength="500"></textarea>
+                    </div>
+                    <div class="campo-comunicado">
+                        <label for="detalleComunicado">Detalle</label>
+                        <textarea id="detalleComunicado" required maxlength="3000"></textarea>
+                    </div>
+                    <div class="campo-comunicado">
+                        <label for="credencialComunicado">Credencial de acceso</label>
+                        <input
+                            id="credencialComunicado"
+                            type="password"
+                            autocomplete="off"
+                            spellcheck="false"
+                            placeholder="Se recordará en este navegador"
+                        >
+                    </div>
+                    <small
+                        class="mensaje-formulario"
+                        id="mensajeComunicado"
+                    ></small>
+                    <div class="acciones-formulario">
+                        <button
+                            class="boton claro"
+                            id="cancelarComunicado"
+                            type="button"
+                        >
+                            Cancelar
+                        </button>
+                        <button
+                            class="boton naranja"
+                            id="guardarComunicado"
+                            type="submit"
+                        >
+                            Guardar comunicado
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </section>
+    </div>
     <div
         class="modal-comunicado"
         id="modalComunicado"
@@ -1346,195 +1483,372 @@
 
     <script>
         "use strict";
-
-        const comunicados =
-            Array.from(
-                document.querySelectorAll(".comunicado")
-            );
-
-        const formularioBusqueda =
-            document.getElementById("formularioBusqueda");
-
-        const buscarComunicado =
-            document.getElementById("buscarComunicado");
-
-        const contadorResultados =
-            document.getElementById("contadorResultados");
-
-        const totalComunicados =
-            document.getElementById("totalComunicados");
-
-        const sinResultados =
-            document.getElementById("sinResultados");
-
-        const modalComunicado =
-            document.getElementById("modalComunicado");
-
-        const modalTitulo =
-            document.getElementById("modalTitulo");
-
-        const modalCuerpo =
-            document.getElementById("modalCuerpo");
-
+        const COMUNICADOS_CONFIG = {
+            owner: "Kiris25",
+            repository: "siscard-plus-landing",
+            branch: "main",
+            path: "data/comunicados.json"
+        };
+        const CREDENTIAL_KEY = "siscardAccessCredential";
+        const listaComunicados = document.getElementById("listaComunicados");
+        const formularioBusqueda = document.getElementById("formularioBusqueda");
+        const buscarComunicado = document.getElementById("buscarComunicado");
+        const contadorResultados = document.getElementById("contadorResultados");
+        const totalComunicados = document.getElementById("totalComunicados");
+        const sinResultados = document.getElementById("sinResultados");
+        const modalComunicado = document.getElementById("modalComunicado");
+        const modalTitulo = document.getElementById("modalTitulo");
+        const modalCuerpo = document.getElementById("modalCuerpo");
+        const modalAgregar = document.getElementById("modalAgregarComunicado");
+        const formularioComunicado = document.getElementById("formularioComunicado");
+        const mensajeComunicado = document.getElementById("mensajeComunicado");
+        let comunicadosDinamicos = [];
         let categoriaActiva = "todos";
-
         let consultaActiva = "";
-
         function normalizarTexto(valor)
         {
             return String(valor || "")
                 .toLowerCase()
                 .normalize("NFD")
-                .replace(/[\u0300-\u036f]/g, "")
+                .replace(/[̀-ͯ]/g, "")
                 .trim();
         }
-
+        function escaparHtml(valor)
+        {
+            const elemento = document.createElement("div");
+            elemento.textContent = String(valor || "");
+            return elemento.innerHTML;
+        }
+        function iconoCategoria(categoria)
+        {
+            return {
+                "documentación": "▤",
+                "parámetros": "⚙",
+                "seguridad": "🔐",
+                "operaciones": "✓",
+                "portal": "◉"
+            }[categoria] || "◉";
+        }
+        function fechaCorta(valor)
+        {
+            const fecha = new Date(valor);
+            return Number.isNaN(fecha.getTime())
+                ? ""
+                : fecha.toLocaleDateString("es-CR");
+        }
+        function renderizarComunicadosDinamicos()
+        {
+            listaComunicados
+                .querySelectorAll("[data-dynamic='true']")
+                .forEach(elemento => elemento.remove());
+            const contenido = comunicadosDinamicos
+                .map(comunicado => `
+                    <article
+                        class="comunicado"
+                        data-dynamic="true"
+                        data-category="${escaparHtml(comunicado.categoria)}"
+                        data-search="${escaparHtml([
+                            comunicado.titulo,
+                            comunicado.categoria,
+                            comunicado.resumen,
+                            comunicado.detalle
+                        ].join(" "))}"
+                    >
+                        <span class="comunicado-icono">
+                            ${iconoCategoria(comunicado.categoria)}
+                        </span>
+                        <div>
+                            <span class="categoria">
+                                ${escaparHtml(comunicado.categoria)}
+                            </span>
+                            <h3>${escaparHtml(comunicado.titulo)}</h3>
+                            <p>${escaparHtml(comunicado.resumen)}</p>
+                        </div>
+                        <div class="comunicado-meta">
+                            <span>${fechaCorta(comunicado.fechaCreacion)}</span>
+                            <button
+                                class="boton claro"
+                                type="button"
+                                data-open-title="${escaparHtml(comunicado.titulo)}"
+                                data-open-body="${escaparHtml(comunicado.detalle)}"
+                            >
+                                Ver
+                            </button>
+                        </div>
+                    </article>
+                `)
+                .join("");
+            listaComunicados.insertAdjacentHTML("afterbegin", contenido);
+            conectarBotonesDetalle();
+            aplicarFiltros();
+        }
+        async function cargarComunicados()
+        {
+            try
+            {
+                const respuesta = await fetch(
+                    `${COMUNICADOS_CONFIG.path}?v=${Date.now()}`,
+                    { cache: "no-store" }
+                );
+                if (!respuesta.ok)
+                {
+                    comunicadosDinamicos = [];
+                    renderizarComunicadosDinamicos();
+                    return;
+                }
+                const datos = await respuesta.json();
+                comunicadosDinamicos = Array.isArray(datos) ? datos : [];
+                renderizarComunicadosDinamicos();
+            }
+            catch (error)
+            {
+                console.error(error);
+                comunicadosDinamicos = [];
+                renderizarComunicadosDinamicos();
+            }
+        }
         function aplicarFiltros()
         {
             const consulta = normalizarTexto(consultaActiva);
-
             let visibles = 0;
-
-            comunicados.forEach(
+            document.querySelectorAll(".comunicado").forEach(
                 function(comunicado)
                 {
-                    const categoria = normalizarTexto(
-                        comunicado.dataset.category
-                    );
-
+                    const categoria = normalizarTexto(comunicado.dataset.category);
                     const texto = normalizarTexto(
                         `${comunicado.textContent} ${comunicado.dataset.search}`
                     );
-
                     const coincideCategoria =
                         categoriaActiva === "todos" ||
-                        categoria.includes(
-                            normalizarTexto(categoriaActiva)
-                        );
-
-                    const coincideConsulta =
-                        !consulta ||
-                        texto.includes(consulta);
-
-                    const visible =
-                        coincideCategoria && coincideConsulta;
-
-                    comunicado.classList.toggle(
-                        "oculto",
-                        !visible
-                    );
-
-                    if (visible)
-                    {
-                        visibles += 1;
-                    }
+                        categoria.includes(normalizarTexto(categoriaActiva));
+                    const coincideConsulta = !consulta || texto.includes(consulta);
+                    const visible = coincideCategoria && coincideConsulta;
+                    comunicado.classList.toggle("oculto", !visible);
+                    if (visible) visibles += 1;
                 }
             );
-
             contadorResultados.textContent =
                 `${visibles} resultado${visibles === 1 ? "" : "s"}`;
-
             totalComunicados.textContent = visibles;
-
-            sinResultados.style.display =
-                visibles === 0 ? "block" : "none";
+            sinResultados.style.display = visibles === 0 ? "block" : "none";
         }
-
-        formularioBusqueda.addEventListener(
-            "submit",
-            function(evento)
+        function conectarBotonesDetalle()
+        {
+            document.querySelectorAll("[data-open-title]").forEach(
+                function(boton)
+                {
+                    if (boton.dataset.listenerReady === "true") return;
+                    boton.dataset.listenerReady = "true";
+                    boton.addEventListener("click", function()
+                    {
+                        modalTitulo.textContent = boton.dataset.openTitle;
+                        modalCuerpo.textContent = boton.dataset.openBody;
+                        modalComunicado.hidden = false;
+                    });
+                }
+            );
+        }
+        function githubApiUrl()
+        {
+            const ruta = COMUNICADOS_CONFIG.path
+                .split("/")
+                .map(parte => encodeURIComponent(parte))
+                .join("/");
+            return `https://api.github.com/repos/${COMUNICADOS_CONFIG.owner}/${COMUNICADOS_CONFIG.repository}/contents/${ruta}`;
+        }
+        function encabezadosGithub(credencial)
+        {
+            return {
+                Accept: "application/vnd.github+json",
+                Authorization: `Bearer ${credencial}`,
+                "X-GitHub-Api-Version": "2022-11-28"
+            };
+        }
+        function base64AUtf8(valor)
+        {
+            const binario = atob(String(valor || "").replace(/\s/g, ""));
+            const bytes = Uint8Array.from(
+                binario,
+                caracter => caracter.charCodeAt(0)
+            );
+            return new TextDecoder().decode(bytes);
+        }
+        function utf8ABase64(valor)
+        {
+            const bytes = new TextEncoder().encode(valor);
+            let binario = "";
+            bytes.forEach(byte => binario += String.fromCharCode(byte));
+            return btoa(binario);
+        }
+        async function guardarComunicadoRemoto(comunicado, credencial)
+        {
+            const lectura = await fetch(
+                `${githubApiUrl()}?ref=${encodeURIComponent(COMUNICADOS_CONFIG.branch)}&v=${Date.now()}`,
+                {
+                    headers: encabezadosGithub(credencial),
+                    cache: "no-store"
+                }
+            );
+            if (lectura.status === 401 || lectura.status === 403)
             {
-                evento.preventDefault();
-
-                consultaActiva = buscarComunicado.value;
-
+                throw new Error("CREDENTIAL_INVALID");
+            }
+            let actuales = [];
+            let sha = "";
+            if (lectura.ok)
+            {
+                const archivo = await lectura.json();
+                sha = archivo.sha || "";
+                const contenido = base64AUtf8(archivo.content || "").trim();
+                actuales = contenido ? JSON.parse(contenido) : [];
+                if (!Array.isArray(actuales))
+                {
+                    throw new Error("INVALID_JSON");
+                }
+            }
+            else if (lectura.status !== 404)
+            {
+                throw new Error(`READ_${lectura.status}`);
+            }
+            actuales.unshift(comunicado);
+            const cuerpo = {
+                message: `Agregar comunicado ${comunicado.id}`,
+                content: utf8ABase64(`${JSON.stringify(actuales, null, 2)}
+`),
+                branch: COMUNICADOS_CONFIG.branch
+            };
+            if (sha) cuerpo.sha = sha;
+            const escritura = await fetch(githubApiUrl(), {
+                method: "PUT",
+                headers: {
+                    ...encabezadosGithub(credencial),
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(cuerpo)
+            });
+            if (escritura.status === 401 || escritura.status === 403)
+            {
+                throw new Error("CREDENTIAL_INVALID");
+            }
+            if (!escritura.ok)
+            {
+                throw new Error(`WRITE_${escritura.status}`);
+            }
+            return actuales;
+        }
+        function abrirAgregarComunicado()
+        {
+            formularioComunicado.reset();
+            document.getElementById("credencialComunicado").value =
+                localStorage.getItem(CREDENTIAL_KEY) || "";
+            mensajeComunicado.textContent = "";
+            modalAgregar.hidden = false;
+        }
+        function cerrarAgregarComunicado()
+        {
+            modalAgregar.hidden = true;
+            mensajeComunicado.textContent = "";
+        }
+        formularioComunicado.addEventListener("submit", async function(evento)
+        {
+            evento.preventDefault();
+            const credencial =
+                document.getElementById("credencialComunicado").value.trim();
+            if (!credencial)
+            {
+                mensajeComunicado.textContent =
+                    "Ingrese la credencial de acceso para guardar.";
+                return;
+            }
+            const ahora = new Date();
+            const comunicado = {
+                id: `COM-${ahora.getTime()}`,
+                titulo: document.getElementById("tituloComunicado").value.trim(),
+                categoria: document.getElementById("categoriaComunicado").value,
+                resumen: document.getElementById("resumenComunicado").value.trim(),
+                detalle: document.getElementById("detalleComunicado").value.trim(),
+                fechaCreacion: ahora.toISOString(),
+                estado: "Publicado"
+            };
+            const boton = document.getElementById("guardarComunicado");
+            boton.disabled = true;
+            boton.textContent = "Guardando...";
+            mensajeComunicado.textContent = "";
+            try
+            {
+                comunicadosDinamicos = await guardarComunicadoRemoto(
+                    comunicado,
+                    credencial
+                );
+                localStorage.setItem(CREDENTIAL_KEY, credencial);
+                cerrarAgregarComunicado();
+                renderizarComunicadosDinamicos();
+                window.dispatchEvent(new CustomEvent("siscard-toast", {
+                    detail: "Comunicado guardado correctamente."
+                }));
+            }
+            catch (error)
+            {
+                console.error(error);
+                mensajeComunicado.textContent =
+                    error.message === "CREDENTIAL_INVALID"
+                        ? "No fue posible validar la credencial."
+                        : "No fue posible guardar el comunicado.";
+            }
+            finally
+            {
+                boton.disabled = false;
+                boton.textContent = "Guardar comunicado";
+            }
+        });
+        formularioBusqueda.addEventListener("submit", function(evento)
+        {
+            evento.preventDefault();
+            consultaActiva = buscarComunicado.value;
+            aplicarFiltros();
+        });
+        document.querySelectorAll("[data-category]").forEach(function(boton)
+        {
+            boton.addEventListener("click", function()
+            {
+                categoriaActiva = boton.dataset.category;
+                document.querySelectorAll("[data-category]").forEach(
+                    elemento => elemento.classList.toggle("activo", elemento === boton)
+                );
                 aplicarFiltros();
-            }
-        );
-
-        document
-            .querySelectorAll("[data-category]")
-            .forEach(
-                function(boton)
-                {
-                    boton.addEventListener(
-                        "click",
-                        function()
-                        {
-                            categoriaActiva = boton.dataset.category;
-
-                            document
-                                .querySelectorAll("[data-category]")
-                                .forEach(
-                                    function(elemento)
-                                    {
-                                        elemento.classList.toggle(
-                                            "activo",
-                                            elemento === boton
-                                        );
-                                    }
-                                );
-
-                            aplicarFiltros();
-                        }
-                    );
-                }
-            );
-
-        document
-            .querySelectorAll("[data-open-title]")
-            .forEach(
-                function(boton)
-                {
-                    boton.addEventListener(
-                        "click",
-                        function()
-                        {
-                            modalTitulo.textContent =
-                                boton.dataset.openTitle;
-
-                            modalCuerpo.textContent =
-                                boton.dataset.openBody;
-
-                            modalComunicado.hidden = false;
-                        }
-                    );
-                }
-            );
-
-        document
-            .getElementById("cerrarModal")
-            .addEventListener(
-                "click",
-                function()
-                {
-                    modalComunicado.hidden = true;
-                }
-            );
-
-        modalComunicado.addEventListener(
-            "click",
-            function(evento)
+            });
+        });
+        document.getElementById("agregarComunicadoButton")
+            .addEventListener("click", abrirAgregarComunicado);
+        document.getElementById("cerrarAgregarComunicado")
+            .addEventListener("click", cerrarAgregarComunicado);
+        document.getElementById("cancelarComunicado")
+            .addEventListener("click", cerrarAgregarComunicado);
+        modalAgregar.addEventListener("click", function(evento)
+        {
+            if (evento.target === modalAgregar) cerrarAgregarComunicado();
+        });
+        document.getElementById("cerrarModal").addEventListener("click", function()
+        {
+            modalComunicado.hidden = true;
+        });
+        modalComunicado.addEventListener("click", function(evento)
+        {
+            if (evento.target === modalComunicado)
             {
-                if (evento.target === modalComunicado)
-                {
-                    modalComunicado.hidden = true;
-                }
+                modalComunicado.hidden = true;
             }
-        );
-
-        document.addEventListener(
-            "keydown",
-            function(evento)
+        });
+        document.addEventListener("keydown", function(evento)
+        {
+            if (evento.key === "Escape")
             {
-                if (evento.key === "Escape")
-                {
-                    modalComunicado.hidden = true;
-                }
+                modalComunicado.hidden = true;
+                cerrarAgregarComunicado();
             }
-        );
-
-        aplicarFiltros();
+        });
+        conectarBotonesDetalle();
+        cargarComunicados();
     </script>
 </body>
 
