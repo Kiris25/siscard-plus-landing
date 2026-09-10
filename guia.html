@@ -483,7 +483,7 @@
                 module: "Inicio",
                 target: "#modules",
                 title: "Módulos disponibles",
-                text: "Las tarjetas permiten abrir Manuales, Parámetros, Formularios, Seguridad, Aprobaciones, Mis solicitudes, Landing IA y Comunicados."
+                text: "Las tarjetas permiten abrir los servicios y gestiones disponibles."
             },
             {
                 page: "manuales.html",
@@ -497,95 +497,169 @@
                 module: "Manuales",
                 target: "input[type='search'], input[type='text']",
                 title: "Buscar documentación",
-                text: "El campo de búsqueda permite localizar documentos por nombre o palabra clave."
+                text: "El campo de búsqueda y los filtros permiten localizar contenidos. Desde este módulo también se accede al repositorio de Parámetros del Emisor TRT08SN0."
             },
             {
-                page: "manuales.html",
-                module: "Manuales",
-                target: "table, .documents-grid, .document-list, .panel",
-                title: "Consultar y abrir contenidos",
-                text: "Desde el listado disponible se puede revisar la categoría, versión y acción asociada a cada contenido. Además, este módulo permite acceder al repositorio de Parámetros del Emisor TRT08SN0."
+                page: "formulario-parametros.html?opcion=05",
+                module: "Solicitudes de parámetros",
+                target: ".form-document",
+                title: "Formulario de la opción 05",
+                text: "Para la demostración se abre directamente la Solicitud de parámetros correspondiente a la opción 05.",
+                note: "La opción 05 corresponde a Parámetros generales del emisor."
             },
             {
-                page: "formularios.html",
-                module: "Formularios",
-                target: "main",
-                title: "Seleccionar un formulario",
-                text: "Formularios reúne las gestiones disponibles para completar información y preparar una solicitud."
+                page: "formulario-parametros.html?opcion=05",
+                module: "Solicitudes de parámetros",
+                target: "#requestForm",
+                title: "Datos generales de la solicitud",
+                text: "En esta sección se registran cliente, emisor, acción, producto y la fecha requerida."
             },
             {
-                page: "formularios.html",
-                module: "Formularios",
-                target: "form, .form-card, .panel, .forms-grid",
-                title: "Completar la información",
-                text: "Cada formulario presenta los campos y secciones correspondientes al proceso seleccionado.",
-                note: "Durante el recorrido no se enviará información."
+                page: "formulario-parametros.html?opcion=05",
+                module: "Solicitudes de parámetros",
+                target: "#parameterSearchForm",
+                title: "Buscar parámetros",
+                text: "El buscador permite localizar parámetros por nombre, descripción, producto, valores o dependencias."
             },
             {
-                page: "formularios.html",
-                module: "Formularios",
-                target: "button[type='submit'], [data-action='submit'], .primary-button",
-                title: "Enviar la solicitud",
-                text: "Al finalizar el registro, la opción de envío remite la solicitud al flujo de revisión correspondiente.",
-                note: "La guía solamente explica el control y no realiza el envío."
+                page: "formulario-parametros.html?opcion=05",
+                module: "Solicitudes de parámetros",
+                target: ".parameters-toolbar",
+                title: "Herramientas del formulario",
+                text: "La barra permite mostrar u ocultar registros, importar o exportar Excel, generar PDF y enviar la solicitud."
             },
             {
-                page: "aprobaciones.html",
-                module: "Aprobaciones",
-                target: "main",
-                title: "Solicitudes pendientes",
-                text: "Aprobaciones centraliza las solicitudes que requieren revisión."
-            },
-            {
-                page: "aprobaciones.html",
-                module: "Aprobaciones",
-                target: "table, .requests-list, .approval-list, .panel",
-                title: "Revisar el detalle",
-                text: "Desde el listado se puede seleccionar una gestión para revisar la información y las respuestas registradas."
-            },
-            {
-                page: "aprobaciones.html",
-                module: "Aprobaciones",
-                target: "button, .approval-actions, .decision-actions",
-                title: "Aprobar o rechazar",
-                text: "Las acciones disponibles permiten registrar la decisión y las observaciones correspondientes.",
-                note: "La guía no ejecuta ninguna decisión."
+                page: "formulario-parametros.html?opcion=05",
+                module: "Solicitudes de parámetros",
+                target: "#parameterContainer",
+                title: "Completar los parámetros",
+                text: "Cada parámetro presenta el valor solicitado, validaciones y una ayuda para consultar la ficha funcional.",
+                note: "Durante la guía no se envían datos."
             },
             {
                 page: "mis-solicitudes.html",
                 module: "Mis solicitudes",
-                target: "main",
-                title: "Seguimiento de gestiones",
-                text: "Mis solicitudes permite consultar las gestiones registradas y revisar su estado actual."
+                target: "#requestsListView",
+                title: "Vista del usuario solicitante",
+                text: "Esta es la vista del usuario que ingresó los formularios. Aquí puede consultar el estado y seguimiento de sus solicitudes."
             },
             {
                 page: "mis-solicitudes.html",
                 module: "Mis solicitudes",
-                target: "table, .requests-list, .request-card, .panel",
-                title: "Consultar el detalle",
-                text: "El listado permite abrir una solicitud y revisar la información, las respuestas y las observaciones asociadas."
+                target: ".request-status-summary",
+                title: "Resumen por estado",
+                text: "El resumen muestra las solicitudes agrupadas por los estados disponibles."
+            },
+            {
+                page: "mis-solicitudes.html",
+                module: "Mis solicitudes",
+                target: ".requests-list-filters",
+                title: "Filtros y búsqueda",
+                text: "Se puede filtrar por solicitud, fecha de envío, cliente, emisor, estado y última actualización. El botón Limpiar restablece la vista."
+            },
+            {
+                page: "mis-solicitudes.html",
+                module: "Mis solicitudes",
+                target: ".requests-table",
+                title: "Listado y ordenamiento",
+                text: "Las columnas permiten revisar la información principal y ordenar solicitudes por identificador, fechas, cliente, emisor u estado."
+            },
+            {
+                page: "mis-solicitudes.html",
+                module: "Mis solicitudes",
+                target: "[data-options-request-id]",
+                title: "Más opciones",
+                text: "El menú de cada solicitud permite acceder a Ver detalle, Corregir o Ver historial, según el estado.",
+                action: "openMyRequestMenu"
+            },
+            {
+                page: "mis-solicitudes.html",
+                module: "Mis solicitudes",
+                target: "#rowOptionsMenu",
+                title: "Ver detalle, corregir e historial",
+                text: "Ver detalle abre la solicitud completa. Corregir aparece cuando la solicitud requiere información. Ver historial muestra los movimientos registrados.",
+                action: "openMyRequestMenu"
+            },
+            {
+                page: "aprobaciones.html",
+                module: "Aprobaciones",
+                target: "#approvalListView",
+                title: "Solicitudes para revisar",
+                text: "Esta bandeja corresponde al proceso de revisión y presenta las solicitudes disponibles para el aprobador."
+            },
+            {
+                page: "aprobaciones.html",
+                module: "Aprobaciones",
+                target: ".approval-status-summary",
+                title: "Estados del flujo",
+                text: "El resumen permite consultar cuántas solicitudes se encuentran enviadas, en revisión, con información requerida, aprobadas, completadas o rechazadas."
+            },
+            {
+                page: "aprobaciones.html",
+                module: "Aprobaciones",
+                target: ".approval-filters",
+                title: "Filtros de aprobación",
+                text: "La bandeja puede filtrarse por solicitud, fecha, cliente, emisor, producto y estado."
+            },
+            {
+                page: "aprobaciones.html",
+                module: "Aprobaciones",
+                target: ".approval-table",
+                title: "Ordenar y consultar solicitudes",
+                text: "Las columnas permiten ordenar los registros y revisar la información principal antes de tomar una solicitud."
+            },
+            {
+                page: "aprobaciones.html",
+                module: "Aprobaciones",
+                target: "[data-options-request-id]",
+                title: "Más opciones",
+                text: "El menú de la solicitud ofrece Ver, Tomar y Ver historial. Tomar asigna la solicitud y la pasa a revisión.",
+                action: "openApprovalMenu"
+            },
+            {
+                page: "aprobaciones.html",
+                module: "Aprobaciones",
+                target: "#rowOptionsMenu",
+                title: "Ver, tomar o consultar historial",
+                text: "Desde Más opciones se abre el detalle, se toma una solicitud disponible o se consulta su historial.",
+                action: "openApprovalMenu"
+            },
+            {
+                page: "aprobaciones.html",
+                module: "Aprobaciones",
+                target: ".approval-inbox-header .approval-request-actions",
+                title: "Actualizar y exportar historial",
+                text: "Actualizar vuelve a cargar la bandeja. Descargar historial Excel genera el registro consolidado de solicitudes y movimientos."
+            },
+            {
+                page: "aprobaciones.html",
+                module: "Aprobaciones",
+                target: "#approvalParametersToolbar, .toolbar-actions",
+                title: "Revisión y decisiones",
+                text: "Al tomar una solicitud, el detalle permite revisar parámetros, marcar Correcto o Requiere ajuste, agregar comentarios, aprobar, solicitar información o rechazar.",
+                note: "Las decisiones se explican sin ejecutarse durante la guía."
+            },
+            {
+                page: "mis-solicitudes.html",
+                module: "Corrección por el solicitante",
+                target: "#rowOptionsMenu",
+                title: "Corregir información requerida",
+                text: "Cuando el aprobador solicita información, la opción Corregir permite abrir únicamente los campos marcados para ajuste y enviarlos nuevamente a revisión.",
+                action: "openMyRequestMenu"
             },
             {
                 page: "seguridad.html",
                 module: "Seguridad",
                 target: "main, .security-coming-soon, .security-message",
                 title: "Próxima implementación",
-                text: "Seguridad se implementará posteriormente para construir usuarios y asignar accesos según el grupo al que pertenezcan.",
-                note: "Actualmente el módulo muestra un mensaje informativo."
+                text: "Seguridad se implementará posteriormente para construir usuarios y asignar accesos según el grupo al que pertenezcan."
             },
             {
                 page: "landing-ia.html",
                 module: "Landing IA",
                 target: "main",
                 title: "Asistente del portal",
-                text: "Landing IA orienta consultas y ayuda a localizar el módulo relacionado con la necesidad planteada."
-            },
-            {
-                page: "landing-ia.html",
-                module: "Landing IA",
-                target: "textarea, input[type='text'], .conversation, .chat-panel",
-                title: "Realizar una consulta",
-                text: "El área de conversación permite escribir consultas y utilizar las sugerencias disponibles."
+                text: "Landing IA orienta consultas y ayuda a localizar servicios y contenidos disponibles."
             },
             {
                 page: "comunicados.html",
@@ -593,13 +667,6 @@
                 target: "main",
                 title: "Avisos y novedades",
                 text: "Comunicados reúne las publicaciones y actualizaciones disponibles en el portal."
-            },
-            {
-                page: "comunicados.html",
-                module: "Comunicados",
-                target: "input[type='search'], .filters, .communications-grid, .panel",
-                title: "Buscar y consultar publicaciones",
-                text: "Las opciones disponibles permiten buscar, filtrar y abrir el detalle de un comunicado."
             },
             {
                 page: "index.html",
@@ -635,6 +702,33 @@
         let guideStarted = false;
 
         toolbarTotal.textContent = `${guideSteps.length} pasos`;
+
+
+        function performStepAction(frameDocument, action)
+        {
+            if (!action)
+            {
+                return;
+            }
+
+            if (action === "openMyRequestMenu" || action === "openApprovalMenu")
+            {
+                const menu = frameDocument.getElementById("rowOptionsMenu");
+                if (menu && !menu.hidden)
+                {
+                    return;
+                }
+
+                const firstOptionsButton = frameDocument.querySelector(
+                    "[data-options-request-id]"
+                );
+
+                if (firstOptionsButton)
+                {
+                    firstOptionsButton.click();
+                }
+            }
+        }
 
         function findTarget(frameDocument, selectorList)
         {
@@ -696,7 +790,7 @@
                     guideLoading.hidden = true;
                     guideCard.hidden = false;
                 },
-                420
+                step.action ? 650 : 420
             );
 
             toolbarModule.textContent = step.module;
@@ -734,6 +828,19 @@
 
             currentPage = step.page;
             guideFrame.src = step.page;
+
+            window.setTimeout(
+                function ()
+                {
+                    if (!guideLoading.hidden)
+                    {
+                        guideLoading.hidden = true;
+                        guideCard.hidden = false;
+                        guideFocus.hidden = true;
+                    }
+                },
+                5000
+            );
         }
 
         guideFrame.addEventListener(
