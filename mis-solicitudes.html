@@ -1742,8 +1742,7 @@
             const filtered = allRequests.filter((request) => {
                 const requestStatus = request.estado || "Enviada";
                 const requestIssuerOption = `${request.emisor || "Sin emisor"} · OP${request.opcion || ""}`;
-                return
-                    (
+                return (
                         !requestId ||
                         normalize(request.id).includes(requestId) ||
                         normalize(request.cliente).includes(requestId) ||
