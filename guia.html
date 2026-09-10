@@ -533,9 +533,17 @@
                             module: "Formularios",
                             target: "#parameterRequests, #parameterForms, #formsContainer, .parameter-requests, .forms-grid, .catalog-grid, .form-list, main",
                             title: "Formularios de parámetros",
-                            text: "En esta sección se encuentran todos los formularios disponibles para realizar solicitudes de parámetros. Para continuar con la demostración, seleccione Siguiente; la guía abrirá directamente la opción 05 sin ejecutar el acceso protegido."
+                            text: "En esta sección se encuentran todos los formularios disponibles para realizar solicitudes de parámetros."
                         },
-            
+            {
+                            page: "formularios.html",
+                            module: "Formularios",
+                            target: "[href*='opcion=05'], [data-option='05'], [data-option='5'], [data-code='05'], [data-code='5']",
+                            title: "Opción 05",
+                            settleTime: 420,
+                            text: "Para esta demostración se seleccionará la opción 05, correspondiente a Parámetros generales del emisor. Al seleccionar Siguiente se abrirá el formulario.",
+                            actionOnNext: "openOption05"
+                        },
             {
                             page: "formulario-parametros.html?opcion=05",
                             module: "Solicitudes de parámetros",
@@ -749,7 +757,6 @@
         let guideTransitioning = false;
 
         toolbarTotal.textContent = `${guideSteps.length} pasos`;
-        localStorage.removeItem("siscardGuideStep");
 
 
         function findClickableByText(frameDocument, texts)
@@ -881,12 +888,8 @@
                     );
                     closeControl?.click();
 
-                    if (
-                        element.dataset.siscardDemoSuppressed !== "true" &&
-                        element.getClientRects().length > 0
-                    )
+                    if (element.getClientRects().length > 0)
                     {
-                        element.dataset.siscardDemoSuppressed = "true";
                         element.hidden = true;
                         element.style.display = "none";
                         element.setAttribute("aria-hidden", "true");
@@ -901,6 +904,28 @@
         function installDemoCredentialGuard(frameDocument)
         {
             suppressDemoCredentialPrompt(frameDocument);
+
+            if (frameDocument.__siscardDemoCredentialGuard)
+            {
+                return;
+            }
+
+            frameDocument.__siscardDemoCredentialGuard =
+                new frameDocument.defaultView.MutationObserver(
+                    function ()
+                    {
+                        suppressDemoCredentialPrompt(frameDocument);
+                    }
+                );
+            frameDocument.__siscardDemoCredentialGuard.observe(
+                frameDocument.body,
+                {
+                    childList: true,
+                    subtree: true,
+                    attributes: true,
+                    attributeFilter: ["hidden", "class", "style"]
+                }
+            );
         }
 
         function findReviewControls(frameDocument)
@@ -1439,7 +1464,7 @@
             guideWelcome.hidden=true; guideFrame.hidden=false;
             guideInteractionBlocker.hidden=false; guideCard.hidden=true;
             guideFocus.hidden=true; guideLoading.hidden=false;
-            guideLoading.textContent = "";
+            guideLoading.textContent="Preparando paso...";
             if (
                 currentPage === step.page &&
                 guideFrame.contentDocument &&
@@ -1475,7 +1500,7 @@
         guideFrame.addEventListener("load",function(){
             if(!guideStarted || guideFrame.contentWindow.location.href==="about:blank") return;
             showCurrentStep().catch(()=>{
-                guideLoading.textContent = "";
+                guideLoading.textContent="No fue posible señalar el elemento. Continúe con el siguiente paso.";
                 guideCard.hidden=false; guideFocus.hidden=true; guideTransitioning=false;
                 previousButton.disabled=currentStep===0; nextButton.disabled=false;
             });
