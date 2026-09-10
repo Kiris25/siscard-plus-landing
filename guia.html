@@ -510,6 +510,36 @@
             {
                 page: "formulario-parametros.html?opcion=05",
                 module: "Solicitudes de parámetros",
+                target: "#templateOverlay",
+                title: "Información anterior encontrada",
+                text: "Al ingresar, el sistema verifica si existe información anterior de la opción 05 y presenta una ventana para decidir cómo continuar.",
+                note: "Esta función evita tener que completar nuevamente datos ya registrados."
+            },
+            {
+                page: "formulario-parametros.html?opcion=05",
+                module: "Solicitudes de parámetros",
+                target: ".template-actions",
+                title: "Opciones para continuar",
+                text: "Iniciar en blanco comienza una solicitud nueva y limpia los datos anteriores. Utilizar información anterior recupera los datos generales y las respuestas guardadas."
+            },
+            {
+                page: "formulario-parametros.html?opcion=05",
+                module: "Solicitudes de parámetros",
+                target: "#loadTemplateButton",
+                title: "Utilizar información anterior",
+                text: "Para esta demostración se utilizará la información anterior. Al seleccionar Siguiente, la guía recuperará los datos guardados y continuará con el formulario.",
+                actionOnNext: "usePreviousInformation"
+            },
+            {
+                page: "formulario-parametros.html?opcion=05",
+                module: "Solicitudes de parámetros",
+                target: "#requestForm",
+                title: "Información recuperada",
+                text: "Los datos generales y las respuestas anteriores se cargan en el formulario. A partir de este punto se puede continuar revisando, completando o modificando la solicitud."
+            },
+            {
+                page: "formulario-parametros.html?opcion=05",
+                module: "Solicitudes de parámetros",
                 target: "#requestForm",
                 title: "Datos generales de la solicitud",
                 text: "En esta sección se registran cliente, emisor, acción, producto y la fecha requerida."
@@ -711,6 +741,20 @@
                 return;
             }
 
+            if (action === "usePreviousInformation")
+            {
+                const usePreviousButton = frameDocument.getElementById(
+                    "loadTemplateButton"
+                );
+
+                if (usePreviousButton)
+                {
+                    usePreviousButton.click();
+                }
+
+                return;
+            }
+
             if (action === "openMyRequestMenu" || action === "openApprovalMenu")
             {
                 const menu = frameDocument.getElementById("rowOptionsMenu");
@@ -773,6 +817,7 @@
                 return;
             }
 
+            performStepAction(frameDocument, step.action);
             const target = findTarget(frameDocument, step.target);
 
             target.scrollIntoView(
@@ -895,6 +940,26 @@
                     localStorage.setItem("siscardQuickGuideCompleted", "true");
                     window.location.href = "index.html";
                     return;
+                }
+
+                const currentGuideStep = guideSteps[currentStep];
+
+                if (currentGuideStep.actionOnNext)
+                {
+                    try
+                    {
+                        performStepAction(
+                            guideFrame.contentDocument,
+                            currentGuideStep.actionOnNext
+                        );
+                    }
+                    catch (error)
+                    {
+                        console.info(
+                            "No fue posible ejecutar la acción guiada.",
+                            error
+                        );
+                    }
                 }
 
                 currentStep += 1;
