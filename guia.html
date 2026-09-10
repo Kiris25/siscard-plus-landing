@@ -533,16 +533,9 @@
                             module: "Formularios",
                             target: "#parameterRequests, #parameterForms, #formsContainer, .parameter-requests, .forms-grid, .catalog-grid, .form-list, main",
                             title: "Formularios de parámetros",
-                            text: "En esta sección se encuentran todos los formularios disponibles para realizar solicitudes de parámetros."
+                            text: "En esta sección se encuentran todos los formularios disponibles para realizar solicitudes de parámetros. Para continuar con la demostración, seleccione Siguiente; la guía abrirá directamente la opción 05 sin ejecutar el acceso protegido."
                         },
-            {
-                            page: "formularios.html",
-                            module: "Formularios",
-                            target: "[href*='opcion=05'], [data-option='05'], [data-option='5'], [data-code='05'], [data-code='5']",
-                            title: "Opción 05",
-                            settleTime: 420,
-                            text: "Para esta demostración se seleccionará la opción 05, correspondiente a Parámetros generales del emisor. Al seleccionar Siguiente se abrirá el formulario directamente en modo demostración."
-                        },
+            
             {
                             page: "formulario-parametros.html?opcion=05",
                             module: "Solicitudes de parámetros",
@@ -1484,15 +1477,13 @@
             }
 
             currentPage = step.page;
-            sessionStorage.setItem("siscardGuideMode", "true");
-            sessionStorage.setItem("siscardDemoMode", "true");
             const separator = step.page.includes("?") ? "&" : "?";
             guideFrame.src = "about:blank";
             window.setTimeout(
                 function ()
                 {
                     guideFrame.src =
-                        `${step.page}${separator}guiaPaso=${currentStep}&modoDemo=true`;
+                        `${step.page}${separator}guiaPaso=${currentStep}`;
                 },
                 20
             );
