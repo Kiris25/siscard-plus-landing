@@ -1851,7 +1851,55 @@
             if (!form.reportValidity()) return false;
             return true;
         }
+        function containsForbiddenDemoWord(value) {
+            return /(^|[^a-z0-9])demo([^a-z0-9]|$)/i.test(
+                String(value || "")
+                    .normalize("NFD")
+                    .replace(/[\u0300-\u036f]/g, "")
+            );
+        }
+        function validateDemoWordRestriction() {
+            if (guideDemoIsActive()) {
+                return true;
+            }
+            const clientControl = document.getElementById("clientName");
+            const issuerControl = document.getElementById("issuerName");
+            const clientHasDemo = containsForbiddenDemoWord(
+                clientControl.value
+            );
+            const issuerHasDemo = containsForbiddenDemoWord(
+                issuerControl.value
+            );
+            clientControl.setCustomValidity(
+                clientHasDemo
+                    ? 'No se permite utilizar la palabra "DEMO" en Cliente.'
+                    : ""
+            );
+            issuerControl.setCustomValidity(
+                issuerHasDemo
+                    ? 'No se permite utilizar la palabra "DEMO" en Emisor.'
+                    : ""
+            );
+            if (clientHasDemo) {
+                clientControl.reportValidity();
+                clientControl.focus();
+                showToast(
+                    'No se permite utilizar la palabra "DEMO" en Cliente.'
+                );
+                return false;
+            }
+            if (issuerHasDemo) {
+                issuerControl.reportValidity();
+                issuerControl.focus();
+                showToast(
+                    'No se permite utilizar la palabra "DEMO" en Emisor.'
+                );
+                return false;
+            }
+            return true;
+        }
         function openConfirmation() {
+            if (!validateDemoWordRestriction()) return;
             if (!validateHeader()) return;
             synchronizeVisibleParameterValues();
             const selectedProduct =
@@ -2368,6 +2416,14 @@
             if (button) loadOption(button.dataset.option);
         });
 
+        ["clientName", "issuerName"].forEach((controlId) => {
+            document.getElementById(controlId).addEventListener(
+                "input",
+                function(event) {
+                    event.target.setCustomValidity("");
+                }
+            );
+        });
         document.getElementById("productFilter").addEventListener("change", renderParameters);
         document.getElementById("parameterSearchInput").addEventListener("input", renderParameters);
         document.getElementById("parameterSearchForm").addEventListener("submit", (event) => {
