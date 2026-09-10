@@ -836,10 +836,10 @@
     "producto": "Corporativo",
     "fechaSolicitud": "2026-09-10",
     "fechaRequerida": "2026-09-10T12:00",
-    "estado": "Enviada",
-    "aprobador": "",
+    "estado": "En revisión",
+    "aprobador": "Seguridad",
     "fechaCreacion": "2026-09-10T17:40:42.896Z",
-    "fechaActualizacion": "2026-09-10T17:40:42.896Z",
+    "fechaActualizacion": "2026-09-10T17:41:07.420Z",
     "comentarios": [],
     "historial": [
       {
@@ -847,6 +847,12 @@
         "fecha": "2026-09-10T17:40:42.896Z",
         "usuario": "DEMO",
         "comentario": "Solicitud enviada para revisión."
+      },
+      {
+        "estado": "En revisión",
+        "fecha": "2026-09-10T17:41:07.420Z",
+        "usuario": "Seguridad",
+        "comentario": "Solicitud actualizada a En revisión."
       }
     ],
     "parametros": [
@@ -1651,7 +1657,8 @@
         "revision": "Pendiente",
         "notaAprobador": ""
       }
-    ]
+    ],
+    "fechaToma": "2026-09-10T17:41:07.420Z"
   },
   {
     "id": "TESTAPP6TESTAPP6205100926",
