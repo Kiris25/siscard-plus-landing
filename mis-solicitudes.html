@@ -1066,38 +1066,67 @@
             return new TextDecoder().decode(bytes);
         }
 
+        function readCredential() {
+            return (localStorage.getItem(ACCESS_CREDENTIAL_KEY) || "").trim();
+        }
+        function sortRequests(requests) {
+            return requests.slice().sort((first, second) => {
+                const firstDate = Date.parse(
+                    first.fechaActualizacion || first.fechaCreacion || ""
+                ) || 0;
+                const secondDate = Date.parse(
+                    second.fechaActualizacion || second.fechaCreacion || ""
+                ) || 0;
+                return secondDate - firstDate;
+            });
+        }
+        async function readPublicRequests() {
+            const response = await fetch(publicRequestsUrl(), {
+                cache: "no-store"
+            });
+            if (!response.ok) {
+                throw new Error(`HTTP_${response.status}`);
+            }
+            const data = await response.json();
+            if (!Array.isArray(data)) {
+                throw new Error("INVALID_STRUCTURE");
+            }
+            return data;
+        }
         async function loadRequests() {
             loadingState.hidden = false;
             emptyState.hidden = true;
             errorState.hidden = true;
             requestsBody.innerHTML = "";
             try {
-                const response = await fetch(publicRequestsUrl(), {
-                    cache: "no-store"
-                });
-                if (!response.ok) {
-                    throw new Error(`HTTP_${response.status}`);
+                const credential = readCredential();
+                let data;
+                if (credential) {
+                    try {
+                        data = (await readRemoteRequests(credential)).requests;
+                    } catch (error) {
+                        if (error.message !== "CREDENTIAL_INVALID") {
+                            throw error;
+                        }
+                        localStorage.removeItem(ACCESS_CREDENTIAL_KEY);
+                        showToast("La validación guardada venció. Ingrésela nuevamente al guardar.");
+                        data = await readPublicRequests();
+                    }
+                } else {
+                    data = await readPublicRequests();
                 }
-                const data = await response.json();
-                if (!Array.isArray(data)) {
-                    throw new Error("INVALID_STRUCTURE");
-                }
-                allRequests = data.sort((a, b) => {
-                    const first = Date.parse(a.fechaCreacion || "") || 0;
-                    const second = Date.parse(b.fechaCreacion || "") || 0;
-                    return second - first;
-                });
+                allRequests = sortRequests(data);
                 refreshColumnFilterOptions();
                 renderRequests();
             } catch (error) {
                 console.error(error);
-                document.getElementById("requestCount").textContent = "Sin información disponible";
+                document.getElementById("requestCount").textContent =
+                    "Sin información disponible";
                 errorState.hidden = false;
             } finally {
                 loadingState.hidden = true;
             }
         }
-
         function dateKey(value) {
             const date = new Date(value || "");
             if (Number.isNaN(date.getTime())) return "";
@@ -1501,6 +1530,32 @@
                     );
                 }
             });
+            const historyStart = documentPdf.lastAutoTable.finalY + 7;
+            documentPdf.autoTable({
+                startY: historyStart,
+                theme: "grid",
+                head: [["Estado", "Fecha", "Usuario", "Comentario"]],
+                body: (request.historial || []).map((movement) => [
+                    movement.estado || "Actualización",
+                    formatDateTime(movement.fecha),
+                    movement.usuario || "",
+                    movement.comentario || ""
+                ]),
+                styles: {
+                    fontSize: 7,
+                    cellPadding: 2,
+                    overflow: "linebreak"
+                },
+                headStyles: {
+                    fillColor: [88, 89, 91]
+                },
+                columnStyles: {
+                    0: { cellWidth: 30 },
+                    1: { cellWidth: 32 },
+                    2: { cellWidth: 32 },
+                    3: { cellWidth: 88 }
+                }
+            });
             documentPdf.save(`${request.id || "solicitud"}.pdf`);
         }
 
@@ -1737,11 +1792,7 @@
                     throw new Error(`WRITE_FAILED_${response.status}`);
                 }
                 localStorage.setItem(ACCESS_CREDENTIAL_KEY, credential);
-                allRequests = current.requests.sort((first, second) => {
-                    const firstDate = Date.parse(first.fechaActualizacion || first.fechaCreacion || "") || 0;
-                    const secondDate = Date.parse(second.fechaActualizacion || second.fechaCreacion || "") || 0;
-                    return secondDate - firstDate;
-                });
+                allRequests = sortRequests(current.requests);
                 refreshColumnFilterOptions();
                 renderRequests();
                 closeCredentialDialog();
