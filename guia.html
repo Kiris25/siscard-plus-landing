@@ -429,6 +429,13 @@
                 Abriendo módulo...
             </div>
 
+            <div
+                id="guideInteractionBlocker"
+                aria-hidden="true"
+                style="position:absolute;inset:0;z-index:13;background:transparent;"
+                hidden
+            ></div>
+
             <div class="guide-focus" id="guideFocus" hidden></div>
 
             <section class="guide-card" id="guideCard" aria-live="polite" hidden>
@@ -510,24 +517,10 @@
             {
                 page: "formularios.html",
                 module: "Formularios",
-                target: "#parameterRequests, #parameterForms, #formsContainer, .parameter-requests, .forms-grid, .catalog-grid, .form-list, main",
-                title: "Lista de formularios",
-                text: "Desde la lista se selecciona la opción que corresponde al trámite requerido. Para esta demostración se continuará con la opción 05."
-            },
-            {
-                page: "formularios.html",
-                module: "Formularios",
-                target: "[href*='opcion=05'], [data-option='05'], [data-option='5'], .form-card, .service-card, main",
+                target: "[href*='opcion=05'], [data-option='05'], [data-option='5'], [data-code='05'], [data-code='5']",
                 title: "Abrir la opción 05",
                 text: "La opción 05 corresponde a Parámetros generales del emisor. Al seleccionar Siguiente, la guía simulará el clic sobre esta opción y abrirá el formulario.",
                 actionOnNext: "openOption05"
-            },
-            {
-                page: "formulario-parametros.html?opcion=05",
-                module: "Solicitudes de parámetros",
-                target: ".form-document",
-                title: "Formulario de la opción 05",
-                text: "El formulario de Parámetros generales del emisor permite registrar los datos de la solicitud y completar los parámetros requeridos."
             },
             {
                 page: "formulario-parametros.html?opcion=05",
@@ -551,13 +544,6 @@
                 title: "Utilizar información anterior",
                 text: "Para esta demostración se utilizará la información anterior. Al seleccionar Siguiente, la guía recuperará los datos guardados y continuará con el formulario.",
                 actionOnNext: "usePreviousInformation"
-            },
-            {
-                page: "formulario-parametros.html?opcion=05",
-                module: "Solicitudes de parámetros",
-                target: "#requestForm",
-                title: "Información recuperada",
-                text: "Los datos generales y las respuestas anteriores se cargan en el formulario. A partir de este punto se puede continuar revisando, completando o modificando la solicitud."
             },
             {
                 page: "formulario-parametros.html?opcion=05",
@@ -593,6 +579,7 @@
                 module: "Mis solicitudes",
                 target: "#requestsListView",
                 title: "Vista del usuario solicitante",
+                action: "filterDemo",
                 text: "Esta es la vista del usuario que ingresó los formularios. Aquí puede consultar el estado y seguimiento de sus solicitudes."
             },
             {
@@ -639,6 +626,7 @@
                 module: "Aprobaciones",
                 target: "#approvalListView",
                 title: "Solicitudes para revisar",
+                action: "filterDemo",
                 text: "Esta bandeja corresponde al proceso de revisión y presenta las solicitudes disponibles para el aprobador."
             },
             {
@@ -680,13 +668,6 @@
                 action: "openApprovalMenu",
                 actionOnNext: "openApprovalDetail",
                 cardPosition: "left"
-            },
-            {
-                page: "aprobaciones.html",
-                module: "Aprobaciones",
-                target: ".approval-inbox-header .approval-request-actions",
-                title: "Actualizar y exportar historial",
-                text: "Actualizar vuelve a cargar la bandeja. Descargar historial Excel genera el registro consolidado de solicitudes y movimientos."
             },
             {
                 page: "aprobaciones.html",
@@ -740,6 +721,9 @@
         const guideWelcome = document.getElementById("guideWelcome");
         const guideLoading = document.getElementById("guideLoading");
         const guideFocus = document.getElementById("guideFocus");
+        const guideInteractionBlocker = document.getElementById(
+            "guideInteractionBlocker"
+        );
         const guideCard = document.getElementById("guideCard");
         const guideStage = document.getElementById("guideStage");
         const guideProgressBar = document.getElementById("guideProgressBar");
@@ -799,34 +783,88 @@
             );
         }
 
+        function findDemoRow(frameDocument)
+        {
+            const rows = Array.from(
+                frameDocument.querySelectorAll(
+                    "tr, .request-row, .approval-row, .request-card"
+                )
+            );
+
+            return rows.find(
+                function (row)
+                {
+                    return String(row.textContent || "")
+                        .toLowerCase()
+                        .includes("demo");
+                }
+            ) || rows[0] || frameDocument.body;
+        }
+
         function openFirstOptionsMenu(frameDocument)
         {
-            const menu = frameDocument.getElementById("rowOptionsMenu");
-
-            if (menu && !menu.hidden)
-            {
-                return menu;
-            }
-
+            const demoRow = findDemoRow(frameDocument);
             const firstOptionsButton =
-                frameDocument.querySelector("[data-options-request-id]") ||
-                findClickableByText(frameDocument, ["más opciones", "mas opciones"]);
+                demoRow.querySelector?.("[data-options-request-id]") ||
+                findClickableByText(demoRow, ["más opciones", "mas opciones"]) ||
+                frameDocument.querySelector("[data-options-request-id]");
 
             if (firstOptionsButton)
             {
-                firstOptionsButton.scrollIntoView(
-                    { block: "center", inline: "center" }
-                );
                 firstOptionsButton.click();
             }
 
-            return frameDocument.getElementById("rowOptionsMenu");
+            const menu = frameDocument.getElementById("rowOptionsMenu");
+
+            if (menu)
+            {
+                menu.hidden = false;
+                Object.assign(
+                    menu.style,
+                    {
+                        position: "fixed",
+                        top: "150px",
+                        right: "28px",
+                        left: "auto",
+                        bottom: "auto",
+                        zIndex: "99999",
+                        maxHeight: "calc(100vh - 180px)",
+                        overflowY: "auto"
+                    }
+                );
+            }
+
+            return menu;
         }
 
         function performStepAction(frameDocument, action)
         {
             if (!action)
             {
+                return;
+            }
+
+            if (action === "filterDemo")
+            {
+                const searchInput =
+                    frameDocument.querySelector(
+                        "input[type='search'], " +
+                        "input[id*='search' i], " +
+                        "input[placeholder*='buscar' i], " +
+                        "input[placeholder*='solicitud' i]"
+                    );
+
+                if (searchInput)
+                {
+                    searchInput.value = "DEMO";
+                    searchInput.dispatchEvent(
+                        new Event("input", { bubbles: true })
+                    );
+                    searchInput.dispatchEvent(
+                        new Event("change", { bubbles: true })
+                    );
+                }
+
                 return;
             }
 
@@ -845,9 +883,6 @@
 
                 if (trigger)
                 {
-                    trigger.scrollIntoView(
-                        { behavior: "smooth", block: "center" }
-                    );
                     trigger.click();
                 }
 
@@ -1047,6 +1082,7 @@
             guideStarted = true;
             guideWelcome.hidden = true;
             guideFrame.hidden = false;
+            guideInteractionBlocker.hidden = false;
             guideCard.hidden = true;
             guideFocus.hidden = true;
             guideLoading.hidden = false;
