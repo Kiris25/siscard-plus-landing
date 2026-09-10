@@ -336,13 +336,13 @@
             position: absolute;
             inset: 0;
             z-index: 12;
-            display: grid;
-            place-items: center;
-            background: rgba(255, 255, 255, 0.72);
-            color: var(--guide-gray);
+            display: block;
+            background: rgba(255, 255, 255, 0.08);
+            color: transparent;
+            font-size: 0;
             opacity: 1;
-            transition: opacity 0.18s ease;
-            font-weight: 700;
+            pointer-events: none;
+            transition: opacity 0.12s ease;
         }
 
         .guide-loading[hidden] {
@@ -963,11 +963,46 @@
 
             if (action === "usePreviousInformation")
             {
-                const button = frameDocument.getElementById("loadTemplateButton");
-                button?.click();
-                return;
-            }
+                const overlay = frameDocument.getElementById(
+                    "templateOverlay"
+                );
+                const button = frameDocument.getElementById(
+                    "loadTemplateButton"
+                );
 
+                if (!button)
+                {
+                    return false;
+                }
+
+                if (overlay)
+                {
+                    overlay.hidden = false;
+                }
+
+                button.focus();
+                button.dispatchEvent(
+                    new frameDocument.defaultView.MouseEvent(
+                        "click",
+                        {
+                            bubbles: true,
+                            cancelable: true,
+                            view: frameDocument.defaultView
+                        }
+                    )
+                );
+
+                if (
+                    overlay &&
+                    !overlay.hidden &&
+                    typeof frameDocument.defaultView.loadLastTemplate === "function"
+                )
+                {
+                    frameDocument.defaultView.loadLastTemplate();
+                }
+
+                return true;
+            }
             if (
                 action === "openMyRequestMenu" ||
                 action === "openApprovalMenu" ||
@@ -1125,7 +1160,11 @@
                 const overlay = frameDocument.getElementById("templateOverlay");
                 if (overlay && !overlay.hidden)
                 {
-                    frameDocument.getElementById("loadTemplateButton")?.click();
+                    performStepAction(
+                        frameDocument,
+                        "usePreviousInformation"
+                    );
+                    await waitUntilOverlayCloses(frameDocument);
                 }
             }
 
@@ -1163,7 +1202,7 @@
             guideWelcome.hidden=true; guideFrame.hidden=false;
             guideInteractionBlocker.hidden=false; guideCard.hidden=true;
             guideFocus.hidden=true; guideLoading.hidden=false;
-            guideLoading.textContent="Preparando paso...";
+            guideLoading.textContent = "";
             currentPage=step.page;
             const separator=step.page.includes("?")?"&":"?";
             guideFrame.src="about:blank";
@@ -1173,7 +1212,7 @@
         guideFrame.addEventListener("load",function(){
             if(!guideStarted || guideFrame.contentWindow.location.href==="about:blank") return;
             showCurrentStep().catch(()=>{
-                guideLoading.textContent="No fue posible señalar el elemento. Continúe con el siguiente paso.";
+                guideLoading.textContent = "";
                 guideCard.hidden=false; guideFocus.hidden=true; guideTransitioning=false;
                 previousButton.disabled=currentStep===0; nextButton.disabled=false;
             });
@@ -1181,18 +1220,58 @@
 
         document.getElementById("startGuideButton").addEventListener("click",function(){currentStep=0;loadCurrentStep();});
 
+        async function waitUntilOverlayCloses(frameDocument)
+        {
+            const startedAt = Date.now();
+
+            while (Date.now() - startedAt < 2400)
+            {
+                const overlay = frameDocument.getElementById(
+                    "templateOverlay"
+                );
+
+                if (!overlay || overlay.hidden)
+                {
+                    return true;
+                }
+
+                await new Promise(
+                    resolve => window.setTimeout(resolve, 80)
+                );
+            }
+
+            return false;
+        }
+
         async function goToGuideStep(nextStep,direction)
         {
             if(guideTransitioning || nextStep<0 || nextStep>=guideSteps.length) return;
             guideTransitioning=true; previousButton.disabled=true; nextButton.disabled=true;
             guideFocus.hidden=true; guideCard.hidden=true; guideLoading.hidden=false;
             const leaving=guideSteps[currentStep];
-            if(direction==="next" && leaving.actionOnNext)
+            if (direction === "next" && leaving.actionOnNext)
             {
-                performStepAction(guideFrame.contentDocument,leaving.actionOnNext);
-                await new Promise(resolve=>window.setTimeout(resolve,750));
+                performStepAction(
+                    guideFrame.contentDocument,
+                    leaving.actionOnNext
+                );
+
+                if (leaving.actionOnNext === "usePreviousInformation")
+                {
+                    await waitUntilOverlayCloses(
+                        guideFrame.contentDocument
+                    );
+                }
+                else
+                {
+                    await new Promise(
+                        resolve => window.setTimeout(resolve, 420)
+                    );
+                }
             }
-            currentStep=nextStep; loadCurrentStep();
+
+            currentStep = nextStep;
+            loadCurrentStep();
         }
 
         previousButton.addEventListener("click",()=>goToGuideStep(currentStep-1,"previous"));
