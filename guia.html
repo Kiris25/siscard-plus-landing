@@ -338,8 +338,9 @@
             z-index: 12;
             display: grid;
             place-items: center;
-            background: rgba(255, 255, 255, 0.72);
-            color: var(--guide-gray);
+            background: rgba(255, 255, 255, 0.05);
+            color: transparent;
+            font-size: 0;
             opacity: 1;
             transition: opacity 0.18s ease;
             font-weight: 700;
@@ -1100,7 +1101,7 @@
         async function waitForStableLayout(frameDocument)
         {
             await (frameDocument.fonts?.ready || Promise.resolve());
-            await new Promise(resolve => window.setTimeout(resolve, 480));
+            await new Promise(resolve => window.setTimeout(resolve, 80));
             await new Promise(resolve =>
                 frameDocument.defaultView.requestAnimationFrame(() =>
                     frameDocument.defaultView.requestAnimationFrame(resolve)
@@ -1154,7 +1155,7 @@
             guideWelcome.hidden=true; guideFrame.hidden=false;
             guideInteractionBlocker.hidden=false; guideCard.hidden=true;
             guideFocus.hidden=true; guideLoading.hidden=false;
-            guideLoading.textContent="Preparando paso...";
+            guideLoading.textContent = "";
             if (
                 currentPage === step.page &&
                 guideFrame.contentDocument &&
@@ -1183,14 +1184,14 @@
                     guideFrame.src =
                         `${step.page}${separator}guiaPaso=${currentStep}`;
                 },
-                20
+                5
             );
         }
 
         guideFrame.addEventListener("load",function(){
             if(!guideStarted || guideFrame.contentWindow.location.href==="about:blank") return;
             showCurrentStep().catch(()=>{
-                guideLoading.textContent="No fue posible señalar el elemento. Continúe con el siguiente paso.";
+                guideLoading.textContent = "";
                 guideCard.hidden=false; guideFocus.hidden=true; guideTransitioning=false;
                 previousButton.disabled=currentStep===0; nextButton.disabled=false;
             });
@@ -1210,7 +1211,7 @@
             if(direction==="next" && leaving.actionOnNext)
             {
                 performStepAction(guideFrame.contentDocument,leaving.actionOnNext);
-                await new Promise(resolve=>window.setTimeout(resolve,750));
+                await new Promise(resolve=>window.setTimeout(resolve,120));
             }
             currentStep=nextStep; loadCurrentStep();
         }
