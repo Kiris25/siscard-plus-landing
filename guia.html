@@ -684,6 +684,7 @@
                             title: "Revisión y decisiones",
                             action: "openReviewWorkspace",
                             settleTime: 900,
+                            cardPosition: "left",
                             text: "Al tomar una solicitud, el detalle permite revisar parámetros, marcar Correcto o Requiere ajuste, agregar comentarios, aprobar, solicitar información o rechazar.",
                             note: "Las decisiones se explican sin ejecutarse durante la guía."
                         },
@@ -1288,6 +1289,83 @@
             performStepAction(frameDocument, step.action);
         }
 
+        async function waitForReviewControls(
+            frameDocument,
+            timeout = 3200
+        )
+        {
+            const startedAt = Date.now();
+
+            while (Date.now() - startedAt < timeout)
+            {
+                suppressDemoCredentialPrompt(frameDocument);
+
+                const reviewControls = findReviewControls(frameDocument);
+
+                if (reviewControls)
+                {
+                    return reviewControls;
+                }
+
+                await new Promise(
+                    resolve => window.setTimeout(resolve, 100)
+                );
+            }
+
+            return null;
+        }
+
+        async function prepareApprovalReview(frameDocument)
+        {
+            installDemoCredentialGuard(frameDocument);
+
+            let reviewControls = findReviewControls(frameDocument);
+
+            if (reviewControls)
+            {
+                return reviewControls;
+            }
+
+            const menu = openFirstOptionsMenu(frameDocument);
+            const scope = menu && !menu.hidden
+                ? menu
+                : frameDocument;
+            const takeButton = findClickableByText(scope, ["tomar"]);
+            const viewButton = findClickableByText(
+                scope,
+                ["ver detalle", "ver"]
+            );
+
+            if (takeButton)
+            {
+                takeButton.click();
+                reviewControls = await waitForReviewControls(
+                    frameDocument,
+                    1800
+                );
+            }
+
+            if (!reviewControls)
+            {
+                const secondMenu = openFirstOptionsMenu(frameDocument);
+                const secondScope = secondMenu && !secondMenu.hidden
+                    ? secondMenu
+                    : frameDocument;
+                const secondViewButton =
+                    findClickableByText(
+                        secondScope,
+                        ["ver detalle", "ver"]
+                    ) ||
+                    viewButton;
+                secondViewButton?.click();
+                reviewControls = await waitForReviewControls(
+                    frameDocument
+                );
+            }
+
+            return reviewControls;
+        }
+
         async function waitForStableLayout(frameDocument)
         {
             await (frameDocument.fonts?.ready || Promise.resolve());
@@ -1314,13 +1392,35 @@
             guideCard.removeAttribute("style");
             guideLoading.hidden = false;
             installDemoCredentialGuard(frameDocument);
-            prepareStepState(step, frameDocument);
+
+            let preparedReviewControls = null;
+
+            if (step.title === "Revisión y decisiones")
+            {
+                preparedReviewControls = await prepareApprovalReview(
+                    frameDocument
+                );
+            }
+            else
+            {
+                prepareStepState(step, frameDocument);
+            }
 
             await waitForStableLayout(frameDocument);
-            const target = resolveStepTarget(step, frameDocument);
-            target.scrollIntoView({behavior:"auto",block:"center",inline:"center"});
+            const target =
+                preparedReviewControls ||
+                resolveStepTarget(step, frameDocument);
+            target.scrollIntoView(
+                {
+                    behavior: "smooth",
+                    block: "center",
+                    inline: "center"
+                }
+            );
             await waitForStableLayout(frameDocument);
-            const settled = resolveStepTarget(step, frameDocument);
+            const settled =
+                preparedReviewControls ||
+                resolveStepTarget(step, frameDocument);
             positionFocus(settled);
             positionGuideCard(step, settled);
 
