@@ -6,6 +6,11 @@
     <meta name="description" content="Recorrido guiado del Landing Siscard+">
     <title>Guía interactiva | Landing Siscard+</title>
     <link rel="stylesheet" href="css/styles.css">
+    <link rel="prefetch" href="manuales.html">
+    <link rel="prefetch" href="formularios.html">
+    <link rel="prefetch" href="formulario-parametros.html?opcion=05">
+    <link rel="prefetch" href="mis-solicitudes.html">
+    <link rel="prefetch" href="aprobaciones.html">
     <style>
         :root {
             --guide-orange: #ff6c0c;
@@ -333,8 +338,10 @@
             z-index: 12;
             display: grid;
             place-items: center;
-            background: rgba(255, 255, 255, 0.88);
+            background: rgba(255, 255, 255, 0.72);
             color: var(--guide-gray);
+            opacity: 1;
+            transition: opacity 0.18s ease;
             font-weight: 700;
         }
 
@@ -507,9 +514,17 @@
                 text: "El campo de búsqueda y los filtros permiten localizar contenidos. Desde este módulo también se accede al repositorio de Parámetros del Emisor TRT08SN0."
             },
             {
+                page: "manuales.html",
+                module: "Manuales",
+                target: "a[href*='parametros-emisor'], [data-title*='Parámetros del Emisor'], .document-card, main",
+                title: "Contenido dinámico de Parámetros del Emisor",
+                text: "Este contenido abre el visor dinámico de Parámetros del Emisor TRT08SN0. Al seleccionar Siguiente, se abrirá en una pestaña independiente para mostrarlo sin interrumpir el recorrido.",
+                actionOnNext: "openDynamicParameters"
+            },
+            {
                 page: "formularios.html",
                 module: "Formularios",
-                target: "main",
+                target: "[data-section='solicitudes-parametros'], [data-target*='parametro'], [href*='solicitudes-parametros'], main",
                 title: "Solicitudes de parámetros",
                 text: "Esta opción despliega la lista de formularios disponibles para gestionar parámetros. Al seleccionar Siguiente, la guía simulará el clic para mostrar el catálogo.",
                 actionOnNext: "openParameterRequests"
@@ -518,8 +533,22 @@
                 page: "formularios.html",
                 module: "Formularios",
                 target: "[href*='opcion=05'], [data-option='05'], [data-option='5'], [data-code='05'], [data-code='5']",
+                title: "Catálogo de solicitudes",
+                text: "La página bajó una sola vez hasta la sección donde se encuentra la opción 05. Seleccione Siguiente para destacar esa opción."
+            },
+            {
+                page: "formularios.html",
+                module: "Formularios",
+                target: "[href*='opcion=05'], [data-option='05'], [data-option='5'], [data-code='05'], [data-code='5']",
+                title: "Opción 05",
+                text: "La opción 05 corresponde a Parámetros generales del emisor. Seleccione Siguiente para preparar su apertura."
+            },
+            {
+                page: "formularios.html",
+                module: "Formularios",
+                target: "[href*='opcion=05'], [data-option='05'], [data-option='5'], [data-code='05'], [data-code='5']",
                 title: "Abrir la opción 05",
-                text: "La opción 05 corresponde a Parámetros generales del emisor. Al seleccionar Siguiente, la guía simulará el clic sobre esta opción y abrirá el formulario.",
+                text: "Al seleccionar Siguiente, la guía simulará el clic sobre la opción 05 y abrirá el formulario.",
                 actionOnNext: "openOption05"
             },
             {
@@ -844,6 +873,28 @@
                 return;
             }
 
+            if (action === "openDynamicParameters")
+            {
+                const contentLink =
+                    frameDocument.querySelector(
+                        "a[href*='parametros-emisor']"
+                    ) ||
+                    findClickableByText(
+                        frameDocument,
+                        ["Parámetros del Emisor TRT08SN0", "Parámetros del Emisor"]
+                    );
+
+                if (contentLink)
+                {
+                    window.open(
+                        contentLink.href,
+                        "siscardParametrosDinamicos"
+                    );
+                }
+
+                return;
+            }
+
             if (action === "filterDemo")
             {
                 const searchInput =
@@ -884,6 +935,26 @@
                 if (trigger)
                 {
                     trigger.click();
+
+                    window.setTimeout(
+                        function ()
+                        {
+                            const option05 =
+                                frameDocument.querySelector(
+                                    "[href*='opcion=05'], [data-option='05'], " +
+                                    "[data-option='5'], [data-code='05'], [data-code='5']"
+                                ) ||
+                                findClickableByText(
+                                    frameDocument,
+                                    ["Opción 05", "Opción 5", "Parámetros generales del emisor"]
+                                );
+
+                            option05?.scrollIntoView(
+                                { behavior: "smooth", block: "center" }
+                            );
+                        },
+                        220
+                    );
                 }
 
                 return;
@@ -1056,7 +1127,7 @@
                     guideLoading.hidden = true;
                     guideCard.hidden = false;
                 },
-                step.action ? 650 : 420
+                step.action ? 280 : 160
             );
 
             toolbarModule.textContent = step.module;
@@ -1106,7 +1177,7 @@
                         guideFocus.hidden = true;
                     }
                 },
-                5000
+                2600
             );
         }
 
@@ -1195,12 +1266,14 @@
                     window.setTimeout(
                         advance,
                         currentGuideStep.actionOnNext === "usePreviousInformation"
-                            ? 900
+                            ? 520
                             : currentGuideStep.actionOnNext === "openParameterRequests"
-                                ? 1100
+                                ? 480
                                 : currentGuideStep.actionOnNext === "openOption05"
-                                    ? 1200
-                                    : 700
+                                    ? 620
+                                    : currentGuideStep.actionOnNext === "openDynamicParameters"
+                                        ? 260
+                                        : 360
                     );
                 }
                 else
