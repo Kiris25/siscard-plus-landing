@@ -883,6 +883,56 @@
                     padding: 10px;
                 }
             }
+
+            .approval-list-view[hidden],
+            .approval-detail-view[hidden] {
+                display: none !important;
+            }
+            .approval-filters {
+                display: grid;
+                grid-template-columns: repeat(6, minmax(120px, 1fr)) auto;
+                gap: 6px;
+                margin-bottom: 10px;
+            }
+            .approval-filter {
+                width: 100%;
+                min-height: 32px;
+                padding: 6px 8px;
+                border: 1px solid var(--line);
+                border-radius: 5px;
+                background: #ffffff;
+                font-size: 10px;
+            }
+            .approval-detail-back {
+                margin-bottom: 14px;
+            }
+            .approval-confirmation-overlay {
+                position: fixed;
+                inset: 0;
+                z-index: 1600;
+                display: grid;
+                place-items: center;
+                padding: 22px;
+                background: rgba(25, 25, 25, 0.74);
+                backdrop-filter: blur(4px);
+            }
+            .approval-confirmation-overlay[hidden] {
+                display: none !important;
+            }
+            .approval-confirmation-dialog {
+                width: min(480px, 100%);
+                padding: 24px;
+                border-top: 5px solid var(--green);
+                border-radius: var(--radius-large);
+                background: #ffffff;
+                box-shadow: 0 24px 70px rgba(0, 0, 0, 0.30);
+                text-align: center;
+            }
+            @media (max-width: 950px) {
+                .approval-filters {
+                    grid-template-columns: repeat(2, minmax(0, 1fr));
+                }
+            }
             @media print {
                 @page {
                     size: A4 landscape;
@@ -937,6 +987,7 @@
                 <div id="topbar-container"></div>
 
                 <main class="content">
+                    <div class="approval-list-view" id="approvalListView">
                     <div style="margin-bottom: 14px">
                         <a class="tertiary-button" href="aprobaciones.html">
                             ← Volver a la bandeja
@@ -965,11 +1016,25 @@
                                 </button>
                             </div>
                         </div>
+                        <div class="approval-filters">
+                            <input class="approval-filter" id="approvalFilterId" placeholder="Solicitud">
+                            <input class="approval-filter" id="approvalFilterDate" type="date" title="Fecha de envío">
+                            <select class="approval-filter" id="approvalFilterClient"><option value="">Todos los clientes</option></select>
+                            <select class="approval-filter" id="approvalFilterIssuer"><option value="">Todos los emisores</option></select>
+                            <select class="approval-filter" id="approvalFilterProduct"><option value="">Todos los productos</option></select>
+                            <select class="approval-filter" id="approvalFilterStatus"><option value="">Todos los estados</option></select>
+                            <button class="tertiary-button" id="clearApprovalFiltersButton" type="button">Limpiar</button>
+                        </div>
                         <div
                             class="approval-request-list"
                             id="approvalRequestList"
                         ></div>
                     </section>
+                    </div>
+                    <div class="approval-detail-view" id="approvalDetailView" hidden>
+                        <div class="approval-detail-back">
+                            <button class="tertiary-button" id="approvalBackButton" type="button">← Volver a la bandeja</button>
+                        </div>
                     <section
                         class="form-document"
                         id="approvalFormDocument"
@@ -1124,11 +1189,19 @@
                             <div class="empty-state">Cargando parámetros...</div>
                         </div>
                     </section>
+                    </div>
                 </main>
                 <div id="footer-container"></div>
             </div>
         </div>
 
+        <div class="approval-confirmation-overlay" id="approvalConfirmationOverlay" hidden>
+            <section class="approval-confirmation-dialog" role="dialog" aria-modal="true">
+                <h2>Solicitud enviada a corrección</h2>
+                <p>La solicitud quedó disponible para que el solicitante realice los ajustes.</p>
+                <button class="primary-button" id="closeApprovalConfirmationButton" type="button">Aceptar</button>
+            </section>
+        </div>
         <div class="credential-overlay" id="credentialOverlay" hidden>
             <section class="credential-dialog" role="dialog" aria-modal="true" aria-labelledby="credentialTitle">
                 <header class="credential-header">
@@ -1979,6 +2052,7 @@
                         showToast("La validación guardada venció. Ingrésela nuevamente al guardar.");
                     }
                     requestStore = sortRequestStore(remote.requests);
+                    refreshApprovalFilters();
                     renderApprovalRequestList();
                 } catch (error) {
                     console.error(error);
@@ -2006,8 +2080,71 @@
                 }
                 await action(saved);
             }
+            function parameterValue(parameter) {
+                return String(
+                    parameter?.valor ??
+                    parameter?.value ??
+                    parameter?.respuesta ??
+                    ""
+                );
+            }
+            function normalizeSubmittedParameter(parameter, index) {
+                return {
+                    ...parameter,
+                    id: parameter.id || `parametro-${index + 1}`,
+                    name: parameter.nombre || parameter.name || parameter.parametro || parameter.id || `Parámetro ${index + 1}`,
+                    product: parameter.producto || parameter.product || "Todos",
+                    required: Boolean(parameter.obligatorio ?? parameter.required),
+                    value: parameterValue(parameter),
+                    reviewStatus: parameter.revision || parameter.reviewStatus || "Pendiente",
+                    approvalNote: parameter.notaAprobador || parameter.approvalNote || "",
+                    values: Array.isArray(parameter.valoresPermitidos) ? parameter.valoresPermitidos : [],
+                    rawValues: "",
+                    description: "",
+                    operation: "",
+                    dependencies: "",
+                    notes: "",
+                    number: index + 1
+                };
+            }
+            function approvalDateKey(value) {
+                const date = new Date(value || "");
+                return Number.isNaN(date.getTime()) ? "" : date.toISOString().slice(0, 10);
+            }
+            function filteredApprovalRequests() {
+                const id = normalize(document.getElementById("approvalFilterId").value);
+                const date = document.getElementById("approvalFilterDate").value;
+                const client = document.getElementById("approvalFilterClient").value;
+                const issuer = document.getElementById("approvalFilterIssuer").value;
+                const product = document.getElementById("approvalFilterProduct").value;
+                const status = document.getElementById("approvalFilterStatus").value;
+                return loadRequests().filter((request) =>
+                    (!id || normalize(request.id).includes(id)) &&
+                    (!date || approvalDateKey(request.fechaCreacion || request.fechaSolicitud) === date) &&
+                    (!client || request.cliente === client) &&
+                    (!issuer || request.emisor === issuer) &&
+                    (!product || (request.producto || "Todos") === product) &&
+                    (!status || (request.estado || "Enviada") === status)
+                );
+            }
+            function populateApprovalFilter(id, values, label) {
+                const select = document.getElementById(id);
+                const selected = select.value;
+                const options = [...new Set(values.filter(Boolean))].sort((a, b) =>
+                    String(a).localeCompare(String(b), "es", { sensitivity: "base" })
+                );
+                select.innerHTML = `<option value="">${label}</option>` + options.map((value) =>
+                    `<option value="${escapeHtml(value)}" ${value === selected ? "selected" : ""}>${escapeHtml(value)}</option>`
+                ).join("");
+            }
+            function refreshApprovalFilters() {
+                populateApprovalFilter("approvalFilterClient", requestStore.map((item) => item.cliente), "Todos los clientes");
+                populateApprovalFilter("approvalFilterIssuer", requestStore.map((item) => item.emisor), "Todos los emisores");
+                populateApprovalFilter("approvalFilterProduct", requestStore.map((item) => item.producto || "Todos"), "Todos los productos");
+                populateApprovalFilter("approvalFilterStatus", requestStore.map((item) => item.estado || "Enviada"), "Todos los estados");
+            }
             function renderApprovalRequestList() {
-                const requests = loadRequests();
+                const requests = filteredApprovalRequests();
                 const container = document.getElementById("approvalRequestList");
                 if (!requests.length) {
                     container.innerHTML =
@@ -2101,60 +2238,47 @@
                 `;
             }
             function selectApprovalRequest(requestId) {
-                const request = loadRequests().find((item) => item.id === requestId);
+                const request = loadRequests().find(
+                    (item) => String(item.id) === String(requestId)
+                );
                 if (!request) return;
                 selectedRequestId = requestId;
-                selectedRequest = request;
+                selectedRequest = structuredClone(request);
                 showEmptyParameters = false;
                 document.getElementById("toggleEmptyButton").textContent = "Vacíos";
-                document.getElementById("approvalFormDocument").style.display =
-                    "block";
-                document.getElementById("parameterSearchForm").style.display =
-                    "grid";
-                document.getElementById(
-                    "approvalParametersToolbar",
-                ).style.display = "flex";
-                document.getElementById(
-                    "approvalParametersPanel",
-                ).style.display = "block";
+                document.getElementById("approvalListView").hidden = true;
+                document.getElementById("approvalDetailView").hidden = false;
+                document.getElementById("approvalFormDocument").style.display = "block";
+                document.getElementById("parameterSearchForm").style.display = "grid";
+                document.getElementById("approvalParametersToolbar").style.display = "flex";
+                document.getElementById("approvalParametersPanel").style.display = "block";
                 currentOption = request.opcion || "05";
                 document.getElementById("clientName").value = request.cliente || "";
                 document.getElementById("issuerName").value = request.emisor || "";
                 document.getElementById("requestedAction").value = request.accion || "";
-                document.getElementById("productFilter").value =
-                    request.producto || "Todos";
-                document.getElementById("requestDate").value =
-                    request.fechaSolicitud || "";
-                document.getElementById("requiredDateTime").value =
-                    request.fechaRequerida || "";
-                document
-                    .querySelectorAll("#requestForm input, #requestForm select")
-                    .forEach((control) => {
-                        control.disabled = true;
-                    });
-                loadOption(currentOption).then(() => {
-                    const submitted = request.parametros || [];
-                    allParameters = allParameters
-                        .filter((parameter) =>
-                            submitted.some(
-                                (item) => String(item.id) === String(parameter.id),
-                            ),
-                        )
-                        .map((parameter) => {
-                            const stored = submitted.find(
-                                (item) => String(item.id) === String(parameter.id),
-                            );
-                            return {
-                                ...parameter,
-                                value: stored?.valor || "",
-                                reviewStatus: stored?.revision || "Pendiente",
-                                approvalNote: stored?.notaAprobador || "",
-                            };
-                        });
-                    renderParameters();
-                        renderApprovalButtons();
-                    renderApprovalRequestList();
+                document.getElementById("productFilter").value = request.producto || "Todos";
+                document.getElementById("requestDate").value = request.fechaSolicitud || "";
+                document.getElementById("requiredDateTime").value = request.fechaRequerida || "";
+                document.querySelectorAll("#requestForm input, #requestForm select").forEach((control) => {
+                    control.disabled = true;
                 });
+                const submitted = Array.isArray(request.parametros)
+                    ? request.parametros
+                    : [];
+                allParameters = submitted.map(normalizeSubmittedParameter);
+                collapsedCards.clear();
+                renderParameters();
+                renderApprovalButtons();
+                window.scrollTo({ top: 0, behavior: "smooth" });
+            }
+            function closeApprovalDetail() {
+                document.getElementById("approvalDetailView").hidden = true;
+                document.getElementById("approvalListView").hidden = false;
+                selectedRequestId = "";
+                selectedRequest = null;
+                allParameters = [];
+                renderApprovalRequestList();
+                window.scrollTo({ top: 0, behavior: "smooth" });
             }
             function saveCurrentReview() {
                 if (!selectedRequestId) return;
@@ -2296,10 +2420,16 @@
                         selectedRequest = structuredClone(updatedRequest);
                         selectedRequestId = updatedRequest.id;
                         document.getElementById("approvalGeneralComment").value = "";
+                        refreshApprovalFilters();
                         renderApprovalRequestList();
-                        selectApprovalRequest(updatedRequest.id);
                         closeCredentialDialog();
-                        showToast(`Solicitud actualizada a ${nextState}.`);
+                        if (nextState === "Requiere información") {
+                            document.getElementById("approvalConfirmationOverlay").hidden = false;
+                            document.body.style.overflow = "hidden";
+                        } else {
+                            selectApprovalRequest(updatedRequest.id);
+                            showToast(`Solicitud actualizada a ${nextState}.`);
+                        }
                     } catch (error) {
                         console.error(error);
                         if (error.message === "CREDENTIAL_INVALID") {
@@ -2319,7 +2449,7 @@
                 });
             }
             async function changeApprovalStateWithCredential(nextState, credential) {
-                localStorage.setItem(ACCESS_CREDENTIAL_KEY, credential);
+                localStorage.setItem(ACCESS_CREDENTIAL_KEY, credential.trim());
                 closeCredentialDialog();
                 await changeApprovalState(nextState);
             }
@@ -2329,6 +2459,7 @@
                 if (!selectedRequest) return;
                 if (["Enviada", "Pendiente", "Enviada a corregir"].includes(selectedRequest.estado)) {
                     await changeApprovalState("En revisión");
+                    return;
                 }
                 selectApprovalRequest(requestId);
             }
@@ -2570,6 +2701,36 @@
                 }
                 const action = pendingRemoteAction;
                 if (action) await action(credential);
+            });
+            document.getElementById("approvalBackButton").addEventListener("click", closeApprovalDetail);
+            document.getElementById("closeApprovalConfirmationButton").addEventListener("click", () => {
+                document.getElementById("approvalConfirmationOverlay").hidden = true;
+                document.body.style.overflow = "";
+                closeApprovalDetail();
+            });
+            [
+                "approvalFilterId",
+                "approvalFilterDate",
+                "approvalFilterClient",
+                "approvalFilterIssuer",
+                "approvalFilterProduct",
+                "approvalFilterStatus"
+            ].forEach((id) => {
+                document.getElementById(id).addEventListener("input", renderApprovalRequestList);
+                document.getElementById(id).addEventListener("change", renderApprovalRequestList);
+            });
+            document.getElementById("clearApprovalFiltersButton").addEventListener("click", () => {
+                [
+                    "approvalFilterId",
+                    "approvalFilterDate",
+                    "approvalFilterClient",
+                    "approvalFilterIssuer",
+                    "approvalFilterProduct",
+                    "approvalFilterStatus"
+                ].forEach((id) => {
+                    document.getElementById(id).value = "";
+                });
+                renderApprovalRequestList();
             });
             initializeRequests();
             document
