@@ -9,10 +9,10 @@
     "producto": "Corporativo",
     "fechaSolicitud": "2026-09-10",
     "fechaRequerida": "2026-09-10T12:00",
-    "estado": "Enviada",
-    "aprobador": "",
+    "estado": "En revisión",
+    "aprobador": "Seguridad",
     "fechaCreacion": "2026-09-10T15:19:10.076Z",
-    "fechaActualizacion": "2026-09-10T15:19:10.076Z",
+    "fechaActualizacion": "2026-09-10T15:25:27.825Z",
     "comentarios": [],
     "historial": [
       {
@@ -20,6 +20,12 @@
         "fecha": "2026-09-10T15:19:10.076Z",
         "usuario": "TESTAPP5",
         "comentario": "Solicitud enviada para revisión."
+      },
+      {
+        "estado": "En revisión",
+        "fecha": "2026-09-10T15:25:27.825Z",
+        "usuario": "Seguridad",
+        "comentario": "Solicitud actualizada a En revisión."
       }
     ],
     "parametros": [
@@ -29,7 +35,7 @@
         "producto": "Todos",
         "obligatorio": true,
         "valor": "PRUEBA",
-        "revision": "Pendiente",
+        "revision": "Requiere ajuste",
         "notaAprobador": ""
       },
       {
@@ -164,7 +170,7 @@
         "producto": "Todos",
         "obligatorio": true,
         "valor": "Empresarial",
-        "revision": "Pendiente",
+        "revision": "Requiere ajuste",
         "notaAprobador": ""
       },
       {
@@ -824,7 +830,8 @@
         "revision": "Pendiente",
         "notaAprobador": ""
       }
-    ]
+    ],
+    "fechaToma": "2026-09-10T15:25:27.825Z"
   },
   {
     "id": "TESTAPP4TESTAPP4105100926",
