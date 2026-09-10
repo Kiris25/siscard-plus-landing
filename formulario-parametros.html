@@ -710,6 +710,56 @@
             .parameter-card.collapsed .parameter-body { display:block; }
             .parameter-body { padding-left:0; }
         }
+
+        .success-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 1500;
+            display: grid;
+            place-items: center;
+            padding: 22px;
+            background: rgba(25, 25, 25, 0.78);
+            backdrop-filter: blur(5px);
+        }
+        .success-overlay[hidden] {
+            display: none !important;
+        }
+        .success-dialog {
+            width: min(560px, 100%);
+            overflow: hidden;
+            border-radius: var(--radius-large);
+            background: #ffffff;
+            box-shadow: 0 24px 70px rgba(0, 0, 0, 0.30);
+        }
+        .success-header {
+            padding: 24px;
+            border-top: 5px solid var(--green);
+            text-align: center;
+        }
+        .success-header h2 {
+            margin: 0;
+            color: var(--sidebar);
+        }
+        .success-header p {
+            margin: 10px 0 0;
+            color: var(--muted);
+            line-height: 1.5;
+        }
+        .success-request-id {
+            display: block;
+            margin-top: 10px;
+            color: var(--orange-dark);
+            font-weight: 850;
+            overflow-wrap: anywhere;
+        }
+        .success-actions {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            padding: 17px 24px;
+            border-top: 1px solid var(--line);
+            background: var(--surface-soft);
+        }
     </style>
 </head>
 <body
@@ -823,6 +873,13 @@
                     <div class="toolbar-actions">
                         <button class="tertiary-button" id="hideAllButton" type="button">Esconder todos</button>
                         <button class="tertiary-button" id="showAllButton" type="button">Mostrar todos</button>
+                        <button class="tertiary-button" id="importExcelButton" type="button">Importar Excel</button>
+                        <input
+                            id="importExcelInput"
+                            type="file"
+                            accept=".xlsx,.xls"
+                            hidden
+                        >
                         <button class="tertiary-button" id="exportExcelButton" type="button">Exportar Excel</button>
                         <button class="tertiary-button" id="exportPdfButton" type="button">Exportar PDF</button>
                         <button class="primary-button" id="saveButton" type="button">Enviar solicitud</button>
@@ -905,6 +962,22 @@
             <footer class="access-actions">
                 <button class="tertiary-button" id="cancelAccessButton" type="button">Cancelar</button>
                 <button class="primary-button" id="continueAccessButton" type="button">Continuar</button>
+            </footer>
+        </section>
+    </div>
+    <div class="success-overlay" id="successOverlay" hidden>
+        <section class="success-dialog" role="dialog" aria-modal="true" aria-labelledby="successTitle">
+            <header class="success-header">
+                <h2 id="successTitle">Solicitud enviada</h2>
+                <p>
+                    La solicitud se registró correctamente.
+                    <span class="success-request-id" id="successRequestId"></span>
+                </p>
+                <p>¿Desea enviar otra solicitud de la misma opción?</p>
+            </header>
+            <footer class="success-actions">
+                <button class="tertiary-button" id="newRequestNoButton" type="button">No</button>
+                <button class="primary-button" id="newRequestYesButton" type="button">Sí</button>
             </footer>
         </section>
     </div>
@@ -1700,7 +1773,18 @@
                 : Math.random().toString(36).slice(2, 12).toUpperCase();
             return `${clientCode}${issuerCode}${dateCode}-${timestamp}-${randomPart}`;
         }
+        function synchronizeVisibleParameterValues() {
+            document.querySelectorAll("[data-entry-id]").forEach((control) => {
+                const parameter = allParameters.find((item) =>
+                    String(item.id) === String(control.dataset.entryId)
+                );
+                if (parameter) {
+                    parameter.value = String(control.value || "").trim();
+                }
+            });
+        }
         function collectPayloadData(includeDefinitiveId = false) {
+            synchronizeVisibleParameterValues();
             const client = document.getElementById("clientName").value.trim();
             const issuer = document.getElementById("issuerName").value.trim();
             const now = new Date().toISOString();
@@ -1851,7 +1935,7 @@
             return new TextDecoder().decode(bytes);
         }
         function readCredential() {
-            return localStorage.getItem(ACCESS_CREDENTIAL_KEY) || "";
+            return (localStorage.getItem(ACCESS_CREDENTIAL_KEY) || "").trim();
         }
         function openAccessDialog(message = "") {
             closeConfirmation();
@@ -1985,13 +2069,17 @@
             );
             try {
                 await persistRequest(credential);
-                localStorage.setItem(ACCESS_CREDENTIAL_KEY, credential);
+                localStorage.setItem(ACCESS_CREDENTIAL_KEY, credential.trim());
                 saveLocalCopies(pendingRequestPayload);
-                const savedId = pendingRequestPayload.id;
+                const savedRequest = structuredClone(pendingRequestPayload);
+                const savedId = savedRequest.id;
                 pendingRequestPayload = null;
                 closeAccessDialog();
                 closeConfirmation();
-                showToast(`Solicitud ${savedId} enviada a Seguridad.`);
+                document.getElementById("successRequestId").textContent =
+                    `Solicitud ${savedId} enviada.`;
+                document.getElementById("successOverlay").hidden = false;
+                document.body.style.overflow = "hidden";
             } catch (error) {
                 console.error(error);
                 if (error.message === "CREDENTIAL_INVALID") {
@@ -2040,6 +2128,60 @@
             return btoa(binary);
         }
 
+        function importExcel() {
+            document.getElementById("importExcelInput").click();
+        }
+        async function processImportedExcel(event) {
+            const file = event.target.files?.[0];
+            event.target.value = "";
+            if (!file) return;
+            try {
+                const workbook = XLSX.read(await file.arrayBuffer(), {
+                    type: "array"
+                });
+                const sheet = workbook.Sheets[workbook.SheetNames[0]];
+                const rows = XLSX.utils.sheet_to_json(sheet, {
+                    header: 1,
+                    defval: ""
+                });
+                const headerIndex = rows.findIndex((row) =>
+                    row.some((cell) => normalize(cell) === "parametro") &&
+                    row.some((cell) => normalize(cell).includes("valor solicitado"))
+                );
+                if (headerIndex < 0) {
+                    showToast("El Excel no contiene la tabla de parámetros esperada.");
+                    return;
+                }
+                const headers = rows[headerIndex].map(normalize);
+                const parameterColumn = headers.findIndex((value) => value === "parametro");
+                const valueColumn = headers.findIndex((value) =>
+                    value.includes("valor solicitado") || value === "valor"
+                );
+                let imported = 0;
+                rows.slice(headerIndex + 1).forEach((row) => {
+                    const name = String(row[parameterColumn] || "").trim();
+                    const value = String(row[valueColumn] || "").trim();
+                    if (!name || !value) return;
+                    const parameter = allParameters.find((item) =>
+                        normalize(item.name) === normalize(name) ||
+                        normalize(item.id) === normalize(name)
+                    );
+                    if (parameter && !String(parameter.value || "").trim()) {
+                        parameter.value = value;
+                        imported += 1;
+                    }
+                });
+                renderParameters();
+                showToast(
+                    imported
+                        ? `${imported} respuesta${imported === 1 ? "" : "s"} importada${imported === 1 ? "" : "s"}.`
+                        : "No se encontraron respuestas nuevas para completar."
+                );
+            } catch (error) {
+                console.error(error);
+                showToast("No fue posible leer el archivo Excel.");
+            }
+        }
         function exportExcel() {
             if (!validateHeader()) return;
             const payload = exportPayload();
@@ -2181,6 +2323,17 @@
         document.getElementById("startBlankButton").addEventListener("click", startBlank);
         document.getElementById("templateOverlay").addEventListener("click", (event) => {
             if (event.target.id === "templateOverlay") closeTemplateDialog();
+        });
+        document.getElementById("importExcelButton").addEventListener("click", importExcel);
+        document.getElementById("importExcelInput").addEventListener("change", processImportedExcel);
+        document.getElementById("newRequestYesButton").addEventListener("click", () => {
+            document.getElementById("successOverlay").hidden = true;
+            document.body.style.overflow = "";
+            readLocalTemplate();
+            openTemplateDialog();
+        });
+        document.getElementById("newRequestNoButton").addEventListener("click", () => {
+            window.location.href = "formularios.html";
         });
         document.getElementById("exportExcelButton").addEventListener("click", exportExcel);
         document.getElementById("exportPdfButton").addEventListener("click", exportPdf);
