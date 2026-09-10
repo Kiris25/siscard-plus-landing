@@ -604,7 +604,7 @@
                                 id="heroGuideButton"
                                 type="button"
                             >
-                                ▶ Iniciar guía rápida
+                                ▶ Iniciar guía interactiva
                             </button>
                         </div>
                     </div>
@@ -618,12 +618,12 @@
                         </span>
 
                         <strong>
-                            Conozca el portal paso a paso
+                            Recorrido interactivo del portal
                         </strong>
 
                         <p>
-                            Reproduzca el recorrido que se mostrará automáticamente
-                            durante el primer ingreso de un cliente.
+                            Explore los módulos del Landing Siscard+ y conozca
+                            sus funciones mediante una demostración guiada.
                         </p>
 
                         <button
@@ -1067,7 +1067,7 @@
                                 </span>
 
                                 <strong>
-                                    Reproducir guía rápida
+                                    Reproducir guía interactiva
                                 </strong>
 
                                 <em>
@@ -1084,87 +1084,6 @@
     </div>
 
     <div
-        class="tour-overlay"
-        id="tourOverlay"
-        aria-hidden="true"
-    ></div>
-
-    <div
-        class="tour-highlight"
-        id="tourHighlight"
-        hidden
-    ></div>
-
-    <section
-        class="tour-card"
-        id="tourCard"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="tourTitle"
-    >
-        <header class="tour-card-header">
-            <strong>
-                Guía rápida Siscard+
-            </strong>
-
-            <button
-                id="closeTourButton"
-                type="button"
-                aria-label="Cerrar guía"
-            >
-                ×
-            </button>
-        </header>
-
-        <div class="tour-card-body">
-            <span
-                class="tour-step-label"
-                id="tourStepLabel"
-            >
-                Paso 1 de 11
-            </span>
-
-            <h2 id="tourTitle">
-                Bienvenida
-            </h2>
-
-            <p id="tourText"></p>
-
-            <div class="tour-progress">
-                <span id="tourProgressBar"></span>
-            </div>
-
-            <div class="tour-actions">
-                <button
-                    class="tour-button"
-                    id="skipTourButton"
-                    type="button"
-                >
-                    Omitir guía
-                </button>
-
-                <div class="tour-actions-group">
-                    <button
-                        class="tour-button"
-                        id="previousTourButton"
-                        type="button"
-                    >
-                        Anterior
-                    </button>
-
-                    <button
-                        class="tour-button primary"
-                        id="nextTourButton"
-                        type="button"
-                    >
-                        Siguiente
-                    </button>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <div
         class="toast"
         id="toast"
         role="status"
@@ -1177,406 +1096,32 @@
     <script>
         "use strict";
 
-        const tourOverlay =
-            document.getElementById("tourOverlay");
+        const guideButtons = document.querySelectorAll(
+            "#topGuideButton, #heroGuideButton, #cardGuideButton, #quickGuideButton"
+        );
 
-        const tourHighlight =
-            document.getElementById("tourHighlight");
-
-        const tourCard =
-            document.getElementById("tourCard");
-
-        const tourStepLabel =
-            document.getElementById("tourStepLabel");
-
-        const tourTitle =
-            document.getElementById("tourTitle");
-
-        const tourText =
-            document.getElementById("tourText");
-
-        const tourProgressBar =
-            document.getElementById("tourProgressBar");
-
-        const previousTourButton =
-            document.getElementById("previousTourButton");
-
-        const nextTourButton =
-            document.getElementById("nextTourButton");
+        guideButtons.forEach(
+            function (button)
+            {
+                button.addEventListener(
+                    "click",
+                    function ()
+                    {
+                        window.location.href = "guia.html";
+                    }
+                );
+            }
+        );
 
         const moduleCards = Array.from(
             document.querySelectorAll(".module-card")
-        );
-
-        let currentTourStep = 0;
-
-        let tourActive = false;
-
-        const tourSteps =
-        [
-            {
-                target: "[data-tour='welcome']",
-                title: "Bienvenida a Siscard+",
-                text:
-                    "Este es el Centro de Servicios Siscard+. Desde aquí se accede a documentación, parámetros, seguridad y otras herramientas."
-            },
-
-            {
-                target: "[data-tour='navigation']",
-                title: "Navegación principal",
-                text:
-                    "La barra lateral permite cambiar entre los módulos disponibles sin perder la referencia del portal."
-            },
-
-            {
-                target: "[data-tour='manuals']",
-                title: "Centro Documental",
-                text:
-                    "Manuales permite consultar documentación funcional, operativa y técnica mediante categorías y búsqueda."
-            },
-
-            {
-                target: "[data-tour='parameters']",
-                title: "Parámetros del Emisor",
-                text:
-                    "Parámetros abre el visor real del repositorio para localizar configuraciones documentadas."
-            },
-
-            {
-                target: "[data-tour='forms']",
-                title: "Formularios",
-                text:
-                    "Formularios reúne las opciones que el cliente puede completar y enviar a revisión."
-            },
-
-            {
-                target: "[data-tour='security']",
-                title: "Seguridad",
-                text:
-                    "Seguridad reúne gestiones de usuarios, grupos, mantenimiento de accesos y reportes."
-            },
-
-            {
-                target: "[data-tour='approvals']",
-                title: "Aprobaciones",
-                text:
-                    "Aprobaciones permite revisar formularios y solicitudes enviados por los clientes."
-            },
-
-            {
-                target: "[data-tour='requests']",
-                title: "Mis solicitudes",
-                text:
-                    "Mis solicitudes muestra el seguimiento y el estado de las gestiones registradas."
-            },
-
-            {
-                target: "[data-tour='ai']",
-                title: "Landing IA",
-                text:
-                    "Landing IA orienta consultas y dirige hacia el módulo relacionado con la necesidad expresada."
-            },
-
-            {
-                target: "[data-tour='communications']",
-                title: "Comunicados",
-                text:
-                    "Comunicados permite revisar avisos, novedades y actualizaciones del ecosistema Siscard+."
-            },
-
-            {
-                target: "[data-tour='modules']",
-                title: "Portal listo para utilizarse",
-                text:
-                    "La guía ha finalizado. Seleccione cualquiera de los módulos para comenzar a trabajar."
-            }
-        ];
-
-        function getTourTarget(step)
-        {
-            return document.querySelector(step.target);
-        }
-
-        function positionTourElements(target)
-        {
-            const rectangle = target.getBoundingClientRect();
-
-            const padding = 7;
-
-            tourHighlight.style.top =
-                `${Math.max(6, rectangle.top - padding)}px`;
-
-            tourHighlight.style.left =
-                `${Math.max(6, rectangle.left - padding)}px`;
-
-            tourHighlight.style.width =
-                `${Math.min(
-                    window.innerWidth - 12,
-                    rectangle.width + padding * 2
-                )}px`;
-
-            tourHighlight.style.height =
-                `${Math.min(
-                    window.innerHeight - 12,
-                    rectangle.height + padding * 2
-                )}px`;
-
-            if (window.innerWidth <= 650)
-            {
-                return;
-            }
-
-            const cardWidth = Math.min(
-                390,
-                window.innerWidth - 28
-            );
-
-            const preferredLeft =
-                rectangle.right + 18;
-
-            const alternativeLeft =
-                rectangle.left - cardWidth - 18;
-
-            let cardLeft = preferredLeft;
-
-            if (preferredLeft + cardWidth > window.innerWidth - 14)
-            {
-                cardLeft = Math.max(14, alternativeLeft);
-            }
-
-            let cardTop = rectangle.top;
-
-            const estimatedCardHeight = 285;
-
-            if (cardTop + estimatedCardHeight > window.innerHeight - 14)
-            {
-                cardTop = window.innerHeight - estimatedCardHeight - 14;
-            }
-
-            tourCard.style.left = `${cardLeft}px`;
-
-            tourCard.style.top = `${Math.max(14, cardTop)}px`;
-        }
-
-        function renderTourStep()
-        {
-            const step = tourSteps[currentTourStep];
-
-            const target = getTourTarget(step);
-
-            if (!target)
-            {
-                endTour(false);
-
-                return;
-            }
-
-            target.scrollIntoView(
-                {
-                    behavior: "smooth",
-                    block: "center"
-                }
-            );
-
-            window.setTimeout(
-                function()
-                {
-                    positionTourElements(target);
-
-                    tourStepLabel.textContent =
-                        `Paso ${currentTourStep + 1} de ${tourSteps.length}`;
-
-                    tourTitle.textContent = step.title;
-
-                    tourText.textContent = step.text;
-
-                    tourProgressBar.style.width =
-                        `${(
-                            (currentTourStep + 1) /
-                            tourSteps.length
-                        ) * 100}%`;
-
-                    previousTourButton.disabled =
-                        currentTourStep === 0;
-
-                    nextTourButton.textContent =
-                        currentTourStep === tourSteps.length - 1
-                            ? "Finalizar"
-                            : "Siguiente";
-
-                    tourHighlight.hidden = false;
-                },
-                380
-            );
-        }
-
-        function startTour()
-        {
-            currentTourStep = 0;
-
-            tourActive = true;
-
-            document.body.style.overflow = "hidden";
-
-            tourOverlay.classList.add("active");
-
-            tourOverlay.setAttribute(
-                "aria-hidden",
-                "false"
-            );
-
-            tourCard.classList.add("active");
-
-            renderTourStep();
-        }
-
-        function endTour(markCompleted)
-        {
-            tourActive = false;
-
-            document.body.style.overflow = "";
-
-            tourOverlay.classList.remove("active");
-
-            tourOverlay.setAttribute(
-                "aria-hidden",
-                "true"
-            );
-
-            tourCard.classList.remove("active");
-
-            tourHighlight.hidden = true;
-
-            if (markCompleted)
-            {
-                localStorage.setItem(
-                    "siscardQuickGuideCompleted",
-                    "true"
-                );
-            }
-        }
-
-        function nextTourStep()
-        {
-            if (currentTourStep === tourSteps.length - 1)
-            {
-                endTour(true);
-
-                return;
-            }
-
-            currentTourStep += 1;
-
-            renderTourStep();
-        }
-
-        function previousTourStep()
-        {
-            if (currentTourStep === 0)
-            {
-                return;
-            }
-
-            currentTourStep -= 1;
-
-            renderTourStep();
-        }
-
-        document
-            .querySelectorAll(
-                "#topGuideButton, #heroGuideButton, #cardGuideButton, #quickGuideButton"
-            )
-            .forEach(
-                function(button)
-                {
-                    button.addEventListener(
-                        "click",
-                        startTour
-                    );
-                }
-            );
-
-        document
-            .getElementById("closeTourButton")
-            .addEventListener(
-                "click",
-                function()
-                {
-                    endTour(false);
-                }
-            );
-
-        document
-            .getElementById("skipTourButton")
-            .addEventListener(
-                "click",
-                function()
-                {
-                    endTour(true);
-                }
-            );
-
-        previousTourButton.addEventListener(
-            "click",
-            previousTourStep
-        );
-
-        nextTourButton.addEventListener(
-            "click",
-            nextTourStep
-        );
-
-        window.addEventListener(
-            "resize",
-            function()
-            {
-                if (!tourActive)
-                {
-                    return;
-                }
-
-                const target = getTourTarget(
-                    tourSteps[currentTourStep]
-                );
-
-                if (target)
-                {
-                    positionTourElements(target);
-                }
-            }
-        );
-
-        document.addEventListener(
-            "keydown",
-            function(event)
-            {
-                if (!tourActive)
-                {
-                    return;
-                }
-
-                if (event.key === "Escape")
-                {
-                    endTour(false);
-                }
-
-                if (event.key === "ArrowRight")
-                {
-                    nextTourStep();
-                }
-
-                if (event.key === "ArrowLeft")
-                {
-                    previousTourStep();
-                }
-            }
         );
 
         document
             .getElementById("serviceSearchForm")
             .addEventListener(
                 "submit",
-                function(event)
+                function (event)
                 {
                     event.preventDefault();
 
@@ -1585,22 +1130,21 @@
                         .value
                         .toLowerCase()
                         .normalize("NFD")
-                        .replace(/[\\u0300-\\u036f]/g, "")
+                        .replace(/[\u0300-\u036f]/g, "")
                         .trim();
 
                     moduleCards.forEach(
-                        function(card)
+                        function (card)
                         {
                             const searchableText =
                                 `${card.textContent} ${card.dataset.search}`
                                     .toLowerCase()
                                     .normalize("NFD")
-                                    .replace(/[\\u0300-\\u036f]/g, "");
+                                    .replace(/[\u0300-\u036f]/g, "");
 
                             card.classList.toggle(
                                 "search-match",
-                                Boolean(query) &&
-                                searchableText.includes(query)
+                                Boolean(query) && searchableText.includes(query)
                             );
                         }
                     );
@@ -1621,17 +1165,16 @@
                 }
             );
 
-        /*
-         * En producción podrá habilitarse la apertura automática
-         * durante el primer ingreso descomentando este bloque:
-         *
-         * if (
-         *     !localStorage.getItem("siscardQuickGuideCompleted")
-         * )
-         * {
-         *     window.setTimeout(startTour, 700);
-         * }
-         */
+        if (!localStorage.getItem("siscardQuickGuideCompleted"))
+        {
+            window.setTimeout(
+                function ()
+                {
+                    window.location.href = "guia.html";
+                },
+                700
+            );
+        }
     </script>
 </body>
 
