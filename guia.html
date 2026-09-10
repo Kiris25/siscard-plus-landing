@@ -509,8 +509,9 @@
             {
                             page: "manuales.html",
                             module: "Manuales",
-                            target: "input[type='search'], input[type='text']",
+                            target: "#manualSearchInput, #documentSearchInput, #searchInput, input[type='search'], input[placeholder*='buscar' i]",
                             title: "Buscar documentación",
+                            settleTime: 420,
                             text: "Utilice la barra de búsqueda y los filtros para localizar los contenidos disponibles."
                         },
             {
@@ -539,6 +540,7 @@
                             module: "Formularios",
                             target: "[href*='opcion=05'], [data-option='05'], [data-option='5'], [data-code='05'], [data-code='5']",
                             title: "Opción 05",
+                            settleTime: 420,
                             text: "Para esta demostración se seleccionará la opción 05, correspondiente a Parámetros generales del emisor. Al seleccionar Siguiente se abrirá el formulario.",
                             actionOnNext: "openOption05"
                         },
@@ -680,7 +682,8 @@
                             module: "Aprobaciones",
                             target: "#approvalParametersToolbar, .review-actions, .decision-actions, #approvalDetailView:not([hidden]), .approval-detail:not([hidden]), main",
                             title: "Revisión y decisiones",
-                            action: "openApprovalDetail",
+                            action: "takeApprovalRequest",
+                            settleTime: 620,
                             text: "Al tomar una solicitud, el detalle permite revisar parámetros, marcar Correcto o Requiere ajuste, agregar comentarios, aprobar, solicitar información o rechazar.",
                             note: "Las decisiones se explican sin ejecutarse durante la guía."
                         },
@@ -989,6 +992,34 @@
                 return;
             }
 
+            if (action === "takeApprovalRequest")
+            {
+                const menu = openFirstOptionsMenu(frameDocument);
+                const scope = menu && !menu.hidden
+                    ? menu
+                    : frameDocument;
+                const takeButton = findClickableByText(
+                    scope,
+                    ["tomar"]
+                );
+
+                if (takeButton)
+                {
+                    takeButton.click();
+                }
+                else
+                {
+                    const demoRow = findDemoRow(frameDocument);
+                    const fallbackTake = findClickableByText(
+                        demoRow,
+                        ["tomar"]
+                    );
+                    fallbackTake?.click();
+                }
+
+                return;
+            }
+
             if (action === "openApprovalDetail")
             {
                 openFirstOptionsMenu(frameDocument);
@@ -1100,7 +1131,11 @@
         async function waitForStableLayout(frameDocument)
         {
             await (frameDocument.fonts?.ready || Promise.resolve());
-            await new Promise(resolve => window.setTimeout(resolve, 220));
+            const step = guideSteps[currentStep];
+            const settleTime = Number(step.settleTime || 220);
+            await new Promise(
+                resolve => window.setTimeout(resolve, settleTime)
+            );
             await new Promise(resolve =>
                 frameDocument.defaultView.requestAnimationFrame(() =>
                     frameDocument.defaultView.requestAnimationFrame(resolve)
@@ -1127,6 +1162,20 @@
             const settled = resolveStepTarget(step, frameDocument);
             positionFocus(settled);
             positionGuideCard(step, settled);
+
+            if (step.settleTime)
+            {
+                await new Promise(
+                    resolve => window.setTimeout(resolve, 90)
+                );
+                const finalTarget = resolveStepTarget(
+                    step,
+                    frameDocument
+                );
+                positionFocus(finalTarget);
+                positionGuideCard(step, finalTarget);
+            }
+
             guideLoading.hidden = true;
             guideCard.hidden = false;
             guideTransitioning = false;
@@ -1154,7 +1203,7 @@
             guideWelcome.hidden=true; guideFrame.hidden=false;
             guideInteractionBlocker.hidden=false; guideCard.hidden=true;
             guideFocus.hidden=true; guideLoading.hidden=false;
-            guideLoading.textContent = "";
+            guideLoading.textContent="Preparando paso...";
             if (
                 currentPage === step.page &&
                 guideFrame.contentDocument &&
@@ -1190,7 +1239,7 @@
         guideFrame.addEventListener("load",function(){
             if(!guideStarted || guideFrame.contentWindow.location.href==="about:blank") return;
             showCurrentStep().catch(()=>{
-                guideLoading.textContent = "";
+                guideLoading.textContent="No fue posible señalar el elemento. Continúe con el siguiente paso.";
                 guideCard.hidden=false; guideFocus.hidden=true; guideTransitioning=false;
                 previousButton.disabled=currentStep===0; nextButton.disabled=false;
             });
@@ -1210,7 +1259,7 @@
             if(direction==="next" && leaving.actionOnNext)
             {
                 performStepAction(guideFrame.contentDocument,leaving.actionOnNext);
-                await new Promise(resolve=>window.setTimeout(resolve, 120));
+                await new Promise(resolve=>window.setTimeout(resolve,750));
             }
             currentStep=nextStep; loadCurrentStep();
         }
