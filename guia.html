@@ -504,21 +504,23 @@
                 module: "Formularios",
                 target: "main",
                 title: "Solicitudes de parámetros",
-                text: "Esta página reúne las solicitudes y formularios disponibles para gestionar parámetros."
+                text: "Esta opción despliega la lista de formularios disponibles para gestionar parámetros. Al seleccionar Siguiente, la guía simulará el clic para mostrar el catálogo.",
+                actionOnNext: "openParameterRequests"
             },
             {
                 page: "formularios.html",
                 module: "Formularios",
-                target: ".catalog-grid, .forms-grid, .documents-grid, .cards-grid, #formsContainer, main",
+                target: "#parameterRequests, #parameterForms, #formsContainer, .parameter-requests, .forms-grid, .catalog-grid, .form-list, main",
                 title: "Lista de formularios",
                 text: "Desde la lista se selecciona la opción que corresponde al trámite requerido. Para esta demostración se continuará con la opción 05."
             },
             {
                 page: "formularios.html",
                 module: "Formularios",
-                target: "[href*='opcion=05'], [data-option='05'], [data-option='5'], .option-card, .catalog-card, .service-card, main",
+                target: "[href*='opcion=05'], [data-option='05'], [data-option='5'], .form-card, .service-card, main",
                 title: "Abrir la opción 05",
-                text: "La opción 05 corresponde a Parámetros generales del emisor. Al seleccionar Siguiente se abrirá ese formulario."
+                text: "La opción 05 corresponde a Parámetros generales del emisor. Al seleccionar Siguiente, la guía simulará el clic sobre esta opción y abrirá el formulario.",
+                actionOnNext: "openOption05"
             },
             {
                 page: "formulario-parametros.html?opcion=05",
@@ -672,7 +674,7 @@
             {
                 page: "aprobaciones.html",
                 module: "Aprobaciones",
-                target: "[data-options-request-id]",
+                target: "#rowOptionsMenu:not([hidden]), #rowOptionsMenu, .row-options-menu",
                 title: "Ver, tomar o consultar historial",
                 text: "Desde Más opciones se abre el detalle, se toma una solicitud disponible o se consulta su historial. Al seleccionar Siguiente, la guía abrirá una solicitud para mostrar la revisión.",
                 action: "openApprovalMenu",
@@ -682,7 +684,7 @@
             {
                 page: "aprobaciones.html",
                 module: "Aprobaciones",
-                target: ".toolbar-actions, .approval-actions, .approval-toolbar, main",
+                target: ".approval-inbox-header .approval-request-actions",
                 title: "Actualizar y exportar historial",
                 text: "Actualizar vuelve a cargar la bandeja. Descargar historial Excel genera el registro consolidado de solicitudes y movimientos."
             },
@@ -697,9 +699,11 @@
             {
                 page: "mis-solicitudes.html",
                 module: "Corrección por el solicitante",
-                target: "#requestsListView",
+                target: "#rowOptionsMenu:not([hidden]), [data-action='correct'], [data-action='corregir'], .row-options-menu, #requestsListView",
                 title: "Corregir información requerida",
-                text: "Cuando el aprobador solicita información adicional o ajustes, el solicitante puede utilizar la opción Corregir para actualizar únicamente los datos requeridos y reenviar la solicitud."
+                text: "Cuando el aprobador solicita información, la opción Corregir permite abrir únicamente los campos marcados para ajuste y enviarlos nuevamente a revisión.",
+                action: "openCorrectionMenu",
+                cardPosition: "left"
             },
             {
                 page: "seguridad.html",
@@ -769,14 +773,26 @@
             return controls.find(
                 function (control)
                 {
-                    const label = String(control.textContent || "")
-                        .trim()
-                        .toLowerCase();
+                    const normalizeLabel = function (value)
+                    {
+                        return String(value || "")
+                            .trim()
+                            .toLowerCase()
+                            .normalize("NFD")
+                            .replace(/[\u0300-\u036f]/g, "");
+                    };
+                    const label = normalizeLabel(
+                        control.textContent ||
+                        control.value ||
+                        control.getAttribute("aria-label") ||
+                        control.getAttribute("title") ||
+                        ""
+                    );
 
                     return texts.some(
                         function (text)
                         {
-                            return label.includes(text.toLowerCase());
+                            return label.includes(normalizeLabel(text));
                         }
                     );
                 }
@@ -811,6 +827,59 @@
         {
             if (!action)
             {
+                return;
+            }
+
+            if (action === "openParameterRequests")
+            {
+                const trigger =
+                    frameDocument.querySelector(
+                        "[data-section='solicitudes-parametros'], " +
+                        "[data-target*='parametro'], " +
+                        "[href*='solicitudes-parametros']"
+                    ) ||
+                    findClickableByText(
+                        frameDocument,
+                        ["Solicitudes de parámetros", "Solicitud de parámetros"]
+                    );
+
+                if (trigger)
+                {
+                    trigger.scrollIntoView(
+                        { behavior: "smooth", block: "center" }
+                    );
+                    trigger.click();
+                }
+
+                return;
+            }
+
+            if (action === "openOption05")
+            {
+                const exactOption =
+                    frameDocument.querySelector(
+                        "[data-option='05'], [data-option='5'], " +
+                        "[href*='opcion=05'], [href*='opcion=5']"
+                    ) ||
+                    findClickableByText(
+                        frameDocument,
+                        [
+                            "OPC05",
+                            "OPC 05",
+                            "Opción 05",
+                            "Opción 5",
+                            "Parámetros generales del emisor"
+                        ]
+                    );
+
+                if (exactOption)
+                {
+                    exactOption.scrollIntoView(
+                        { behavior: "smooth", block: "center" }
+                    );
+                    exactOption.click();
+                }
+
                 return;
             }
 
@@ -888,15 +957,10 @@
             const top = frameRectangle.top - guideStage.getBoundingClientRect().top + targetRectangle.top - padding;
             const left = frameRectangle.left - guideStage.getBoundingClientRect().left + targetRectangle.left - padding;
 
-            const safeTop = Math.max(12, top);
-            const safeLeft = Math.max(12, left);
-            const maximumWidth = Math.max(40, guideStage.clientWidth - safeLeft - 12);
-            const maximumHeight = Math.max(40, guideStage.clientHeight - safeTop - 12);
-
-            guideFocus.style.top = `${safeTop}px`;
-            guideFocus.style.left = `${safeLeft}px`;
-            guideFocus.style.width = `${Math.min(maximumWidth, targetRectangle.width + padding * 2)}px`;
-            guideFocus.style.height = `${Math.min(maximumHeight, targetRectangle.height + padding * 2)}px`;
+            guideFocus.style.top = `${Math.max(6, top)}px`;
+            guideFocus.style.left = `${Math.max(6, left)}px`;
+            guideFocus.style.width = `${Math.min(guideStage.clientWidth - 12, targetRectangle.width + padding * 2)}px`;
+            guideFocus.style.height = `${Math.min(guideStage.clientHeight - 12, targetRectangle.height + padding * 2)}px`;
             guideFocus.hidden = false;
         }
 
@@ -1096,7 +1160,11 @@
                         advance,
                         currentGuideStep.actionOnNext === "usePreviousInformation"
                             ? 900
-                            : 700
+                            : currentGuideStep.actionOnNext === "openParameterRequests"
+                                ? 1100
+                                : currentGuideStep.actionOnNext === "openOption05"
+                                    ? 1200
+                                    : 700
                     );
                 }
                 else
