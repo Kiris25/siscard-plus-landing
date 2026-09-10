@@ -749,6 +749,7 @@
         let guideTransitioning = false;
 
         toolbarTotal.textContent = `${guideSteps.length} pasos`;
+        localStorage.removeItem("siscardGuideStep");
 
 
         function findClickableByText(frameDocument, texts)
@@ -880,8 +881,12 @@
                     );
                     closeControl?.click();
 
-                    if (element.getClientRects().length > 0)
+                    if (
+                        element.dataset.siscardDemoSuppressed !== "true" &&
+                        element.getClientRects().length > 0
+                    )
                     {
+                        element.dataset.siscardDemoSuppressed = "true";
                         element.hidden = true;
                         element.style.display = "none";
                         element.setAttribute("aria-hidden", "true");
@@ -896,28 +901,6 @@
         function installDemoCredentialGuard(frameDocument)
         {
             suppressDemoCredentialPrompt(frameDocument);
-
-            if (frameDocument.__siscardDemoCredentialGuard)
-            {
-                return;
-            }
-
-            frameDocument.__siscardDemoCredentialGuard =
-                new frameDocument.defaultView.MutationObserver(
-                    function ()
-                    {
-                        suppressDemoCredentialPrompt(frameDocument);
-                    }
-                );
-            frameDocument.__siscardDemoCredentialGuard.observe(
-                frameDocument.body,
-                {
-                    childList: true,
-                    subtree: true,
-                    attributes: true,
-                    attributeFilter: ["hidden", "class", "style"]
-                }
-            );
         }
 
         function findReviewControls(frameDocument)
