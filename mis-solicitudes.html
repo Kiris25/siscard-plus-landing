@@ -1011,6 +1011,26 @@
                 .trim();
         }
 
+        function normalizeParameter(parameter, index = 0) {
+            return {
+                ...parameter,
+                id: parameter.id || `parametro-${index + 1}`,
+                nombre: parameter.nombre || parameter.name || parameter.parametro || parameter.id || `Parámetro ${index + 1}`,
+                producto: parameter.producto || parameter.product || "Todos",
+                obligatorio: Boolean(parameter.obligatorio ?? parameter.required),
+                valor: String(parameter.valor ?? parameter.value ?? parameter.respuesta ?? ""),
+                revision: parameter.revision || parameter.reviewStatus || "Pendiente",
+                notaAprobador: parameter.notaAprobador || parameter.approvalNote || ""
+            };
+        }
+        function normalizeRequest(request) {
+            return {
+                ...request,
+                parametros: Array.isArray(request.parametros)
+                    ? request.parametros.map(normalizeParameter)
+                    : []
+            };
+        }
         function formatDateTime(value) {
             if (!value) return "Sin fecha";
             const date = new Date(value);
@@ -1115,7 +1135,7 @@
                 } else {
                     data = await readPublicRequests();
                 }
-                allRequests = sortRequests(data);
+                allRequests = sortRequests(data.map(normalizeRequest));
                 refreshColumnFilterOptions();
                 renderRequests();
             } catch (error) {
@@ -1303,7 +1323,10 @@
                 request.parametros.forEach((parameter, index) => {
                     const catalogItem = catalog.find((item) =>
                         String(item.id ?? item.numero ?? item.codigo ?? item.orden ?? "") === String(parameter.id)
-                    ) || catalog[index];
+                    ) || catalog.find((item) =>
+                        normalize(item.nombre ?? item.parametro ?? item.titulo ?? item.name ?? "") ===
+                        normalize(parameter.nombre || "")
+                    );
                     parameter.valoresPermitidos = allowedValuesFromRecord(catalogItem);
                 });
             } catch (error) {
@@ -1391,7 +1414,7 @@
                 (item) => String(item.id) === String(requestId)
             );
             if (!request) return;
-            selectedRequest = structuredClone(request);
+            selectedRequest = normalizeRequest(structuredClone(request));
             pendingCorrection = correctionMode ? selectedRequest : null;
             if (correctionMode && pendingCorrection) {
                 await enrichCorrectionParameters(pendingCorrection);
@@ -1414,7 +1437,7 @@
                 detailField("Producto", request.producto),
                 detailField("Fecha requerida", request.fechaRequerida ? formatDateTime(request.fechaRequerida) : "No indicada")
             ].join("");
-            const parameters = request.parametros || [];
+            const parameters = selectedRequest.parametros;
             document.getElementById("detailParameterCount").textContent =
                 `${parameters.length} parámetro${parameters.length === 1 ? "" : "s"} enviados`;
             const adjustmentCount = parameters.filter(
@@ -1791,7 +1814,7 @@
                 if (!response.ok) {
                     throw new Error(`WRITE_FAILED_${response.status}`);
                 }
-                localStorage.setItem(ACCESS_CREDENTIAL_KEY, credential);
+                localStorage.setItem(ACCESS_CREDENTIAL_KEY, credential.trim());
                 allRequests = sortRequests(current.requests);
                 refreshColumnFilterOptions();
                 renderRequests();
