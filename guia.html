@@ -235,7 +235,7 @@
                 0 0 0 7px rgba(255, 108, 12, 0.18),
                 0 0 28px rgba(255, 108, 12, 0.70);
             pointer-events: none;
-            transition: top 0.32s ease, left 0.32s ease, width 0.32s ease, height 0.32s ease;
+            transition: none;
         }
 
         .guide-focus[hidden] {
@@ -478,268 +478,251 @@
 
         const guideSteps = [
             {
-                page: "index.html",
-                module: "Inicio",
-                target: ".service-hero",
-                title: "Centro de Servicios Siscard+",
-                text: "El Inicio concentra el acceso a los servicios disponibles en el Landing Siscard+.",
-                note: "La guía señalará cada área sin ejecutar acciones."
-            },
+                            page: "index.html",
+                            module: "Inicio",
+                            target: ".service-hero",
+                            title: "Centro de Servicios Siscard+",
+                            text: "El Inicio concentra el acceso a los servicios disponibles en el Landing Siscard+.",
+                            note: "La guía señalará cada área sin ejecutar acciones."
+                        },
             {
-                page: "index.html",
-                module: "Inicio",
-                target: "#serviceSearchForm",
-                title: "Buscar un servicio",
-                text: "El buscador permite localizar rápidamente un módulo disponible en el portal."
-            },
+                            page: "index.html",
+                            module: "Inicio",
+                            target: "#serviceSearchForm",
+                            title: "Buscar un servicio",
+                            text: "El buscador permite localizar rápidamente un módulo disponible en el portal."
+                        },
             {
-                page: "index.html",
-                module: "Inicio",
-                target: "#modules",
-                title: "Módulos disponibles",
-                text: "Las tarjetas permiten abrir los servicios y gestiones disponibles."
-            },
+                            page: "index.html",
+                            module: "Inicio",
+                            target: "#modules",
+                            title: "Módulos disponibles",
+                            text: "Las tarjetas permiten abrir los servicios y gestiones disponibles."
+                        },
             {
-                page: "manuales.html",
-                module: "Manuales",
-                target: "main",
-                title: "Centro de Conocimiento",
-                text: "Manuales reúne la documentación funcional, operativa y técnica disponible para consulta."
-            },
+                            page: "manuales.html",
+                            module: "Manuales",
+                            target: "main",
+                            title: "Centro de Conocimiento",
+                            text: "Manuales reúne la documentación funcional, operativa y técnica disponible para consulta."
+                        },
             {
-                page: "manuales.html",
-                module: "Manuales",
-                target: "input[type='search'], input[type='text']",
-                title: "Buscar documentación",
-                text: "Utilice la barra de búsqueda y los filtros para localizar los contenidos disponibles."
-            },
+                            page: "manuales.html",
+                            module: "Manuales",
+                            target: "input[type='search'], input[type='text']",
+                            title: "Buscar documentación",
+                            text: "Utilice la barra de búsqueda y los filtros para localizar los contenidos disponibles."
+                        },
             {
-                page: "manuales.html",
-                module: "Manuales",
-                target: "a[href*='parametros-emisor'], [data-title*='Parámetros del Emisor'], .document-card, main",
-                title: "Parámetros del Emisor TRT08SN0",
-                text: "Puede consultar contenido dinámico como el de Parámetros del Emisor desde esta pantalla una vez terminado el recorrido."
-            },
+                            page: "manuales.html",
+                            module: "Manuales",
+                            target: "a[href*='parametros-emisor'], [data-title*='Parámetros del Emisor'], .document-card, main",
+                            title: "Parámetros del Emisor TRT08SN0",
+                            text: "Puede consultar contenido dinámico como el de Parámetros del Emisor desde esta pantalla una vez terminado el recorrido."
+                        },
             {
-                page: "formularios.html",
-                module: "Formularios",
-                target: "[data-section='solicitudes-parametros'], [data-target*='parametro'], [href*='solicitudes-parametros'], main",
-                title: "Solicitudes de parámetros",
-                text: "Esta opción despliega la lista de formularios disponibles para gestionar parámetros. Al seleccionar Siguiente, la guía simulará el clic para mostrar el catálogo."
-            },
+                            page: "formularios.html",
+                            module: "Formularios",
+                            target: "[data-section='solicitudes-parametros'], [data-target*='parametro'], [href*='solicitudes-parametros'], main",
+                            title: "Solicitudes de parámetros",
+                            text: "Esta opción despliega la lista de formularios disponibles para gestionar parámetros. Al seleccionar Siguiente, la guía simulará el clic para mostrar el catálogo."
+                        },
             {
-                page: "formularios.html",
-                module: "Formularios",
-                target: "[href*='opcion=05'], [data-option='05'], [data-option='5'], [data-code='05'], [data-code='5']",
-                title: "Formularios de parámetros",
-                text: "En esta sección se encuentran todos los formularios disponibles para realizar solicitudes de parámetros."
-            },
+                            page: "formularios.html",
+                            module: "Formularios",
+                            target: "#parameterRequests, #parameterForms, #formsContainer, .parameter-requests, .forms-grid, .catalog-grid, .form-list, main",
+                            title: "Formularios de parámetros",
+                            text: "En esta sección se encuentran todos los formularios disponibles para realizar solicitudes de parámetros."
+                        },
             {
-                page: "formularios.html",
-                module: "Formularios",
-                target: "[href*='opcion=05'], [data-option='05'], [data-option='5'], [data-code='05'], [data-code='5']",
-                title: "Opción 05",
-                text: "Para esta demostración se seleccionará la opción 05, correspondiente a Parámetros generales del emisor."
-            },
+                            page: "formularios.html",
+                            module: "Formularios",
+                            target: "[href*='opcion=05'], [data-option='05'], [data-option='5'], [data-code='05'], [data-code='5']",
+                            title: "Opción 05",
+                            text: "Para esta demostración se seleccionará la opción 05, correspondiente a Parámetros generales del emisor. Al seleccionar Siguiente se abrirá el formulario.",
+                            actionOnNext: "openOption05"
+                        },
             {
-                page: "formularios.html",
-                module: "Formularios",
-                target: "[href*='opcion=05'], [data-option='05'], [data-option='5'], [data-code='05'], [data-code='5']",
-                title: "Abrir la opción 05",
-                text: "Al seleccionar Siguiente, la guía simulará el clic sobre la opción 05 y abrirá el formulario."
-            },
+                            page: "formulario-parametros.html?opcion=05",
+                            module: "Solicitudes de parámetros",
+                            target: "#templateOverlay .template-dialog, .template-dialog",
+                            title: "Información anterior encontrada",
+                            text: "Al ingresar, el sistema verifica si existe información anterior de la opción 05 y presenta una ventana para decidir cómo continuar.",
+                            note: "Esta función evita tener que completar nuevamente datos ya registrados."
+                        },
             {
-                page: "formulario-parametros.html?opcion=05",
-                module: "Solicitudes de parámetros",
-                target: "#templateOverlay",
-                title: "Información anterior encontrada",
-                text: "Al ingresar, el sistema verifica si existe información anterior de la opción 05 y presenta una ventana para decidir cómo continuar.",
-                note: "Esta función evita tener que completar nuevamente datos ya registrados."
-            },
+                            page: "formulario-parametros.html?opcion=05",
+                            module: "Solicitudes de parámetros",
+                            target: ".template-actions",
+                            title: "Opciones para continuar",
+                            text: "Iniciar en blanco comienza una solicitud nueva y limpia los datos anteriores. Utilizar información anterior recupera los datos generales y las respuestas guardadas."
+                        },
             {
-                page: "formulario-parametros.html?opcion=05",
-                module: "Solicitudes de parámetros",
-                target: ".template-actions",
-                title: "Opciones para continuar",
-                text: "Iniciar en blanco comienza una solicitud nueva y limpia los datos anteriores. Utilizar información anterior recupera los datos generales y las respuestas guardadas."
-            },
+                            page: "formulario-parametros.html?opcion=05",
+                            module: "Solicitudes de parámetros",
+                            target: "#loadTemplateButton",
+                            title: "Utilizar información anterior",
+                            text: "Para esta demostración se utilizará la información anterior. Al seleccionar Siguiente, la guía recuperará los datos guardados y continuará con el formulario.",
+                            actionOnNext: "usePreviousInformation"
+                        },
             {
-                page: "formulario-parametros.html?opcion=05",
-                module: "Solicitudes de parámetros",
-                target: "#loadTemplateButton",
-                title: "Utilizar información anterior",
-                text: "Para esta demostración se utilizará la información anterior. Al seleccionar Siguiente, la guía recuperará los datos guardados y continuará con el formulario."
-            },
+                            page: "formulario-parametros.html?opcion=05",
+                            module: "Solicitudes de parámetros",
+                            target: "#requestForm",
+                            title: "Datos generales de la solicitud",
+                            text: "En esta sección se registran cliente, emisor, acción, producto y la fecha requerida."
+                        },
             {
-                page: "formulario-parametros.html?opcion=05",
-                module: "Solicitudes de parámetros",
-                target: "#requestForm",
-                title: "Datos generales de la solicitud",
-                text: "En esta sección se registran cliente, emisor, acción, producto y la fecha requerida."
-            },
+                            page: "formulario-parametros.html?opcion=05",
+                            module: "Solicitudes de parámetros",
+                            target: "#parameterSearchForm",
+                            title: "Buscar parámetros",
+                            text: "El buscador permite localizar parámetros por nombre, descripción, producto, valores o dependencias."
+                        },
             {
-                page: "formulario-parametros.html?opcion=05",
-                module: "Solicitudes de parámetros",
-                target: "#parameterSearchForm",
-                title: "Buscar parámetros",
-                text: "El buscador permite localizar parámetros por nombre, descripción, producto, valores o dependencias."
-            },
+                            page: "formulario-parametros.html?opcion=05",
+                            module: "Solicitudes de parámetros",
+                            target: ".parameters-toolbar",
+                            title: "Herramientas del formulario",
+                            text: "La barra permite mostrar u ocultar registros, importar o exportar Excel, generar PDF y enviar la solicitud."
+                        },
             {
-                page: "formulario-parametros.html?opcion=05",
-                module: "Solicitudes de parámetros",
-                target: ".parameters-toolbar",
-                title: "Herramientas del formulario",
-                text: "La barra permite mostrar u ocultar registros, importar o exportar Excel, generar PDF y enviar la solicitud."
-            },
+                            page: "formulario-parametros.html?opcion=05",
+                            module: "Solicitudes de parámetros",
+                            target: "#parameterContainer",
+                            title: "Completar los parámetros",
+                            text: "Cada parámetro presenta el valor solicitado, validaciones y una ayuda para consultar la ficha funcional.",
+                            note: "Durante la guía no se envían datos."
+                        },
             {
-                page: "formulario-parametros.html?opcion=05",
-                module: "Solicitudes de parámetros",
-                target: "#parameterContainer",
-                title: "Completar los parámetros",
-                text: "Cada parámetro presenta el valor solicitado, validaciones y una ayuda para consultar la ficha funcional.",
-                note: "Durante la guía no se envían datos."
-            },
+                            page: "mis-solicitudes.html",
+                            module: "Mis solicitudes",
+                            target: "#requestsListView",
+                            title: "Vista del usuario solicitante",
+                            action: "filterDemo",
+                            text: "Esta es la vista del usuario que ingresó los formularios. Aquí puede consultar el estado y seguimiento de sus solicitudes."
+                        },
             {
-                page: "mis-solicitudes.html",
-                module: "Mis solicitudes",
-                target: "#requestsListView",
-                title: "Vista del usuario solicitante",
-                action: "filterDemo",
-                text: "Esta es la vista del usuario que ingresó los formularios. Aquí puede consultar el estado y seguimiento de sus solicitudes."
-            },
+                            page: "mis-solicitudes.html",
+                            module: "Mis solicitudes",
+                            target: ".request-status-summary",
+                            title: "Resumen por estado",
+                            text: "El resumen muestra las solicitudes agrupadas por los estados disponibles."
+                        },
             {
-                page: "mis-solicitudes.html",
-                module: "Mis solicitudes",
-                target: ".request-status-summary",
-                title: "Resumen por estado",
-                text: "El resumen muestra las solicitudes agrupadas por los estados disponibles."
-            },
+                            page: "mis-solicitudes.html",
+                            module: "Mis solicitudes",
+                            target: ".requests-list-filters",
+                            title: "Filtros y búsqueda",
+                            text: "Se puede filtrar por solicitud, fecha de envío, cliente, emisor, estado y última actualización. El botón Limpiar restablece la vista."
+                        },
             {
-                page: "mis-solicitudes.html",
-                module: "Mis solicitudes",
-                target: ".requests-list-filters",
-                title: "Filtros y búsqueda",
-                text: "Se puede filtrar por solicitud, fecha de envío, cliente, emisor, estado y última actualización. El botón Limpiar restablece la vista."
-            },
+                            page: "mis-solicitudes.html",
+                            module: "Mis solicitudes",
+                            target: "[data-options-request-id]",
+                            title: "Más opciones",
+                            text: "El menú de cada solicitud permite acceder a Ver detalle, Corregir o Ver historial, según el estado.",
+                            action: "openMyRequestMenu",
+                            cardPosition: "left"
+                        },
             {
-                page: "mis-solicitudes.html",
-                module: "Mis solicitudes",
-                target: ".requests-table",
-                title: "Listado y ordenamiento",
-                text: "Las columnas permiten revisar la información principal y ordenar solicitudes por identificador, fechas, cliente, emisor u estado."
-            },
+                            page: "mis-solicitudes.html",
+                            module: "Mis solicitudes",
+                            target: "#rowOptionsMenu:not([hidden]), #rowOptionsMenu, .row-options-menu",
+                            title: "Ver detalle, corregir e historial",
+                            text: "Ver detalle abre la solicitud completa. Corregir aparece cuando la solicitud requiere información. Ver historial muestra los movimientos registrados.",
+                            action: "openMyRequestMenu",
+                            cardPosition: "left"
+                        },
             {
-                page: "mis-solicitudes.html",
-                module: "Mis solicitudes",
-                target: "[data-options-request-id]",
-                title: "Más opciones",
-                text: "El menú de cada solicitud permite acceder a Ver detalle, Corregir o Ver historial, según el estado.",
-                action: "openMyRequestMenu",
-                cardPosition: "left"
-            },
+                            page: "aprobaciones.html",
+                            module: "Aprobaciones",
+                            target: "#approvalListView",
+                            title: "Solicitudes para revisar",
+                            action: "filterDemo",
+                            text: "Esta bandeja corresponde al proceso de revisión y presenta las solicitudes disponibles para el aprobador."
+                        },
             {
-                page: "mis-solicitudes.html",
-                module: "Mis solicitudes",
-                target: "#rowOptionsMenu:not([hidden]), #rowOptionsMenu, .row-options-menu",
-                title: "Ver detalle, corregir e historial",
-                text: "Ver detalle abre la solicitud completa. Corregir aparece cuando la solicitud requiere información. Ver historial muestra los movimientos registrados.",
-                action: "openMyRequestMenu",
-                cardPosition: "left"
-            },
+                            page: "aprobaciones.html",
+                            module: "Aprobaciones",
+                            target: ".approval-status-summary",
+                            title: "Estados del flujo",
+                            text: "El resumen permite consultar cuántas solicitudes se encuentran enviadas, en revisión, con información requerida, aprobadas, completadas o rechazadas."
+                        },
             {
-                page: "aprobaciones.html",
-                module: "Aprobaciones",
-                target: "#approvalListView",
-                title: "Solicitudes para revisar",
-                action: "filterDemo",
-                text: "Esta bandeja corresponde al proceso de revisión y presenta las solicitudes disponibles para el aprobador."
-            },
+                            page: "aprobaciones.html",
+                            module: "Aprobaciones",
+                            target: ".approval-filters",
+                            title: "Filtros de aprobación",
+                            text: "La bandeja puede filtrarse por solicitud, fecha, cliente, emisor, producto y estado."
+                        },
             {
-                page: "aprobaciones.html",
-                module: "Aprobaciones",
-                target: ".approval-status-summary",
-                title: "Estados del flujo",
-                text: "El resumen permite consultar cuántas solicitudes se encuentran enviadas, en revisión, con información requerida, aprobadas, completadas o rechazadas."
-            },
+                            page: "aprobaciones.html",
+                            module: "Aprobaciones",
+                            target: "[data-options-request-id]",
+                            title: "Más opciones",
+                            text: "El menú de la solicitud ofrece Ver, Tomar y Ver historial. Tomar asigna la solicitud y la pasa a revisión.",
+                            action: "openApprovalMenu",
+                            cardPosition: "left"
+                        },
             {
-                page: "aprobaciones.html",
-                module: "Aprobaciones",
-                target: ".approval-filters",
-                title: "Filtros de aprobación",
-                text: "La bandeja puede filtrarse por solicitud, fecha, cliente, emisor, producto y estado."
-            },
+                            page: "aprobaciones.html",
+                            module: "Aprobaciones",
+                            target: "#rowOptionsMenu:not([hidden]), #rowOptionsMenu, .row-options-menu",
+                            title: "Ver, tomar o consultar historial",
+                            text: "Desde Más opciones se abre el detalle, se toma una solicitud disponible o se consulta su historial. Al seleccionar Siguiente, la guía abrirá una solicitud para mostrar la revisión.",
+                            action: "openApprovalMenu",
+                            actionOnNext: "openApprovalDetail",
+                            cardPosition: "left"
+                        },
             {
-                page: "aprobaciones.html",
-                module: "Aprobaciones",
-                target: ".approval-table",
-                title: "Ordenar y consultar solicitudes",
-                text: "Las columnas permiten ordenar los registros y revisar la información principal antes de tomar una solicitud."
-            },
+                            page: "aprobaciones.html",
+                            module: "Aprobaciones",
+                            target: "#approvalParametersToolbar, .review-actions, .decision-actions, #approvalDetailView:not([hidden]), .approval-detail:not([hidden]), main",
+                            title: "Revisión y decisiones",
+                            action: "openApprovalDetail",
+                            text: "Al tomar una solicitud, el detalle permite revisar parámetros, marcar Correcto o Requiere ajuste, agregar comentarios, aprobar, solicitar información o rechazar.",
+                            note: "Las decisiones se explican sin ejecutarse durante la guía."
+                        },
             {
-                page: "aprobaciones.html",
-                module: "Aprobaciones",
-                target: "[data-options-request-id]",
-                title: "Más opciones",
-                text: "El menú de la solicitud ofrece Ver, Tomar y Ver historial. Tomar asigna la solicitud y la pasa a revisión.",
-                action: "openApprovalMenu",
-                cardPosition: "left"
-            },
+                            page: "mis-solicitudes.html",
+                            module: "Corrección por el solicitante",
+                            target: "#rowOptionsMenu:not([hidden]), [data-action='correct'], [data-action='corregir'], .row-options-menu, #requestsListView",
+                            title: "Corregir información requerida",
+                            text: "Cuando el aprobador solicita información, la opción Corregir permite abrir únicamente los campos marcados para ajuste y enviarlos nuevamente a revisión.",
+                            action: "openCorrectionMenu",
+                            cardPosition: "left"
+                        },
             {
-                page: "aprobaciones.html",
-                module: "Aprobaciones",
-                target: "#rowOptionsMenu:not([hidden]), #rowOptionsMenu, .row-options-menu",
-                title: "Ver, tomar o consultar historial",
-                text: "Desde Más opciones se abre el detalle, se toma una solicitud disponible o se consulta su historial. Al seleccionar Siguiente, la guía abrirá una solicitud para mostrar la revisión.",
-                action: "openApprovalMenu",
-                actionOnNext: "openApprovalDetail",
-                cardPosition: "left"
-            },
+                            page: "seguridad.html",
+                            module: "Seguridad",
+                            target: "main, .security-coming-soon, .security-message",
+                            title: "Próxima implementación",
+                            text: "Seguridad se implementará posteriormente para construir usuarios y asignar accesos según el grupo al que pertenezcan."
+                        },
             {
-                page: "aprobaciones.html",
-                module: "Aprobaciones",
-                target: "#approvalDetailView:not([hidden]), .approval-detail:not([hidden]), #approvalParametersToolbar, .review-actions, .decision-actions, main",
-                title: "Revisión y decisiones",
-                text: "Al tomar una solicitud, el detalle permite revisar parámetros, marcar Correcto o Requiere ajuste, agregar comentarios, aprobar, solicitar información o rechazar.",
-                note: "Las decisiones se explican sin ejecutarse durante la guía."
-            },
+                            page: "landing-ia.html",
+                            module: "Landing IA",
+                            target: "main",
+                            title: "Asistente del portal",
+                            text: "Landing IA orienta consultas y ayuda a localizar servicios y contenidos disponibles."
+                        },
             {
-                page: "mis-solicitudes.html",
-                module: "Corrección por el solicitante",
-                target: "#rowOptionsMenu:not([hidden]), [data-action='correct'], [data-action='corregir'], .row-options-menu, #requestsListView",
-                title: "Corregir información requerida",
-                text: "Cuando el aprobador solicita información, la opción Corregir permite abrir únicamente los campos marcados para ajuste y enviarlos nuevamente a revisión.",
-                action: "openCorrectionMenu",
-                cardPosition: "left"
-            },
+                            page: "comunicados.html",
+                            module: "Comunicados",
+                            target: "main",
+                            title: "Avisos y novedades",
+                            text: "Comunicados reúne las publicaciones y actualizaciones disponibles en el portal."
+                        },
             {
-                page: "seguridad.html",
-                module: "Seguridad",
-                target: "main, .security-coming-soon, .security-message",
-                title: "Próxima implementación",
-                text: "Seguridad se implementará posteriormente para construir usuarios y asignar accesos según el grupo al que pertenezcan."
-            },
-            {
-                page: "landing-ia.html",
-                module: "Landing IA",
-                target: "main",
-                title: "Asistente del portal",
-                text: "Landing IA orienta consultas y ayuda a localizar servicios y contenidos disponibles."
-            },
-            {
-                page: "comunicados.html",
-                module: "Comunicados",
-                target: "main",
-                title: "Avisos y novedades",
-                text: "Comunicados reúne las publicaciones y actualizaciones disponibles en el portal."
-            },
-            {
-                page: "index.html",
-                module: "Fin del recorrido",
-                target: "#modules",
-                title: "Demostración completada",
-                text: "El recorrido ha finalizado. El Landing Siscard+ queda disponible para explorar cada módulo directamente.",
-                note: "Seleccione Finalizar para regresar al Inicio."
-            }
+                            page: "index.html",
+                            module: "Fin del recorrido",
+                            target: "#modules",
+                            title: "Demostración completada",
+                            text: "El recorrido ha finalizado. El Landing Siscard+ queda disponible para explorar cada módulo directamente.",
+                            note: "Seleccione Finalizar para regresar al Inicio."
+                        }
+
         ];
 
         const guideFrame = document.getElementById("guideFrame");
@@ -1026,6 +1009,21 @@
             }
         }
 
+        function resolveStepTarget(step, frameDocument)
+        {
+            if (step.title === "Formularios de parámetros")
+            {
+                const option05 = frameDocument.querySelector(
+                    "[href*='opcion=05'], [data-option='05'], " +
+                    "[data-option='5'], [data-code='05'], [data-code='5']"
+                );
+                return option05?.closest(
+                    "section, .forms-grid, .catalog-grid, .form-list, .panel"
+                ) || findTarget(frameDocument, step.target);
+            }
+            return findTarget(frameDocument, step.target);
+        }
+
         function findTarget(frameDocument, selectorList)
         {
             const selectors = selectorList.split(",");
@@ -1089,241 +1087,120 @@
 
         function prepareStepState(step, frameDocument)
         {
-            const parameterCatalogSteps = [
-                "Formularios de parámetros",
-                "Opción 05",
-                "Abrir la opción 05"
-            ];
-
             if (
                 step.page === "formularios.html" &&
-                parameterCatalogSteps.includes(step.title)
+                ["Formularios de parámetros", "Opción 05"].includes(step.title)
             )
             {
-                performStepAction(
-                    frameDocument,
-                    "openParameterRequests"
-                );
+                performStepAction(frameDocument, "openParameterRequests");
             }
-
-            if (
-                step.page.includes("formulario-parametros.html") &&
-                [
-                    "Datos generales de la solicitud",
-                    "Buscar parámetros",
-                    "Herramientas del formulario",
-                    "Completar los parámetros"
-                ].includes(step.title)
-            )
-            {
-                performStepAction(
-                    frameDocument,
-                    "usePreviousInformation"
-                );
-            }
-
             performStepAction(frameDocument, step.action);
         }
 
-        function showCurrentStep()
+        async function waitForStableLayout(frameDocument)
+        {
+            await (frameDocument.fonts?.ready || Promise.resolve());
+            await new Promise(resolve => window.setTimeout(resolve, 480));
+            await new Promise(resolve =>
+                frameDocument.defaultView.requestAnimationFrame(() =>
+                    frameDocument.defaultView.requestAnimationFrame(resolve)
+                )
+            );
+        }
+
+        async function showCurrentStep()
         {
             const step = guideSteps[currentStep];
             const frameDocument = guideFrame.contentDocument;
-
-            if (!frameDocument)
-            {
-                return;
-            }
+            if (!frameDocument) return;
 
             guideFocus.hidden = true;
             guideCard.hidden = true;
             guideCard.removeAttribute("style");
             guideLoading.hidden = false;
-
             prepareStepState(step, frameDocument);
 
-            window.setTimeout(
-                function ()
+            if (["Datos generales de la solicitud","Buscar parámetros","Herramientas del formulario","Completar los parámetros"].includes(step.title))
+            {
+                const overlay = frameDocument.getElementById("templateOverlay");
+                if (overlay && !overlay.hidden)
                 {
-                    const target = findTarget(
-                        frameDocument,
-                        step.target
-                    );
+                    frameDocument.getElementById("loadTemplateButton")?.click();
+                }
+            }
 
-                    target.scrollIntoView(
-                        {
-                            behavior: "auto",
-                            block: "center",
-                            inline: "center"
-                        }
-                    );
-
-                    frameDocument.defaultView.requestAnimationFrame(
-                        function ()
-                        {
-                            frameDocument.defaultView.requestAnimationFrame(
-                                function ()
-                                {
-                                    const settledTarget = findTarget(
-                                        frameDocument,
-                                        step.target
-                                    );
-
-                                    positionFocus(settledTarget);
-                                    positionGuideCard(
-                                        step,
-                                        settledTarget
-                                    );
-                                    guideLoading.hidden = true;
-                                    guideCard.hidden = false;
-                                    guideTransitioning = false;
-                                    previousButton.disabled =
-                                        currentStep === 0;
-                                    nextButton.disabled = false;
-                                }
-                            );
-                        }
-                    );
-                },
-                420
-            );
+            await waitForStableLayout(frameDocument);
+            const target = resolveStepTarget(step, frameDocument);
+            target.scrollIntoView({behavior:"auto",block:"center",inline:"center"});
+            await waitForStableLayout(frameDocument);
+            const settled = resolveStepTarget(step, frameDocument);
+            positionFocus(settled);
+            positionGuideCard(step, settled);
+            guideLoading.hidden = true;
+            guideCard.hidden = false;
+            guideTransitioning = false;
+            previousButton.disabled = currentStep === 0;
+            nextButton.disabled = false;
 
             toolbarModule.textContent = step.module;
             toolbarStep.textContent = `Paso ${currentStep + 1}`;
-            guideProgressBar.style.width =
-                `${((currentStep + 1) / guideSteps.length) * 100}%`;
+            guideProgressBar.style.width = `${((currentStep + 1) / guideSteps.length) * 100}%`;
             cardModule.textContent = step.module;
-            cardCounter.textContent =
-                `${currentStep + 1} de ${guideSteps.length}`;
+            cardCounter.textContent = `${currentStep + 1} de ${guideSteps.length}`;
             cardTitle.textContent = step.title;
             cardText.textContent = step.text;
             cardNote.hidden = !step.note;
             cardNote.textContent = step.note || "";
-            nextButton.textContent =
-                currentStep === guideSteps.length - 1
-                    ? "Finalizar"
-                    : "Siguiente";
-
-            localStorage.setItem(
-                "siscardGuideStep",
-                String(currentStep)
-            );
+            nextButton.textContent = currentStep === guideSteps.length - 1 ? "Finalizar" : "Siguiente";
+            localStorage.setItem("siscardGuideStep",String(currentStep));
         }
 
         function loadCurrentStep()
         {
-            const step = guideSteps[currentStep];
-
-            guideStarted = true;
-            guideTransitioning = true;
-            previousButton.disabled = true;
-            nextButton.disabled = true;
-            guideWelcome.hidden = true;
-            guideFrame.hidden = false;
-            guideInteractionBlocker.hidden = false;
-            guideCard.hidden = true;
-            guideFocus.hidden = true;
-            guideLoading.hidden = false;
-            guideLoading.textContent = "Preparando paso...";
-
-            currentPage = step.page;
-
-            const separator = step.page.includes("?")
-                ? "&"
-                : "?";
-            const stepUrl =
-                `${step.page}${separator}guiaPaso=${currentStep}`;
-
-            guideFrame.src = "about:blank";
-
-            window.setTimeout(
-                function ()
-                {
-                    guideFrame.src = stepUrl;
-                },
-                30
-            );
+            const step=guideSteps[currentStep];
+            guideStarted=true; guideTransitioning=true;
+            previousButton.disabled=true; nextButton.disabled=true;
+            guideWelcome.hidden=true; guideFrame.hidden=false;
+            guideInteractionBlocker.hidden=false; guideCard.hidden=true;
+            guideFocus.hidden=true; guideLoading.hidden=false;
+            guideLoading.textContent="Preparando paso...";
+            currentPage=step.page;
+            const separator=step.page.includes("?")?"&":"?";
+            guideFrame.src="about:blank";
+            window.setTimeout(()=>{guideFrame.src=`${step.page}${separator}guiaPaso=${currentStep}`;},30);
         }
 
-        guideFrame.addEventListener(
-            "load",
-            function ()
-            {
-                if (!guideStarted)
-                {
-                    return;
-                }
+        guideFrame.addEventListener("load",function(){
+            if(!guideStarted || guideFrame.contentWindow.location.href==="about:blank") return;
+            showCurrentStep().catch(()=>{
+                guideLoading.textContent="No fue posible señalar el elemento. Continúe con el siguiente paso.";
+                guideCard.hidden=false; guideFocus.hidden=true; guideTransitioning=false;
+                previousButton.disabled=currentStep===0; nextButton.disabled=false;
+            });
+        });
 
-                try
-                {
-                    showCurrentStep();
-                }
-                catch (error)
-                {
-                    guideLoading.textContent = "No fue posible señalar el elemento. Continúe con el siguiente paso.";
-                    guideCard.hidden = false;
-                    guideFocus.hidden = true;
-                }
-            }
-        );
+        document.getElementById("startGuideButton").addEventListener("click",function(){currentStep=0;loadCurrentStep();});
 
-        document.getElementById("startGuideButton").addEventListener(
-            "click",
-            function ()
-            {
-                currentStep = 0;
-                loadCurrentStep();
-            }
-        );
-
-        function goToGuideStep(nextStep)
+        async function goToGuideStep(nextStep,direction)
         {
-            if (
-                guideTransitioning ||
-                nextStep < 0 ||
-                nextStep >= guideSteps.length
-            )
+            if(guideTransitioning || nextStep<0 || nextStep>=guideSteps.length) return;
+            guideTransitioning=true; previousButton.disabled=true; nextButton.disabled=true;
+            guideFocus.hidden=true; guideCard.hidden=true; guideLoading.hidden=false;
+            const leaving=guideSteps[currentStep];
+            if(direction==="next" && leaving.actionOnNext)
             {
-                return;
+                performStepAction(guideFrame.contentDocument,leaving.actionOnNext);
+                await new Promise(resolve=>window.setTimeout(resolve,750));
             }
-
-            guideFocus.hidden = true;
-            guideCard.hidden = true;
-            guideLoading.hidden = false;
-            currentStep = nextStep;
-            loadCurrentStep();
+            currentStep=nextStep; loadCurrentStep();
         }
 
-        previousButton.addEventListener(
-            "click",
-            function ()
-            {
-                goToGuideStep(currentStep - 1);
-            }
-        );
-
-        nextButton.addEventListener(
-            "click",
-            function ()
-            {
-                if (guideTransitioning)
-                {
-                    return;
-                }
-
-                if (currentStep === guideSteps.length - 1)
-                {
-                    localStorage.setItem(
-                        "siscardQuickGuideCompleted",
-                        "true"
-                    );
-                    window.location.href = "index.html";
-                    return;
-                }
-
-                goToGuideStep(currentStep + 1);
-            }
-        );
+        previousButton.addEventListener("click",()=>goToGuideStep(currentStep-1,"previous"));
+        nextButton.addEventListener("click",function(){
+            if(guideTransitioning)return;
+            if(currentStep===guideSteps.length-1){localStorage.setItem("siscardQuickGuideCompleted","true");window.location.href="index.html";return;}
+            goToGuideStep(currentStep+1,"next");
+        });
 
         openPageButton.addEventListener(
             "click",
@@ -1354,7 +1231,7 @@
                 try
                 {
                     const step = guideSteps[currentStep];
-                    const target = findTarget(guideFrame.contentDocument, step.target);
+                    const target = resolveStepTarget(step, guideFrame.contentDocument);
                     positionFocus(target);
                 }
                 catch (error)
