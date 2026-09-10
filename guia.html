@@ -541,8 +541,7 @@
                             target: "[href*='opcion=05'], [data-option='05'], [data-option='5'], [data-code='05'], [data-code='5']",
                             title: "Opción 05",
                             settleTime: 420,
-                            text: "Para esta demostración se seleccionará la opción 05, correspondiente a Parámetros generales del emisor. Al seleccionar Siguiente se abrirá el formulario.",
-                            actionOnNext: "openOption05"
+                            text: "Para esta demostración se seleccionará la opción 05, correspondiente a Parámetros generales del emisor. Al seleccionar Siguiente se abrirá el formulario directamente en modo demostración."
                         },
             {
                             page: "formulario-parametros.html?opcion=05",
@@ -1464,7 +1463,7 @@
             guideWelcome.hidden=true; guideFrame.hidden=false;
             guideInteractionBlocker.hidden=false; guideCard.hidden=true;
             guideFocus.hidden=true; guideLoading.hidden=false;
-            guideLoading.textContent="Preparando paso...";
+            guideLoading.textContent = "";
             if (
                 currentPage === step.page &&
                 guideFrame.contentDocument &&
@@ -1485,13 +1484,15 @@
             }
 
             currentPage = step.page;
+            sessionStorage.setItem("siscardGuideMode", "true");
+            sessionStorage.setItem("siscardDemoMode", "true");
             const separator = step.page.includes("?") ? "&" : "?";
             guideFrame.src = "about:blank";
             window.setTimeout(
                 function ()
                 {
                     guideFrame.src =
-                        `${step.page}${separator}guiaPaso=${currentStep}`;
+                        `${step.page}${separator}guiaPaso=${currentStep}&modoDemo=true`;
                 },
                 20
             );
@@ -1500,7 +1501,7 @@
         guideFrame.addEventListener("load",function(){
             if(!guideStarted || guideFrame.contentWindow.location.href==="about:blank") return;
             showCurrentStep().catch(()=>{
-                guideLoading.textContent="No fue posible señalar el elemento. Continúe con el siguiente paso.";
+                guideLoading.textContent = "";
                 guideCard.hidden=false; guideFocus.hidden=true; guideTransitioning=false;
                 previousButton.disabled=currentStep===0; nextButton.disabled=false;
             });
