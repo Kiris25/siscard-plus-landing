@@ -9,10 +9,10 @@
     "producto": "Corporativo",
     "fechaSolicitud": "2026-09-10",
     "fechaRequerida": "2026-09-10T12:00",
-    "estado": "En revisión",
+    "estado": "Requiere información",
     "aprobador": "Seguridad",
     "fechaCreacion": "2026-09-10T17:17:21.779Z",
-    "fechaActualizacion": "2026-09-10T17:17:40.149Z",
+    "fechaActualizacion": "2026-09-10T17:17:56.899Z",
     "comentarios": [],
     "historial": [
       {
@@ -26,6 +26,12 @@
         "fecha": "2026-09-10T17:17:40.149Z",
         "usuario": "Seguridad",
         "comentario": "Solicitud actualizada a En revisión."
+      },
+      {
+        "estado": "Requiere información",
+        "fecha": "2026-09-10T17:17:56.899Z",
+        "usuario": "Seguridad",
+        "comentario": "Solicitud actualizada a Requiere información."
       }
     ],
     "parametros": [
@@ -35,8 +41,8 @@
         "producto": "Todos",
         "obligatorio": true,
         "valor": "PRUEBA",
-        "revision": "Pendiente",
-        "notaAprobador": ""
+        "revision": "Requiere ajuste",
+        "notaAprobador": "NUEVO NOMBRE"
       },
       {
         "id": "27c505e3-c040-4851-8118-f6f07229531f",
@@ -44,7 +50,7 @@
         "producto": "Todos",
         "obligatorio": true,
         "valor": "PRUEBA",
-        "revision": "Pendiente",
+        "revision": "Correcto",
         "notaAprobador": ""
       },
       {
@@ -53,7 +59,7 @@
         "producto": "Todos",
         "obligatorio": true,
         "valor": "CO",
-        "revision": "Pendiente",
+        "revision": "Correcto",
         "notaAprobador": ""
       },
       {
@@ -62,7 +68,7 @@
         "producto": "Crédito Corporativo",
         "obligatorio": true,
         "valor": "S = Sí",
-        "revision": "Pendiente",
+        "revision": "Correcto",
         "notaAprobador": ""
       },
       {
@@ -71,7 +77,7 @@
         "producto": "Todos",
         "obligatorio": false,
         "valor": "",
-        "revision": "Pendiente",
+        "revision": "Correcto",
         "notaAprobador": ""
       },
       {
@@ -80,7 +86,7 @@
         "producto": "Todos",
         "obligatorio": true,
         "valor": "12",
-        "revision": "Pendiente",
+        "revision": "Correcto",
         "notaAprobador": ""
       },
       {
@@ -89,7 +95,7 @@
         "producto": "Todos",
         "obligatorio": false,
         "valor": "",
-        "revision": "Pendiente",
+        "revision": "Correcto",
         "notaAprobador": ""
       },
       {
@@ -98,7 +104,7 @@
         "producto": "Todos",
         "obligatorio": true,
         "valor": "12",
-        "revision": "Pendiente",
+        "revision": "Correcto",
         "notaAprobador": ""
       },
       {
@@ -107,7 +113,7 @@
         "producto": "Todos",
         "obligatorio": true,
         "valor": "S = Sí",
-        "revision": "Pendiente",
+        "revision": "Correcto",
         "notaAprobador": ""
       },
       {
@@ -116,7 +122,7 @@
         "producto": "Todos",
         "obligatorio": false,
         "valor": "",
-        "revision": "Pendiente",
+        "revision": "Correcto",
         "notaAprobador": ""
       },
       {
@@ -125,7 +131,7 @@
         "producto": "Todos",
         "obligatorio": false,
         "valor": "",
-        "revision": "Pendiente",
+        "revision": "Correcto",
         "notaAprobador": ""
       },
       {
@@ -134,7 +140,7 @@
         "producto": "Todos",
         "obligatorio": false,
         "valor": "",
-        "revision": "Pendiente",
+        "revision": "Correcto",
         "notaAprobador": ""
       },
       {
@@ -143,7 +149,7 @@
         "producto": "Todos",
         "obligatorio": false,
         "valor": "",
-        "revision": "Pendiente",
+        "revision": "Correcto",
         "notaAprobador": ""
       },
       {
@@ -152,7 +158,7 @@
         "producto": "Todos",
         "obligatorio": false,
         "valor": "",
-        "revision": "Pendiente",
+        "revision": "Correcto",
         "notaAprobador": ""
       },
       {
@@ -161,7 +167,7 @@
         "producto": "Todos",
         "obligatorio": false,
         "valor": "",
-        "revision": "Pendiente",
+        "revision": "Correcto",
         "notaAprobador": ""
       },
       {
@@ -170,7 +176,7 @@
         "producto": "Todos",
         "obligatorio": true,
         "valor": "Empresarial",
-        "revision": "Pendiente",
+        "revision": "Correcto",
         "notaAprobador": ""
       },
       {
@@ -179,7 +185,7 @@
         "producto": "Todos",
         "obligatorio": true,
         "valor": "IP INFINITE PAYMENTS",
-        "revision": "Pendiente",
+        "revision": "Correcto",
         "notaAprobador": ""
       },
       {
@@ -188,7 +194,7 @@
         "producto": "Todos",
         "obligatorio": true,
         "valor": "Débito",
-        "revision": "Pendiente",
+        "revision": "Correcto",
         "notaAprobador": ""
       },
       {
@@ -197,7 +203,7 @@
         "producto": "Todos",
         "obligatorio": false,
         "valor": "",
-        "revision": "Pendiente",
+        "revision": "Correcto",
         "notaAprobador": ""
       },
       {
@@ -206,7 +212,7 @@
         "producto": "Todos",
         "obligatorio": false,
         "valor": "",
-        "revision": "Pendiente",
+        "revision": "Correcto",
         "notaAprobador": ""
       },
       {
@@ -215,7 +221,7 @@
         "producto": "Todos",
         "obligatorio": false,
         "valor": "",
-        "revision": "Pendiente",
+        "revision": "Correcto",
         "notaAprobador": ""
       },
       {
@@ -224,7 +230,7 @@
         "producto": "Todos",
         "obligatorio": false,
         "valor": "",
-        "revision": "Pendiente",
+        "revision": "Correcto",
         "notaAprobador": ""
       },
       {
@@ -233,7 +239,7 @@
         "producto": "Todos",
         "obligatorio": false,
         "valor": "",
-        "revision": "Pendiente",
+        "revision": "Correcto",
         "notaAprobador": ""
       },
       {
@@ -242,7 +248,7 @@
         "producto": "Todos",
         "obligatorio": false,
         "valor": "",
-        "revision": "Pendiente",
+        "revision": "Correcto",
         "notaAprobador": ""
       },
       {
@@ -251,7 +257,7 @@
         "producto": "Todos",
         "obligatorio": true,
         "valor": "00 = Activa",
-        "revision": "Pendiente",
+        "revision": "Correcto",
         "notaAprobador": ""
       },
       {
@@ -260,7 +266,7 @@
         "producto": "Todos",
         "obligatorio": false,
         "valor": "",
-        "revision": "Pendiente",
+        "revision": "Correcto",
         "notaAprobador": ""
       },
       {
@@ -269,7 +275,7 @@
         "producto": "Todos",
         "obligatorio": false,
         "valor": "",
-        "revision": "Pendiente",
+        "revision": "Correcto",
         "notaAprobador": ""
       },
       {
@@ -278,7 +284,7 @@
         "producto": "Todos",
         "obligatorio": false,
         "valor": "",
-        "revision": "Pendiente",
+        "revision": "Correcto",
         "notaAprobador": ""
       },
       {
@@ -287,7 +293,7 @@
         "producto": "Todos",
         "obligatorio": false,
         "valor": "",
-        "revision": "Pendiente",
+        "revision": "Correcto",
         "notaAprobador": ""
       },
       {
@@ -296,7 +302,7 @@
         "producto": "Todos",
         "obligatorio": false,
         "valor": "",
-        "revision": "Pendiente",
+        "revision": "Correcto",
         "notaAprobador": ""
       },
       {
@@ -305,7 +311,7 @@
         "producto": "Todos",
         "obligatorio": false,
         "valor": "",
-        "revision": "Pendiente",
+        "revision": "Correcto",
         "notaAprobador": ""
       },
       {
@@ -314,7 +320,7 @@
         "producto": "Todos",
         "obligatorio": false,
         "valor": "",
-        "revision": "Pendiente",
+        "revision": "Correcto",
         "notaAprobador": ""
       },
       {
@@ -323,7 +329,7 @@
         "producto": "Todos",
         "obligatorio": false,
         "valor": "",
-        "revision": "Pendiente",
+        "revision": "Correcto",
         "notaAprobador": ""
       },
       {
@@ -332,7 +338,7 @@
         "producto": "Todos",
         "obligatorio": false,
         "valor": "",
-        "revision": "Pendiente",
+        "revision": "Correcto",
         "notaAprobador": ""
       },
       {
@@ -341,7 +347,7 @@
         "producto": "Todos",
         "obligatorio": false,
         "valor": "",
-        "revision": "Pendiente",
+        "revision": "Correcto",
         "notaAprobador": ""
       },
       {
@@ -350,7 +356,7 @@
         "producto": "Todos",
         "obligatorio": true,
         "valor": "12",
-        "revision": "Pendiente",
+        "revision": "Correcto",
         "notaAprobador": ""
       },
       {
@@ -359,7 +365,7 @@
         "producto": "Todos",
         "obligatorio": true,
         "valor": "S = Sí",
-        "revision": "Pendiente",
+        "revision": "Correcto",
         "notaAprobador": ""
       },
       {
@@ -368,7 +374,7 @@
         "producto": "Todos",
         "obligatorio": true,
         "valor": "Local",
-        "revision": "Pendiente",
+        "revision": "Correcto",
         "notaAprobador": ""
       },
       {
@@ -377,7 +383,7 @@
         "producto": "Todos",
         "obligatorio": true,
         "valor": "C = Consecutivo",
-        "revision": "Pendiente",
+        "revision": "Correcto",
         "notaAprobador": ""
       },
       {
@@ -386,7 +392,7 @@
         "producto": "Todos",
         "obligatorio": true,
         "valor": "12",
-        "revision": "Pendiente",
+        "revision": "Correcto",
         "notaAprobador": ""
       },
       {
@@ -395,7 +401,7 @@
         "producto": "Todos",
         "obligatorio": false,
         "valor": "",
-        "revision": "Pendiente",
+        "revision": "Correcto",
         "notaAprobador": ""
       },
       {
@@ -404,7 +410,7 @@
         "producto": "Todos",
         "obligatorio": true,
         "valor": "S = Sí",
-        "revision": "Pendiente",
+        "revision": "Correcto",
         "notaAprobador": ""
       },
       {
@@ -413,7 +419,7 @@
         "producto": "Todos",
         "obligatorio": false,
         "valor": "",
-        "revision": "Pendiente",
+        "revision": "Correcto",
         "notaAprobador": ""
       },
       {
@@ -422,7 +428,7 @@
         "producto": "Todos",
         "obligatorio": false,
         "valor": "",
-        "revision": "Pendiente",
+        "revision": "Correcto",
         "notaAprobador": ""
       },
       {
@@ -431,7 +437,7 @@
         "producto": "Todos",
         "obligatorio": false,
         "valor": "",
-        "revision": "Pendiente",
+        "revision": "Correcto",
         "notaAprobador": ""
       },
       {
@@ -440,7 +446,7 @@
         "producto": "Todos",
         "obligatorio": true,
         "valor": "S = Sí",
-        "revision": "Pendiente",
+        "revision": "Correcto",
         "notaAprobador": ""
       },
       {
@@ -449,7 +455,7 @@
         "producto": "Todos",
         "obligatorio": true,
         "valor": "S = Sí",
-        "revision": "Pendiente",
+        "revision": "Correcto",
         "notaAprobador": ""
       },
       {
@@ -458,7 +464,7 @@
         "producto": "Todos",
         "obligatorio": true,
         "valor": "S = Sí",
-        "revision": "Pendiente",
+        "revision": "Correcto",
         "notaAprobador": ""
       },
       {
@@ -467,7 +473,7 @@
         "producto": "Todos",
         "obligatorio": false,
         "valor": "",
-        "revision": "Pendiente",
+        "revision": "Correcto",
         "notaAprobador": ""
       },
       {
@@ -476,7 +482,7 @@
         "producto": "Todos",
         "obligatorio": false,
         "valor": "",
-        "revision": "Pendiente",
+        "revision": "Correcto",
         "notaAprobador": ""
       },
       {
@@ -485,7 +491,7 @@
         "producto": "Todos",
         "obligatorio": true,
         "valor": "S = Sí",
-        "revision": "Pendiente",
+        "revision": "Correcto",
         "notaAprobador": ""
       },
       {
@@ -494,7 +500,7 @@
         "producto": "Todos",
         "obligatorio": true,
         "valor": "N = No",
-        "revision": "Pendiente",
+        "revision": "Correcto",
         "notaAprobador": ""
       },
       {
@@ -503,7 +509,7 @@
         "producto": "Todos",
         "obligatorio": false,
         "valor": "",
-        "revision": "Pendiente",
+        "revision": "Correcto",
         "notaAprobador": ""
       },
       {
@@ -512,7 +518,7 @@
         "producto": "Todos",
         "obligatorio": false,
         "valor": "",
-        "revision": "Pendiente",
+        "revision": "Correcto",
         "notaAprobador": ""
       },
       {
@@ -521,7 +527,7 @@
         "producto": "Todos",
         "obligatorio": false,
         "valor": "",
-        "revision": "Pendiente",
+        "revision": "Correcto",
         "notaAprobador": ""
       },
       {
@@ -530,7 +536,7 @@
         "producto": "Todos",
         "obligatorio": true,
         "valor": "S = Sí",
-        "revision": "Pendiente",
+        "revision": "Correcto",
         "notaAprobador": ""
       },
       {
@@ -539,7 +545,7 @@
         "producto": "Todos",
         "obligatorio": false,
         "valor": "",
-        "revision": "Pendiente",
+        "revision": "Correcto",
         "notaAprobador": ""
       },
       {
@@ -548,7 +554,7 @@
         "producto": "Todos",
         "obligatorio": true,
         "valor": "S = Sí",
-        "revision": "Pendiente",
+        "revision": "Correcto",
         "notaAprobador": ""
       },
       {
@@ -557,7 +563,7 @@
         "producto": "Todos",
         "obligatorio": true,
         "valor": "S = Sí",
-        "revision": "Pendiente",
+        "revision": "Correcto",
         "notaAprobador": ""
       },
       {
@@ -566,7 +572,7 @@
         "producto": "Todos",
         "obligatorio": false,
         "valor": "",
-        "revision": "Pendiente",
+        "revision": "Correcto",
         "notaAprobador": ""
       },
       {
@@ -575,7 +581,7 @@
         "producto": "Todos",
         "obligatorio": false,
         "valor": "",
-        "revision": "Pendiente",
+        "revision": "Correcto",
         "notaAprobador": ""
       },
       {
@@ -584,7 +590,7 @@
         "producto": "Todos",
         "obligatorio": false,
         "valor": "",
-        "revision": "Pendiente",
+        "revision": "Correcto",
         "notaAprobador": ""
       },
       {
@@ -593,7 +599,7 @@
         "producto": "Todos",
         "obligatorio": true,
         "valor": "S = Sí",
-        "revision": "Pendiente",
+        "revision": "Correcto",
         "notaAprobador": ""
       },
       {
@@ -602,7 +608,7 @@
         "producto": "Todos",
         "obligatorio": false,
         "valor": "",
-        "revision": "Pendiente",
+        "revision": "Correcto",
         "notaAprobador": ""
       },
       {
@@ -611,7 +617,7 @@
         "producto": "Todos",
         "obligatorio": true,
         "valor": "2 – Autorización Visa Mandataria.",
-        "revision": "Pendiente",
+        "revision": "Correcto",
         "notaAprobador": ""
       },
       {
@@ -620,7 +626,7 @@
         "producto": "Todos",
         "obligatorio": true,
         "valor": "B – Tarjeta de banda magnética.",
-        "revision": "Pendiente",
+        "revision": "Correcto",
         "notaAprobador": ""
       },
       {
@@ -629,7 +635,7 @@
         "producto": "Todos",
         "obligatorio": false,
         "valor": "",
-        "revision": "Pendiente",
+        "revision": "Correcto",
         "notaAprobador": ""
       },
       {
@@ -638,7 +644,7 @@
         "producto": "Todos",
         "obligatorio": false,
         "valor": "",
-        "revision": "Pendiente",
+        "revision": "Correcto",
         "notaAprobador": ""
       },
       {
@@ -647,7 +653,7 @@
         "producto": "Todos",
         "obligatorio": true,
         "valor": "S = Sí",
-        "revision": "Pendiente",
+        "revision": "Correcto",
         "notaAprobador": ""
       },
       {
@@ -656,7 +662,7 @@
         "producto": "Todos",
         "obligatorio": false,
         "valor": "",
-        "revision": "Pendiente",
+        "revision": "Correcto",
         "notaAprobador": ""
       },
       {
@@ -665,7 +671,7 @@
         "producto": "Todos",
         "obligatorio": false,
         "valor": "",
-        "revision": "Pendiente",
+        "revision": "Correcto",
         "notaAprobador": ""
       },
       {
@@ -674,7 +680,7 @@
         "producto": "Todos",
         "obligatorio": false,
         "valor": "",
-        "revision": "Pendiente",
+        "revision": "Correcto",
         "notaAprobador": ""
       },
       {
@@ -683,7 +689,7 @@
         "producto": "Todos",
         "obligatorio": false,
         "valor": "",
-        "revision": "Pendiente",
+        "revision": "Correcto",
         "notaAprobador": ""
       },
       {
@@ -692,7 +698,7 @@
         "producto": "Todos",
         "obligatorio": false,
         "valor": "",
-        "revision": "Pendiente",
+        "revision": "Correcto",
         "notaAprobador": ""
       },
       {
@@ -701,7 +707,7 @@
         "producto": "Todos",
         "obligatorio": true,
         "valor": "S = Sí",
-        "revision": "Pendiente",
+        "revision": "Correcto",
         "notaAprobador": ""
       },
       {
@@ -710,7 +716,7 @@
         "producto": "Todos",
         "obligatorio": false,
         "valor": "",
-        "revision": "Pendiente",
+        "revision": "Correcto",
         "notaAprobador": ""
       },
       {
@@ -719,7 +725,7 @@
         "producto": "Todos",
         "obligatorio": false,
         "valor": "",
-        "revision": "Pendiente",
+        "revision": "Correcto",
         "notaAprobador": ""
       },
       {
@@ -728,7 +734,7 @@
         "producto": "Todos",
         "obligatorio": false,
         "valor": "",
-        "revision": "Pendiente",
+        "revision": "Correcto",
         "notaAprobador": ""
       },
       {
@@ -737,7 +743,7 @@
         "producto": "Todos",
         "obligatorio": true,
         "valor": "Dormido",
-        "revision": "Pendiente",
+        "revision": "Correcto",
         "notaAprobador": ""
       },
       {
@@ -746,7 +752,7 @@
         "producto": "Todos",
         "obligatorio": true,
         "valor": "12",
-        "revision": "Pendiente",
+        "revision": "Correcto",
         "notaAprobador": ""
       },
       {
@@ -755,7 +761,7 @@
         "producto": "Todos",
         "obligatorio": true,
         "valor": "S = Sí",
-        "revision": "Pendiente",
+        "revision": "Correcto",
         "notaAprobador": ""
       },
       {
@@ -764,7 +770,7 @@
         "producto": "Todos",
         "obligatorio": false,
         "valor": "",
-        "revision": "Pendiente",
+        "revision": "Correcto",
         "notaAprobador": ""
       },
       {
@@ -773,7 +779,7 @@
         "producto": "Todos",
         "obligatorio": true,
         "valor": "S = Sí",
-        "revision": "Pendiente",
+        "revision": "Correcto",
         "notaAprobador": ""
       },
       {
@@ -782,7 +788,7 @@
         "producto": "Todos",
         "obligatorio": true,
         "valor": "S = Sí",
-        "revision": "Pendiente",
+        "revision": "Correcto",
         "notaAprobador": ""
       },
       {
@@ -791,7 +797,7 @@
         "producto": "Todos",
         "obligatorio": true,
         "valor": "C = Chip",
-        "revision": "Pendiente",
+        "revision": "Correcto",
         "notaAprobador": ""
       },
       {
@@ -800,7 +806,7 @@
         "producto": "Todos",
         "obligatorio": true,
         "valor": "S = Sí",
-        "revision": "Pendiente",
+        "revision": "Correcto",
         "notaAprobador": ""
       },
       {
@@ -809,7 +815,7 @@
         "producto": "Todos",
         "obligatorio": true,
         "valor": "S = Sí",
-        "revision": "Pendiente",
+        "revision": "Correcto",
         "notaAprobador": ""
       },
       {
@@ -818,7 +824,7 @@
         "producto": "Todos",
         "obligatorio": false,
         "valor": "",
-        "revision": "Pendiente",
+        "revision": "Correcto",
         "notaAprobador": ""
       },
       {
@@ -827,11 +833,12 @@
         "producto": "Todos",
         "obligatorio": false,
         "valor": "",
-        "revision": "Pendiente",
+        "revision": "Correcto",
         "notaAprobador": ""
       }
     ],
-    "fechaToma": "2026-09-10T17:17:40.149Z"
+    "fechaToma": "2026-09-10T17:17:40.149Z",
+    "fechaRevision": "2026-09-10T17:17:56.899Z"
   },
   {
     "id": "TESTAPP6TESTAPP6105100926",
