@@ -30,7 +30,7 @@
         }
 
         .requests-hero {
-            padding: 26px;
+            padding: 20px 22px;
             border-top: 5px solid var(--request-orange);
         }
 
@@ -958,19 +958,11 @@
                     <p>Consulte las solicitudes enviadas, su estado actual y las observaciones de la revisión.</p>
                 </section>
 
-                <section class="requests-toolbar" aria-label="Filtros de solicitudes">
-                    <input
-                        id="requestSearch"
-                        type="search"
-                        placeholder="Buscar por solicitud, cliente, emisor u opción"
-                    >
+                <section class="requests-toolbar" aria-label="Vista de solicitudes">
                     <select id="requestScope" aria-label="Vista de solicitudes">
                         <option value="all">Todas</option>
                         <option value="corrections">Por corregir</option>
                     </select>
-                    <button class="tertiary-button refresh-button" id="refreshButton" type="button">
-                        Actualizar
-                    </button>
                 </section>
 
                 <section class="requests-panel">
@@ -979,6 +971,13 @@
                             <strong id="requestCount">Cargando solicitudes...</strong>
                             <small>Información sincronizada con el registro central.</small>
                         </div>
+                        <button
+                            class="tertiary-button"
+                            id="refreshButton"
+                            type="button"
+                        >
+                            Actualizar
+                        </button>
                     </header>
                     <div class="request-status-summary" id="requestStatusSummary"></div>
                     <div class="table-wrap">
@@ -1428,9 +1427,14 @@
             ].forEach((id) => {
                 document.getElementById(id).value = "";
             });
+            document.getElementById("requestScope").value = "all";
+            selectedClientIssuerFilters.clear();
+            closeCombinedFilterPanel();
+            closeRowOptionsMenu();
+            closeHistoryPopover();
+            renderCombinedFilterOptions();
             renderRequests();
         }
-
         function clientIssuerKey(request) {
             return `${request.cliente || "Sin cliente"}|||${request.emisor || "Sin emisor"}`;
         }
@@ -1510,7 +1514,6 @@
             );
         }
         function filteredRequests() {
-            const query = normalize(document.getElementById("requestSearch").value);
             const scope = document.getElementById("requestScope").value;
             const requestId = normalize(document.getElementById("filterRequestId").value);
             const createdDate = document.getElementById("filterCreatedDate").value;
@@ -1523,16 +1526,7 @@
                 const requestIssuerOption = `${request.emisor || "Sin emisor"} · OP${request.opcion || ""}`;
                 const scopeMatches = scope !== "corrections" ||
                     requestStatus === "Requiere información";
-                const searchable = normalize([
-                    request.id,
-                    request.cliente,
-                    request.emisor,
-                    request.opcion,
-                    request.accion,
-                    request.producto
-                ].join(" "));
                 return scopeMatches &&
-                    (!query || searchable.includes(query)) &&
                     (
                         !requestId ||
                         normalize(request.id).includes(requestId) ||
@@ -1616,6 +1610,9 @@
             emptyState.hidden = requests.length > 0;
         }
 
+        function closeCombinedFilterPanel() {
+            document.getElementById("combinedFilterPanel").hidden = true;
+        }
         function closeRowOptionsMenu() {
             document.getElementById("rowOptionsMenu").hidden = true;
             activeOptionsRequestId = "";
@@ -1624,6 +1621,14 @@
         }
         function openRowOptionsMenu(requestId, anchor) {
             closeHistoryPopover();
+            closeCombinedFilterPanel();
+            if (
+                activeOptionsRequestId === requestId &&
+                !document.getElementById("rowOptionsMenu").hidden
+            ) {
+                closeRowOptionsMenu();
+                return;
+            }
             closeRowOptionsMenu();
             activeOptionsRequestId = requestId;
             activeOptionsAnchor = anchor;
@@ -2266,7 +2271,6 @@
             saveCorrection(credential);
         }
 
-        document.getElementById("requestSearch").addEventListener("input", renderRequests);
         document.getElementById("requestScope").addEventListener("change", renderRequests);
         document.getElementById("refreshButton").addEventListener("click", loadRequests);
         [
@@ -2367,30 +2371,53 @@
             }
         });
 
-        loadRequests();
-        window.addEventListener("focus", () => {
-            if (!document.getElementById("requestsListView").hidden) {
-                document.getElementById("closeHistoryPopoverButton").addEventListener("click", closeHistoryPopover);
+        document
+            .getElementById("closeHistoryPopoverButton")
+            .addEventListener("click", (event) => {
+                event.stopPropagation();
+                closeHistoryPopover();
+            });
         document.addEventListener("click", (event) => {
-            if (
-                !event.target.closest("#rowOptionsMenu") &&
-                !event.target.closest("[data-options-request-id]")
-            ) {
+            const clickedCombinedFilter = event.target.closest(
+                "#combinedRequestFilter"
+            );
+            const clickedOptionsMenu = event.target.closest(
+                "#rowOptionsMenu"
+            );
+            const clickedOptionsButton = event.target.closest(
+                "[data-options-request-id]"
+            );
+            const clickedHistory = event.target.closest(
+                "#historyPopover"
+            );
+            if (!clickedCombinedFilter) {
+                closeCombinedFilterPanel();
+            }
+            if (!clickedOptionsMenu && !clickedOptionsButton) {
                 closeRowOptionsMenu();
             }
-            if (
-                !event.target.closest("#historyPopover") &&
-                !event.target.closest("[data-menu-action=history]")
-            ) {
+            if (!clickedHistory && !clickedOptionsMenu) {
                 closeHistoryPopover();
             }
-            if (!event.target.closest("#combinedRequestFilter")) {
-                document.getElementById("combinedFilterPanel").hidden = true;
+        });
+        window.addEventListener("scroll", () => {
+            closeCombinedFilterPanel();
+            closeRowOptionsMenu();
+            closeHistoryPopover();
+        }, {
+            passive: true
+        });
+        window.addEventListener("resize", () => {
+            closeCombinedFilterPanel();
+            closeRowOptionsMenu();
+            closeHistoryPopover();
+        });
+        window.addEventListener("focus", () => {
+            if (!document.getElementById("requestsListView").hidden) {
+                loadRequests();
             }
         });
         loadRequests();
-            }
-        });
     </script>
 </body>
 </html>
