@@ -1763,15 +1763,18 @@
                 String(date.getFullYear()).slice(-2),
             ].join("");
         }
-        function createUniqueRequestId(client, issuer) {
-            const clientCode = consecutivePart(client);
-            const issuerCode = consecutivePart(issuer);
-            const dateCode = requestDateCode();
-            const timestamp = Date.now().toString(36).toUpperCase();
-            const randomPart = typeof crypto !== "undefined" && crypto.randomUUID
-                ? crypto.randomUUID().replaceAll("-", "").slice(0, 10).toUpperCase()
-                : Math.random().toString(36).slice(2, 12).toUpperCase();
-            return `${clientCode}${issuerCode}${dateCode}-${timestamp}-${randomPart}`;
+        function buildRequestId(requests, client, issuer, option, dateCode) {
+            const prefix = `${consecutivePart(client)}${consecutivePart(issuer)}`;
+            const suffix = `${String(option).padStart(2, "0")}${dateCode}`;
+            const matchingPattern = new RegExp(
+                `^${prefix}(\\d+)${suffix}$`
+            );
+            const highestConsecutive = requests.reduce((highest, request) => {
+                const match = String(request.id || "").match(matchingPattern);
+                if (!match) return highest;
+                return Math.max(highest, Number(match[1]) || 0);
+            }, 0);
+            return `${prefix}${highestConsecutive + 1}${suffix}`;
         }
         function synchronizeVisibleParameterValues() {
             document.querySelectorAll("[data-entry-id]").forEach((control) => {
@@ -1789,9 +1792,7 @@
             const issuer = document.getElementById("issuerName").value.trim();
             const now = new Date().toISOString();
             return {
-                id: includeDefinitiveId
-                    ? createUniqueRequestId(client, issuer)
-                    : "BORRADOR",
+                id: "BORRADOR",
                 tipo: "formulario-parametros",
                 opcion: currentOption,
                 cliente: client,
@@ -1852,6 +1853,7 @@
         }
         function openConfirmation() {
             if (!validateHeader()) return;
+            synchronizeVisibleParameterValues();
             const selectedProduct =
                 document.getElementById("productFilter").value;
             const applicableParameters = allParameters.filter((parameter) =>
@@ -2032,7 +2034,25 @@
         async function persistRequest(credential, retryOnConflict = true) {
             const current = await readRemoteRequests(credential);
             const requests = current.requests.slice();
+            const requestDate = pendingRequestPayload.fechaSolicitud
+                ? new Date(`${pendingRequestPayload.fechaSolicitud}T12:00:00`)
+                : new Date();
+            const dateCode = [
+                String(requestDate.getDate()).padStart(2, "0"),
+                String(requestDate.getMonth() + 1).padStart(2, "0"),
+                String(requestDate.getFullYear()).slice(-2)
+            ].join("");
+            pendingRequestPayload.id = buildRequestId(
+                requests,
+                pendingRequestPayload.cliente,
+                pendingRequestPayload.emisor,
+                pendingRequestPayload.opcion,
+                dateCode
+            );
             requests.unshift(structuredClone(pendingRequestPayload));
+            if (!pendingRequestPayload.parametros.length) {
+                throw new Error("EMPTY_PARAMETERS");
+            }
             const response = await writeRemoteRequests(
                 credential,
                 requests,
@@ -2087,6 +2107,9 @@
                     openAccessDialog(
                         "No fue posible validar la credencial. Revise el dato e inténtelo nuevamente."
                     );
+                } else if (error.message === "EMPTY_PARAMETERS") {
+                    closeAccessDialog();
+                    showToast("No se encontraron respuestas para guardar.");
                 } else if (error.message === "INVALID_JSON_STRUCTURE") {
                     closeAccessDialog();
                     showToast("El archivo de solicitudes no tiene una estructura válida.");
