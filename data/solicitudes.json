@@ -9,10 +9,10 @@
     "producto": "Corporativo",
     "fechaSolicitud": "2026-09-10",
     "fechaRequerida": "2026-09-10T12:00",
-    "estado": "Enviada",
-    "aprobador": "",
+    "estado": "En revisión",
+    "aprobador": "Seguridad",
     "fechaCreacion": "2026-09-10T17:40:55.707Z",
-    "fechaActualizacion": "2026-09-10T17:40:55.707Z",
+    "fechaActualizacion": "2026-09-10T19:00:29.241Z",
     "comentarios": [],
     "historial": [
       {
@@ -20,6 +20,12 @@
         "fecha": "2026-09-10T17:40:55.707Z",
         "usuario": "DEMO1",
         "comentario": "Solicitud enviada para revisión."
+      },
+      {
+        "estado": "En revisión",
+        "fecha": "2026-09-10T19:00:29.241Z",
+        "usuario": "Seguridad",
+        "comentario": "Solicitud actualizada a En revisión."
       }
     ],
     "parametros": [
@@ -824,7 +830,8 @@
         "revision": "Pendiente",
         "notaAprobador": ""
       }
-    ]
+    ],
+    "fechaToma": "2026-09-10T19:00:29.241Z"
   },
   {
     "id": "DEMODEMO105100926",
