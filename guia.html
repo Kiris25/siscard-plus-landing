@@ -336,13 +336,13 @@
             position: absolute;
             inset: 0;
             z-index: 12;
-            display: block;
-            background: rgba(255, 255, 255, 0.08);
-            color: transparent;
-            font-size: 0;
+            display: grid;
+            place-items: center;
+            background: rgba(255, 255, 255, 0.72);
+            color: var(--guide-gray);
             opacity: 1;
-            pointer-events: none;
-            transition: opacity 0.12s ease;
+            transition: opacity 0.18s ease;
+            font-weight: 700;
         }
 
         .guide-loading[hidden] {
@@ -963,46 +963,11 @@
 
             if (action === "usePreviousInformation")
             {
-                const overlay = frameDocument.getElementById(
-                    "templateOverlay"
-                );
-                const button = frameDocument.getElementById(
-                    "loadTemplateButton"
-                );
-
-                if (!button)
-                {
-                    return false;
-                }
-
-                if (overlay)
-                {
-                    overlay.hidden = false;
-                }
-
-                button.focus();
-                button.dispatchEvent(
-                    new frameDocument.defaultView.MouseEvent(
-                        "click",
-                        {
-                            bubbles: true,
-                            cancelable: true,
-                            view: frameDocument.defaultView
-                        }
-                    )
-                );
-
-                if (
-                    overlay &&
-                    !overlay.hidden &&
-                    typeof frameDocument.defaultView.loadLastTemplate === "function"
-                )
-                {
-                    frameDocument.defaultView.loadLastTemplate();
-                }
-
-                return true;
+                const button = frameDocument.getElementById("loadTemplateButton");
+                button?.click();
+                return;
             }
+
             if (
                 action === "openMyRequestMenu" ||
                 action === "openApprovalMenu" ||
@@ -1155,19 +1120,6 @@
             guideLoading.hidden = false;
             prepareStepState(step, frameDocument);
 
-            if (["Datos generales de la solicitud","Buscar parámetros","Herramientas del formulario","Completar los parámetros"].includes(step.title))
-            {
-                const overlay = frameDocument.getElementById("templateOverlay");
-                if (overlay && !overlay.hidden)
-                {
-                    performStepAction(
-                        frameDocument,
-                        "usePreviousInformation"
-                    );
-                    await waitUntilOverlayCloses(frameDocument);
-                }
-            }
-
             await waitForStableLayout(frameDocument);
             const target = resolveStepTarget(step, frameDocument);
             target.scrollIntoView({behavior:"auto",block:"center",inline:"center"});
@@ -1202,17 +1154,43 @@
             guideWelcome.hidden=true; guideFrame.hidden=false;
             guideInteractionBlocker.hidden=false; guideCard.hidden=true;
             guideFocus.hidden=true; guideLoading.hidden=false;
-            guideLoading.textContent = "";
-            currentPage=step.page;
-            const separator=step.page.includes("?")?"&":"?";
-            guideFrame.src="about:blank";
-            window.setTimeout(()=>{guideFrame.src=`${step.page}${separator}guiaPaso=${currentStep}`;},30);
+            guideLoading.textContent="Preparando paso...";
+            if (
+                currentPage === step.page &&
+                guideFrame.contentDocument &&
+                guideFrame.contentWindow.location.href !== "about:blank"
+            )
+            {
+                showCurrentStep().catch(
+                    function ()
+                    {
+                        guideCard.hidden = false;
+                        guideFocus.hidden = true;
+                        guideTransitioning = false;
+                        previousButton.disabled = currentStep === 0;
+                        nextButton.disabled = false;
+                    }
+                );
+                return;
+            }
+
+            currentPage = step.page;
+            const separator = step.page.includes("?") ? "&" : "?";
+            guideFrame.src = "about:blank";
+            window.setTimeout(
+                function ()
+                {
+                    guideFrame.src =
+                        `${step.page}${separator}guiaPaso=${currentStep}`;
+                },
+                20
+            );
         }
 
         guideFrame.addEventListener("load",function(){
             if(!guideStarted || guideFrame.contentWindow.location.href==="about:blank") return;
             showCurrentStep().catch(()=>{
-                guideLoading.textContent = "";
+                guideLoading.textContent="No fue posible señalar el elemento. Continúe con el siguiente paso.";
                 guideCard.hidden=false; guideFocus.hidden=true; guideTransitioning=false;
                 previousButton.disabled=currentStep===0; nextButton.disabled=false;
             });
@@ -1220,58 +1198,21 @@
 
         document.getElementById("startGuideButton").addEventListener("click",function(){currentStep=0;loadCurrentStep();});
 
-        async function waitUntilOverlayCloses(frameDocument)
-        {
-            const startedAt = Date.now();
-
-            while (Date.now() - startedAt < 2400)
-            {
-                const overlay = frameDocument.getElementById(
-                    "templateOverlay"
-                );
-
-                if (!overlay || overlay.hidden)
-                {
-                    return true;
-                }
-
-                await new Promise(
-                    resolve => window.setTimeout(resolve, 80)
-                );
-            }
-
-            return false;
-        }
-
         async function goToGuideStep(nextStep,direction)
         {
             if(guideTransitioning || nextStep<0 || nextStep>=guideSteps.length) return;
             guideTransitioning=true; previousButton.disabled=true; nextButton.disabled=true;
-            guideFocus.hidden=true; guideCard.hidden=true; guideLoading.hidden=false;
+            guideFocus.hidden = true;
+            guideCard.hidden = true;
+            guideLoading.hidden = false;
+            guideLoading.style.opacity = "0";
             const leaving=guideSteps[currentStep];
-            if (direction === "next" && leaving.actionOnNext)
+            if(direction==="next" && leaving.actionOnNext)
             {
-                performStepAction(
-                    guideFrame.contentDocument,
-                    leaving.actionOnNext
-                );
-
-                if (leaving.actionOnNext === "usePreviousInformation")
-                {
-                    await waitUntilOverlayCloses(
-                        guideFrame.contentDocument
-                    );
-                }
-                else
-                {
-                    await new Promise(
-                        resolve => window.setTimeout(resolve, 420)
-                    );
-                }
+                performStepAction(guideFrame.contentDocument,leaving.actionOnNext);
+                await new Promise(resolve=>window.setTimeout(resolve,750));
             }
-
-            currentStep = nextStep;
-            loadCurrentStep();
+            currentStep=nextStep; loadCurrentStep();
         }
 
         previousButton.addEventListener("click",()=>goToGuideStep(currentStep-1,"previous"));
