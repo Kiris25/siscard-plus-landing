@@ -1574,29 +1574,16 @@
             }
 
             function buildInput(parameter) {
-                const choices = productFilteredChoices(parameter);
-                if (choices.length) {
-                    const instruction =
-                        choices.length <= 3
-                            ? `Seleccione: ${choices.join(" / ")}`
-                            : `Seleccione una de ${choices.length} opciones permitidas`;
-                    return `
-                    <select data-entry-id="${escapeHtml(parameter.id)}" disabled>
-                        <option value="" selected disabled hidden></option>
-                        ${choices.map((value) => `<option value="${escapeHtml(value)}">${escapeHtml(value)}</option>`).join("")}
-                    </select>
-                    <small class="validation-message"></small>`;
-                }
-                const kind = inputKind(parameter);
-                const attributes = [
-                    `type="${kind.type}"`,
-                    kind.min !== undefined ? `min="${kind.min}"` : "",
-                    kind.max !== undefined ? `max="${kind.max}"` : "",
-                    kind.step !== undefined ? `step="${kind.step}"` : "",
-                ]
-                    .filter(Boolean)
-                    .join(" ");
-                return `<input ${attributes} data-entry-id="${escapeHtml(parameter.id)}" ${parameter.required ? "required" : ""} data-validation-reason="${escapeHtml(kind.reason)}" placeholder="Digite el valor solicitado" readonly><small class="validation-message"></small>`;
+                const storedValue = parameterValue(parameter);
+                return `
+                    <input
+                        type="text"
+                        data-entry-id="${escapeHtml(parameter.id)}"
+                        value="${escapeHtml(storedValue)}"
+                        readonly
+                    >
+                    <small class="validation-message"></small>
+                `;
             }
             function renderParameters() {
                 const selectedProduct = document.getElementById("productFilter").value;
@@ -1786,9 +1773,9 @@
                     const parameter = allParameters.find(
                         (item) => String(item.id) === String(control.dataset.entryId),
                     );
-                    if (parameter?.value) control.value = parameter.value;
-                    control.addEventListener("change", () => validateInput(control));
-                    control.addEventListener("blur", () => validateInput(control));
+                    if (parameter) {
+                        control.value = parameterValue(parameter);
+                    }
                 });
 
                 document.querySelectorAll("[data-review-id]").forEach((button) => {
@@ -2237,11 +2224,40 @@
                     </table>
                 `;
             }
-            function selectApprovalRequest(requestId) {
-                const request = loadRequests().find(
+            async function getLatestApprovalRequest(requestId) {
+                const credential = (
+                    localStorage.getItem(ACCESS_CREDENTIAL_KEY) || ""
+                ).trim();
+                let remote;
+                try {
+                    remote = await fetchRemoteRequests(credential);
+                } catch (error) {
+                    if (error.message !== "CREDENTIAL_INVALID") {
+                        throw error;
+                    }
+                    localStorage.removeItem(ACCESS_CREDENTIAL_KEY);
+                    remote = await fetchRemoteRequests();
+                }
+                requestStore = sortRequestStore(remote.requests);
+                refreshApprovalFilters();
+                renderApprovalRequestList();
+                return requestStore.find(
                     (item) => String(item.id) === String(requestId)
-                );
-                if (!request) return;
+                ) || null;
+            }
+            async function selectApprovalRequest(requestId) {
+                let request;
+                try {
+                    request = await getLatestApprovalRequest(requestId);
+                } catch (error) {
+                    console.error(error);
+                    showToast("No fue posible actualizar la solicitud seleccionada.");
+                    return;
+                }
+                if (!request) {
+                    showToast("La solicitud ya no está disponible.");
+                    return;
+                }
                 selectedRequestId = requestId;
                 selectedRequest = structuredClone(request);
                 showEmptyParameters = false;
@@ -2454,14 +2470,32 @@
                 await changeApprovalState(nextState);
             }
             async function takeRequest(requestId) {
-                selectedRequestId = requestId;
-                selectedRequest = loadRequests().find((item) => item.id === requestId) || null;
-                if (!selectedRequest) return;
-                if (["Enviada", "Pendiente", "Enviada a corregir"].includes(selectedRequest.estado)) {
-                    await changeApprovalState("En revisión");
-                    return;
+                try {
+                    const latestRequest = await getLatestApprovalRequest(requestId);
+                    if (!latestRequest) {
+                        showToast("La solicitud ya no está disponible.");
+                        return;
+                    }
+                    selectedRequestId = requestId;
+                    selectedRequest = structuredClone(latestRequest);
+                    allParameters = (latestRequest.parametros || []).map(
+                        normalizeSubmittedParameter
+                    );
+                    if (
+                        [
+                            "Enviada",
+                            "Pendiente",
+                            "Enviada a corregir"
+                        ].includes(latestRequest.estado)
+                    ) {
+                        await changeApprovalState("En revisión");
+                        return;
+                    }
+                    await selectApprovalRequest(requestId);
+                } catch (error) {
+                    console.error(error);
+                    showToast("No fue posible tomar la solicitud.");
                 }
-                selectApprovalRequest(requestId);
             }
             function exportApprovalHistory() {
                 const requests = loadRequests();
@@ -2733,6 +2767,11 @@
                 renderApprovalRequestList();
             });
             initializeRequests();
+            window.addEventListener("focus", () => {
+                if (!document.getElementById("approvalListView").hidden) {
+                    initializeRequests();
+                }
+            });
             document
                 .querySelectorAll("#requestForm input, #requestForm select")
                 .forEach((control) => {
