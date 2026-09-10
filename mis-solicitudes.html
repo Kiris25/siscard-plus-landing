@@ -734,6 +734,188 @@
             color: var(--request-gray);
         }
 
+
+        .request-status-summary {
+            display: flex;
+            gap: 7px;
+            flex-wrap: wrap;
+            padding: 11px 16px;
+            border-bottom: 1px solid var(--request-line);
+            background: #ffffff;
+        }
+        .status-count {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 7px 10px;
+            border: 1px solid var(--request-line);
+            border-radius: 999px;
+            background: var(--request-soft);
+            color: var(--request-gray);
+            font-size: 10px;
+            font-weight: 750;
+        }
+        .status-count strong {
+            color: var(--request-orange);
+            font-size: 12px;
+        }
+        .sortable-heading {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            width: 100%;
+            padding: 0;
+            border: 0;
+            background: transparent;
+            color: inherit;
+            font: inherit;
+            text-align: left;
+            text-transform: inherit;
+            cursor: pointer;
+        }
+        .sortable-heading span {
+            color: var(--request-orange);
+        }
+        .combined-request-filter {
+            position: relative;
+            min-width: 140px;
+        }
+        .combined-filter-panel {
+            position: absolute;
+            top: calc(100% + 5px);
+            left: 0;
+            z-index: 1250;
+            width: min(320px, calc(100vw - 36px));
+            max-height: 290px;
+            overflow: hidden;
+            padding: 10px;
+            border: 1px solid var(--request-line);
+            border-top: 3px solid var(--request-orange);
+            border-radius: var(--radius);
+            background: #ffffff;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.18);
+        }
+        .combined-filter-panel[hidden] {
+            display: none !important;
+        }
+        .combined-filter-panel > strong {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--request-gray);
+            font-size: 10px;
+        }
+        .combined-filter-options {
+            display: grid;
+            gap: 5px;
+            max-height: 235px;
+            overflow-y: auto;
+        }
+        .combined-filter-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 7px;
+            border-radius: 5px;
+            color: var(--request-gray);
+            font-size: 10px;
+            cursor: pointer;
+        }
+        .combined-filter-option:hover {
+            background: var(--orange-soft);
+        }
+        .combined-filter-option input {
+            width: 14px;
+            height: 14px;
+            accent-color: var(--request-orange);
+        }
+        .row-options-button {
+            display: grid;
+            place-items: center;
+            width: 34px;
+            height: 34px;
+            padding: 5px;
+            border: 1px solid var(--request-line);
+            border-radius: var(--radius);
+            background: #ffffff;
+        }
+        .row-options-button:hover,
+        .row-options-button.active {
+            border-color: var(--request-orange);
+            background: var(--orange-soft);
+        }
+        .row-options-button img {
+            width: 20px;
+            height: 20px;
+            object-fit: contain;
+        }
+        .row-options-menu {
+            position: fixed;
+            z-index: 1750;
+            display: grid;
+            min-width: 150px;
+            overflow: hidden;
+            border: 1px solid var(--request-line);
+            border-top: 3px solid var(--request-orange);
+            border-radius: var(--radius);
+            background: #ffffff;
+            box-shadow: 0 14px 35px rgba(0, 0, 0, 0.20);
+        }
+        .row-options-menu[hidden] {
+            display: none !important;
+        }
+        .row-options-menu button {
+            padding: 9px 11px;
+            border: 0;
+            border-bottom: 1px solid var(--request-line);
+            background: #ffffff;
+            color: var(--request-gray);
+            text-align: left;
+            font-size: 11px;
+            font-weight: 750;
+        }
+        .row-options-menu button:last-child {
+            border-bottom: 0;
+        }
+        .row-options-menu button:hover {
+            background: var(--orange-soft);
+            color: var(--request-orange);
+        }
+        .history-popover {
+            position: fixed;
+            z-index: 1760;
+            width: min(390px, calc(100vw - 28px));
+            max-height: min(480px, calc(100vh - 28px));
+            overflow: hidden;
+            border: 1px solid var(--request-line);
+            border-top: 4px solid var(--request-orange);
+            border-radius: var(--radius);
+            background: #ffffff;
+            box-shadow: 0 18px 48px rgba(0, 0, 0, 0.24);
+        }
+        .history-popover[hidden] {
+            display: none !important;
+        }
+        .history-popover-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 11px 13px;
+            border-bottom: 1px solid var(--request-line);
+            background: var(--request-soft);
+        }
+        .history-popover-close {
+            width: 28px;
+            height: 28px;
+            border: 1px solid var(--request-line);
+            border-radius: 50%;
+            background: #ffffff;
+            font-size: 18px;
+        }
+        .history-popover-body {
+            max-height: 405px;
+            overflow-y: auto;
+            padding: 10px 12px 12px;
+        }
         @media (max-width: 850px) {
             .detail-grid {
                 grid-template-columns: 1fr;
@@ -798,21 +980,42 @@
                             <small>Información sincronizada con el registro central.</small>
                         </div>
                     </header>
+                    <div class="request-status-summary" id="requestStatusSummary"></div>
                     <div class="table-wrap">
                         <table class="requests-table">
                             <thead>
                                 <tr>
-                                    <th>Solicitud</th>
-                                    <th>Fecha de envío</th>
-                                    <th>Cliente</th>
-                                    <th>Emisor / opción</th>
-                                    <th>Estado</th>
-                                    <th>Última actualización</th>
-                                    <th>Acciones</th>
+                                    <th>#</th>
+                                    <th><button class="sortable-heading" type="button" data-sort-key="id">Solicitud <span data-sort-indicator="id">↕</span></button></th>
+                                    <th><button class="sortable-heading" type="button" data-sort-key="fechaCreacion">Fecha de envío <span data-sort-indicator="fechaCreacion">↕</span></button></th>
+                                    <th><button class="sortable-heading" type="button" data-sort-key="cliente">Cliente <span data-sort-indicator="cliente">↕</span></button></th>
+                                    <th><button class="sortable-heading" type="button" data-sort-key="emisorOpcion">Emisor / opción <span data-sort-indicator="emisorOpcion">↕</span></button></th>
+                                    <th><button class="sortable-heading" type="button" data-sort-key="estado">Estado <span data-sort-indicator="estado">↕</span></button></th>
+                                    <th><button class="sortable-heading" type="button" data-sort-key="fechaActualizacion">Última actualización <span data-sort-indicator="fechaActualizacion">↕</span></button></th>
+                                    <th>Opciones</th>
                                 </tr>
                                 <tr class="column-filters">
+                                    <th></th>
                                     <th>
-                                        <input class="column-filter" id="filterRequestId" placeholder="Filtrar">
+                                        <div class="combined-request-filter" id="combinedRequestFilter">
+                                            <input
+                                                class="column-filter"
+                                                id="filterRequestId"
+                                                placeholder="Solicitud"
+                                                autocomplete="off"
+                                            >
+                                            <div
+                                                class="combined-filter-panel"
+                                                id="combinedFilterPanel"
+                                                hidden
+                                            >
+                                                <strong>CLIENTE / EMISOR</strong>
+                                                <div
+                                                    class="combined-filter-options"
+                                                    id="combinedFilterOptions"
+                                                ></div>
+                                            </div>
+                                        </div>
                                     </th>
                                     <th>
                                         <input class="column-filter column-filter-date" id="filterCreatedDate" type="date" title="Fecha de envío">
@@ -922,6 +1125,25 @@
         </div>
     </div>
 
+    <div class="row-options-menu" id="rowOptionsMenu" hidden>
+        <button type="button" data-menu-action="view">Ver detalle</button>
+        <button type="button" data-menu-action="correct">Corregir</button>
+        <button type="button" data-menu-action="history">Ver historial</button>
+    </div>
+    <div class="history-popover" id="historyPopover" hidden>
+        <div class="history-popover-header">
+            <strong>Historial de estados</strong>
+            <button
+                class="history-popover-close"
+                id="closeHistoryPopoverButton"
+                type="button"
+                aria-label="Cerrar historial"
+            >
+                ×
+            </button>
+        </div>
+        <div class="history-popover-body" id="historyPopoverBody"></div>
+    </div>
     <div class="modal-overlay" id="correctionConfirmationOverlay" hidden>
         <section class="modal-dialog compact" role="dialog" aria-modal="true" aria-labelledby="correctionConfirmationTitle">
             <header class="modal-header">
@@ -991,6 +1213,13 @@
         let allRequests = [];
         let selectedRequest = null;
         let pendingCorrection = null;
+        let requestSort = {
+            key: "fechaCreacion",
+            direction: "desc"
+        };
+        let selectedClientIssuerFilters = new Set();
+        let activeOptionsRequestId = "";
+        let activeOptionsAnchor = null;
 
         const requestsBody = document.getElementById("requestsBody");
         const loadingState = document.getElementById("loadingState");
@@ -1170,6 +1399,7 @@
         }
 
         function refreshColumnFilterOptions() {
+            renderCombinedFilterOptions();
             populateSelect(
                 "filterClient",
                 allRequests.map((request) => request.cliente || "Sin información"),
@@ -1201,6 +1431,84 @@
             renderRequests();
         }
 
+        function clientIssuerKey(request) {
+            return `${request.cliente || "Sin cliente"}|||${request.emisor || "Sin emisor"}`;
+        }
+        function renderCombinedFilterOptions() {
+            const container = document.getElementById("combinedFilterOptions");
+            if (!container) return;
+            const pairs = [
+                ...new Map(
+                    allRequests.map((request) => [
+                        clientIssuerKey(request),
+                        {
+                            key: clientIssuerKey(request),
+                            label: `${request.cliente || "Sin cliente"} / ${request.emisor || "Sin emisor"}`
+                        }
+                    ])
+                ).values()
+            ].sort((first, second) =>
+                first.label.localeCompare(second.label, "es", {
+                    sensitivity: "base"
+                })
+            );
+            container.innerHTML = pairs.map((pair) => `
+                <label class="combined-filter-option">
+                    <input
+                        type="checkbox"
+                        value="${escapeHtml(pair.key)}"
+                        ${selectedClientIssuerFilters.has(pair.key) ? "checked" : ""}
+                    >
+                    <span>${escapeHtml(pair.label)}</span>
+                </label>
+            `).join("");
+        }
+        function renderStatusSummary() {
+            const order = [
+                "Enviada",
+                "En revisión",
+                "Requiere información",
+                "Enviada a corregir",
+                "Aprobada",
+                "Completada",
+                "Rechazada"
+            ];
+            const counts = allRequests.reduce((summary, request) => {
+                const status = request.estado || "Enviada";
+                summary[status] = (summary[status] || 0) + 1;
+                return summary;
+            }, {});
+            const additional = Object.keys(counts).filter(
+                (status) => !order.includes(status)
+            );
+            document.getElementById("requestStatusSummary").innerHTML = [
+                ...order,
+                ...additional
+            ].map((status) => `
+                <span class="status-count">
+                    ${escapeHtml(status)}
+                    <strong>${counts[status] || 0}</strong>
+                </span>
+            `).join("");
+        }
+        function requestSortValue(request, key) {
+            if (key === "fechaCreacion") {
+                return Date.parse(
+                    request.fechaCreacion || request.fechaSolicitud || ""
+                ) || 0;
+            }
+            if (key === "fechaActualizacion") {
+                return Date.parse(request.fechaActualizacion || "") || 0;
+            }
+            if (key === "emisorOpcion") {
+                return normalize(`${request.emisor || ""} ${request.opcion || ""}`);
+            }
+            return normalize(
+                key === "estado"
+                    ? request.estado || "Enviada"
+                    : request[key]
+            );
+        }
         function filteredRequests() {
             const query = normalize(document.getElementById("requestSearch").value);
             const scope = document.getElementById("requestScope").value;
@@ -1210,7 +1518,7 @@
             const issuerOption = document.getElementById("filterIssuerOption").value;
             const status = document.getElementById("filterStatus").value;
             const updatedDate = document.getElementById("filterUpdatedDate").value;
-            return allRequests.filter((request) => {
+            const filtered = allRequests.filter((request) => {
                 const requestStatus = request.estado || "Enviada";
                 const requestIssuerOption = `${request.emisor || "Sin emisor"} · OP${request.opcion || ""}`;
                 const scopeMatches = scope !== "corrections" ||
@@ -1225,23 +1533,51 @@
                 ].join(" "));
                 return scopeMatches &&
                     (!query || searchable.includes(query)) &&
-                    (!requestId || normalize(request.id).includes(requestId)) &&
+                    (
+                        !requestId ||
+                        normalize(request.id).includes(requestId) ||
+                        normalize(request.cliente).includes(requestId) ||
+                        normalize(request.emisor).includes(requestId)
+                    ) &&
+                    (
+                        !selectedClientIssuerFilters.size ||
+                        selectedClientIssuerFilters.has(clientIssuerKey(request))
+                    ) &&
                     (!createdDate || dateKey(request.fechaCreacion || request.fechaSolicitud) === createdDate) &&
                     (!client || (request.cliente || "Sin información") === client) &&
                     (!issuerOption || requestIssuerOption === issuerOption) &&
                     (!status || requestStatus === status) &&
                     (!updatedDate || dateKey(request.fechaActualizacion) === updatedDate);
             });
+            return filtered.sort((first, second) => {
+                const firstValue = requestSortValue(first, requestSort.key);
+                const secondValue = requestSortValue(second, requestSort.key);
+                const comparison = typeof firstValue === "number"
+                    ? firstValue - secondValue
+                    : String(firstValue).localeCompare(String(secondValue), "es", {
+                        sensitivity: "base",
+                        numeric: true
+                    });
+                return requestSort.direction === "asc"
+                    ? comparison
+                    : -comparison;
+            });
         }
-
         function renderRequests() {
             const requests = filteredRequests();
+            renderStatusSummary();
+            document.querySelectorAll("[data-sort-indicator]").forEach((indicator) => {
+                indicator.textContent = indicator.dataset.sortIndicator === requestSort.key
+                    ? requestSort.direction === "asc" ? "▲" : "▼"
+                    : "↕";
+            });
             document.getElementById("requestCount").textContent =
                 `${requests.length} solicitud${requests.length === 1 ? "" : "es"}`;
-            requestsBody.innerHTML = requests.map((request) => {
+            requestsBody.innerHTML = requests.map((request, index) => {
                 const needsCorrection = request.estado === "Requiere información";
                 return `
                     <tr>
+                        <td>${index + 1}</td>
                         <td>
                             <span class="request-id">${escapeHtml(request.id || "Sin ID")}</span>
                         </td>
@@ -1260,24 +1596,19 @@
                         </td>
                         <td>${escapeHtml(formatDateTime(request.fechaActualizacion))}</td>
                         <td>
-                            <div class="row-actions">
-                                <button
-                                    class="tertiary-button"
-                                    type="button"
-                                    data-view-id="${escapeHtml(request.id)}"
+                            <button
+                                class="row-options-button"
+                                type="button"
+                                data-options-request-id="${escapeHtml(request.id)}"
+                                aria-label="Más opciones"
+                                title="Más opciones"
+                            >
+                                <img
+                                    src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAANCAIAAAArLKlOAAACNElEQVR4ATySW0hUQRjHvzn39babbZooRpZSBLuRCNoGRZS2dLGLYYIv9dBLRBSBtbJCCUFUkEbQUy8VGhJBqGXhQ5enQKSQkLKL5LrbxV0Rzzpz9pwZ5+w5ux/f/OH7z/xg5vtGYPkwTZqcpwsxmoxRgzi2OfNR7z+18ugSXUw4jqMCZIORNBm5jYeiePgmfnadPO9lesqcGsejfcru00LVNm7Svz+zZ21xMTo/Tf98V1uvqq0R7XgUIYGM3cu8f6y2nJMCzcqeM9KmBuP1fZZO2RCAi4FlQuEaVFYjeMtRaSXyV9MfE0wpkOqanHMcpgu/aSrulDmMWSgbjguGLu04jASZjPZxhxEdD98R60Li+lpe8sxhRX4rMUte3DLGHxiv+s0vH8QNAe1kD41/w4NRPBARSiuVfWdBlDnD08XEilp5V4c5/c6cHMl8GhMDzeLGepbBUnC/NTcFpqGEOpCsccBJF2PLSTo7IdbUi1v38suw1Jz5+Q1+0mX9mpS2hJCvnLy8yxYTDsPVxXgb2dJ/NXyBt049eFHwlBhvHwreddqxbvXAefXQZYZ1K/6VA066GDBAnhIo9IGkIMUDBV7gTdKK7cdIKtKKkKcYgDoM1xwGlOFlICvcAkqB6FlN2yVjfDz2rl24y8UEfzXfI0+7+W/AgxErMSPt7LT+xfBQj+0MXAFGxbLNLpQfN/JVaO29clO7HGyRG46qR7qUxhNa5w0pGJa3h+XGNq3tGlpblcdWAQAA///xyceHAAAABklEQVQDAD+UBA3+7SoMAAAAAElFTkSuQmCC"
+                                    alt=""
+                                    aria-hidden="true"
                                 >
-                                    Ver detalle
-                                </button>
-                                ${needsCorrection ? `
-                                    <button
-                                        class="primary-button"
-                                        type="button"
-                                        data-correct-id="${escapeHtml(request.id)}"
-                                    >
-                                        Corregir
-                                    </button>
-                                ` : ""}
-                            </div>
+                            </button>
                         </td>
                     </tr>
                 `;
@@ -1285,6 +1616,51 @@
             emptyState.hidden = requests.length > 0;
         }
 
+        function closeRowOptionsMenu() {
+            document.getElementById("rowOptionsMenu").hidden = true;
+            activeOptionsRequestId = "";
+            activeOptionsAnchor?.classList.remove("active");
+            activeOptionsAnchor = null;
+        }
+        function openRowOptionsMenu(requestId, anchor) {
+            closeHistoryPopover();
+            closeRowOptionsMenu();
+            activeOptionsRequestId = requestId;
+            activeOptionsAnchor = anchor;
+            anchor.classList.add("active");
+            const request = allRequests.find(
+                (item) => String(item.id) === String(requestId)
+            );
+            document.querySelector('[data-menu-action="correct"]').hidden =
+                request?.estado !== "Requiere información";
+            const menu = document.getElementById("rowOptionsMenu");
+            menu.hidden = false;
+            const rect = anchor.getBoundingClientRect();
+            const width = 150;
+            menu.style.left = `${Math.max(14, Math.min(rect.right - width, window.innerWidth - width - 14))}px`;
+            menu.style.top = `${rect.bottom + 6}px`;
+        }
+        function closeHistoryPopover() {
+            document.getElementById("historyPopover").hidden = true;
+        }
+        function openHistoryPopover(requestId, anchor) {
+            const request = allRequests.find(
+                (item) => String(item.id) === String(requestId)
+            );
+            if (!request) return;
+            const history = Array.isArray(request.historial)
+                ? request.historial.slice().reverse()
+                : [];
+            document.getElementById("historyPopoverBody").innerHTML =
+                historyMarkup(history.slice().reverse()) ||
+                '<div class="empty-state">No hay movimientos registrados.</div>';
+            const popover = document.getElementById("historyPopover");
+            popover.hidden = false;
+            const rect = anchor.getBoundingClientRect();
+            const width = Math.min(390, window.innerWidth - 28);
+            popover.style.left = `${Math.max(14, Math.min(rect.right - width, window.innerWidth - width - 14))}px`;
+            popover.style.top = `${Math.min(rect.bottom + 7, window.innerHeight - 440)}px`;
+        }
         function detailField(label, value) {
             return `
                 <div class="request-field">
@@ -1894,7 +2270,6 @@
         document.getElementById("requestScope").addEventListener("change", renderRequests);
         document.getElementById("refreshButton").addEventListener("click", loadRequests);
         [
-            "filterRequestId",
             "filterCreatedDate",
             "filterClient",
             "filterIssuerOption",
@@ -1904,20 +2279,78 @@
             document.getElementById(id).addEventListener("input", renderRequests);
             document.getElementById(id).addEventListener("change", renderRequests);
         });
+        document.getElementById("filterRequestId").addEventListener("focus", () => {
+            renderCombinedFilterOptions();
+            document.getElementById("combinedFilterPanel").hidden = false;
+        });
+        document.getElementById("filterRequestId").addEventListener("click", () => {
+            renderCombinedFilterOptions();
+            document.getElementById("combinedFilterPanel").hidden = false;
+        });
+        document.getElementById("filterRequestId").addEventListener("input", renderRequests);
+        document.getElementById("combinedFilterOptions").addEventListener("change", (event) => {
+            const checkbox = event.target.closest('input[type="checkbox"]');
+            if (!checkbox) return;
+            if (checkbox.checked) {
+                selectedClientIssuerFilters.add(checkbox.value);
+            } else {
+                selectedClientIssuerFilters.delete(checkbox.value);
+            }
+            renderRequests();
+        });
         document.getElementById("clearColumnFiltersButton").addEventListener("click", clearColumnFilters);
 
         requestsBody.addEventListener("click", (event) => {
-            const viewButton = event.target.closest("[data-view-id]");
-            const correctButton = event.target.closest("[data-correct-id]");
-            if (correctButton) {
-                openDetail(correctButton.dataset.correctId, true);
+            const sortButton = event.target.closest("[data-sort-key]");
+            const optionsButton = event.target.closest("[data-options-request-id]");
+            if (sortButton) {
+                const key = sortButton.dataset.sortKey;
+                if (requestSort.key === key) {
+                    requestSort.direction = requestSort.direction === "asc"
+                        ? "desc"
+                        : "asc";
+                } else {
+                    requestSort.key = key;
+                    requestSort.direction = "asc";
+                }
+                renderRequests();
                 return;
             }
-            if (viewButton) {
-                openDetail(viewButton.dataset.viewId, false);
+            if (optionsButton) {
+                event.stopPropagation();
+                openRowOptionsMenu(
+                    optionsButton.dataset.optionsRequestId,
+                    optionsButton
+                );
             }
         });
-
+        document.querySelector(".requests-table thead").addEventListener("click", (event) => {
+            const sortButton = event.target.closest("[data-sort-key]");
+            if (!sortButton) return;
+            const key = sortButton.dataset.sortKey;
+            if (requestSort.key === key) {
+                requestSort.direction = requestSort.direction === "asc" ? "desc" : "asc";
+            } else {
+                requestSort.key = key;
+                requestSort.direction = "asc";
+            }
+            renderRequests();
+        });
+        document.getElementById("rowOptionsMenu").addEventListener("click", async (event) => {
+            const button = event.target.closest("[data-menu-action]");
+            if (!button || !activeOptionsRequestId) return;
+            const action = button.dataset.menuAction;
+            const requestId = activeOptionsRequestId;
+            const anchor = activeOptionsAnchor;
+            closeRowOptionsMenu();
+            if (action === "view") {
+                await openDetail(requestId, false);
+            } else if (action === "correct") {
+                await openDetail(requestId, true);
+            } else if (action === "history") {
+                openHistoryPopover(requestId, anchor);
+            }
+        });
         document.getElementById("cancelCorrectionConfirmationButton").addEventListener("click", closeCorrectionConfirmation);
         document.getElementById("confirmCorrectionButton").addEventListener("click", confirmCorrection);
         document.getElementById("correctionConfirmationOverlay").addEventListener("click", (event) => {
@@ -1937,7 +2370,25 @@
         loadRequests();
         window.addEventListener("focus", () => {
             if (!document.getElementById("requestsListView").hidden) {
-                loadRequests();
+                document.getElementById("closeHistoryPopoverButton").addEventListener("click", closeHistoryPopover);
+        document.addEventListener("click", (event) => {
+            if (
+                !event.target.closest("#rowOptionsMenu") &&
+                !event.target.closest("[data-options-request-id]")
+            ) {
+                closeRowOptionsMenu();
+            }
+            if (
+                !event.target.closest("#historyPopover") &&
+                !event.target.closest("[data-menu-action=history]")
+            ) {
+                closeHistoryPopover();
+            }
+            if (!event.target.closest("#combinedRequestFilter")) {
+                document.getElementById("combinedFilterPanel").hidden = true;
+            }
+        });
+        loadRequests();
             }
         });
     </script>
