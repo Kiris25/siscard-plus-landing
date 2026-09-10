@@ -1730,6 +1730,12 @@
                     }
                 ],
                 parametros: allParameters
+                    .filter((parameter) =>
+                        productApplies(
+                            parameter.product,
+                            document.getElementById("productFilter").value
+                        )
+                    )
                     .map((parameter) => ({
                         id: parameter.id,
                         nombre: parameter.name,
@@ -1764,37 +1770,47 @@
             if (!validateHeader()) return;
             const selectedProduct =
                 document.getElementById("productFilter").value;
-            
-            const invalidRequired = allParameters
-                .map((parameter) => document.querySelector(`[data-entry-id="${parameter.id}"]`))
+            const applicableParameters = allParameters.filter((parameter) =>
+                productApplies(parameter.product, selectedProduct)
+            );
+            const invalidRequired = applicableParameters
+                .map((parameter) =>
+                    document.querySelector(
+                        `[data-entry-id="${CSS.escape(String(parameter.id))}"]`
+                    )
+                )
                 .filter((control) => control && !control.checkValidity());
             if (invalidRequired.length) {
                 invalidRequired[0].reportValidity();
-                invalidRequired[0].scrollIntoView({ behavior: "smooth", block: "center" });
+                invalidRequired[0].scrollIntoView({
+                    behavior: "smooth",
+                    block: "center"
+                });
                 showToast("Complete los campos obligatorios antes de enviar.");
                 return;
             }
-            const answeredParameters = allParameters.filter((parameter) =>
+            const answeredParameters = applicableParameters.filter((parameter) =>
                 String(parameter.value || "").trim()
             );
             if (!answeredParameters.length) {
                 showToast("Complete al menos un parámetro antes de enviar.");
                 return;
             }
-            cost selectedProduct =
-                document.getElementById("productFilter").value;
-            
-            const missingRequired = allParameters.find((parameter) =>
-                productApplies(parameter.product, selectedProduct) &&
+            const missingRequired = applicableParameters.find((parameter) =>
                 parameter.required && !String(parameter.value || "").trim()
             );
             if (missingRequired) {
                 const control = document.querySelector(
                     `[data-entry-id="${CSS.escape(String(missingRequired.id))}"]`
                 );
-                control?.scrollIntoView({ behavior: "smooth", block: "center" });
+                control?.scrollIntoView({
+                    behavior: "smooth",
+                    block: "center"
+                });
                 control?.focus();
-                showToast(`Complete el parámetro obligatorio: ${missingRequired.name}.`);
+                showToast(
+                    `Complete el parámetro obligatorio: ${missingRequired.name}.`
+                );
                 return;
             }
             pendingRequestPayload = requestPayload();
