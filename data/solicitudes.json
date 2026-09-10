@@ -1,5 +1,832 @@
 [
   {
+    "id": "DEMO1DEMO1105100926",
+    "tipo": "formulario-parametros",
+    "opcion": "05",
+    "cliente": "DEMO1",
+    "emisor": "DEMO1",
+    "accion": "Agregar",
+    "producto": "Corporativo",
+    "fechaSolicitud": "2026-09-10",
+    "fechaRequerida": "2026-09-10T12:00",
+    "estado": "Enviada",
+    "aprobador": "",
+    "fechaCreacion": "2026-09-10T17:40:55.707Z",
+    "fechaActualizacion": "2026-09-10T17:40:55.707Z",
+    "comentarios": [],
+    "historial": [
+      {
+        "estado": "Enviada",
+        "fecha": "2026-09-10T17:40:55.707Z",
+        "usuario": "DEMO1",
+        "comentario": "Solicitud enviada para revisión."
+      }
+    ],
+    "parametros": [
+      {
+        "id": "6b8df515-da9e-4a1d-9030-14339dd3f367",
+        "nombre": "Emisor",
+        "producto": "Todos",
+        "obligatorio": true,
+        "valor": "PRUEBA",
+        "revision": "Pendiente",
+        "notaAprobador": ""
+      },
+      {
+        "id": "27c505e3-c040-4851-8118-f6f07229531f",
+        "nombre": "Franquicia",
+        "producto": "Todos",
+        "obligatorio": true,
+        "valor": "PRUEBA",
+        "revision": "Pendiente",
+        "notaAprobador": ""
+      },
+      {
+        "id": "e1e5afe3-dc68-4bd3-a8f3-bb7b2ea15b18",
+        "nombre": "Moneda Asignada",
+        "producto": "Todos",
+        "obligatorio": true,
+        "valor": "CO",
+        "revision": "Pendiente",
+        "notaAprobador": ""
+      },
+      {
+        "id": "4f47bcb0-e646-49f0-b06f-41635afa5224",
+        "nombre": "Tarjeta Corporativa",
+        "producto": "Crédito Corporativo",
+        "obligatorio": true,
+        "valor": "S = Sí",
+        "revision": "Pendiente",
+        "notaAprobador": ""
+      },
+      {
+        "id": "fda74d47-06e6-4f43-9361-caec14f9e76a",
+        "nombre": "Última cuenta Asignada (Uso de Evertec)",
+        "producto": "Todos",
+        "obligatorio": false,
+        "valor": "",
+        "revision": "Pendiente",
+        "notaAprobador": ""
+      },
+      {
+        "id": "5dfba02e-a6bc-4dc1-ac79-40afb2e440ad",
+        "nombre": "Último Prospecto Asignado (Uso de Evertec)",
+        "producto": "Todos",
+        "obligatorio": true,
+        "valor": "12",
+        "revision": "Pendiente",
+        "notaAprobador": ""
+      },
+      {
+        "id": "d8ed33c7-82c0-4a96-9263-11724b329236",
+        "nombre": "Color de Tinta",
+        "producto": "Todos",
+        "obligatorio": false,
+        "valor": "",
+        "revision": "Pendiente",
+        "notaAprobador": ""
+      },
+      {
+        "id": "d1f78e80-6755-4a49-a3a5-0ed77d1fd2eb",
+        "nombre": "Retiene Autorización",
+        "producto": "Todos",
+        "obligatorio": true,
+        "valor": "12",
+        "revision": "Pendiente",
+        "notaAprobador": ""
+      },
+      {
+        "id": "6104d59d-3d14-47cb-aad3-052717d3f2c6",
+        "nombre": "Permite Tarjeta Adicional",
+        "producto": "Todos",
+        "obligatorio": true,
+        "valor": "S = Sí",
+        "revision": "Pendiente",
+        "notaAprobador": ""
+      },
+      {
+        "id": "5d237453-e34c-463e-b545-45f443de9db9",
+        "nombre": "Programa Imprime Letra",
+        "producto": "Todos",
+        "obligatorio": false,
+        "valor": "",
+        "revision": "Pendiente",
+        "notaAprobador": ""
+      },
+      {
+        "id": "7c1f526d-d772-4004-979f-519b04a8247d",
+        "nombre": "Programa Imprime Contrato",
+        "producto": "Todos",
+        "obligatorio": false,
+        "valor": "",
+        "revision": "Pendiente",
+        "notaAprobador": ""
+      },
+      {
+        "id": "abc19c23-abaf-4f4c-8d67-4d4eae8a075f",
+        "nombre": "Carta por 1.IV",
+        "producto": "Todos",
+        "obligatorio": false,
+        "valor": "",
+        "revision": "Pendiente",
+        "notaAprobador": ""
+      },
+      {
+        "id": "60db5cab-54ec-4f21-b233-c4715e62cecd",
+        "nombre": "Carta por 2.IV",
+        "producto": "Todos",
+        "obligatorio": false,
+        "valor": "",
+        "revision": "Pendiente",
+        "notaAprobador": ""
+      },
+      {
+        "id": "167e318d-0392-49d6-8137-21c2dca68d34",
+        "nombre": "Carta por 3.IV",
+        "producto": "Todos",
+        "obligatorio": false,
+        "valor": "",
+        "revision": "Pendiente",
+        "notaAprobador": ""
+      },
+      {
+        "id": "c6563aab-6451-4ce5-bebd-1fecaeafd344",
+        "nombre": "Carta por Mas de 3.IV",
+        "producto": "Todos",
+        "obligatorio": false,
+        "valor": "",
+        "revision": "Pendiente",
+        "notaAprobador": ""
+      },
+      {
+        "id": "85990998-1d8c-4ef8-83c5-1e14db210926",
+        "nombre": "Línea de Emisor",
+        "producto": "Todos",
+        "obligatorio": true,
+        "valor": "Empresarial",
+        "revision": "Pendiente",
+        "notaAprobador": ""
+      },
+      {
+        "id": "7017a0ea-0440-424c-ab92-801b0d354051",
+        "nombre": "Clase de Tarjeta",
+        "producto": "Todos",
+        "obligatorio": true,
+        "valor": "IP INFINITE PAYMENTS",
+        "revision": "Pendiente",
+        "notaAprobador": ""
+      },
+      {
+        "id": "1423e762-9063-4c62-a62e-e9f2a93a93f7",
+        "nombre": "Tipo de Tarjeta",
+        "producto": "Todos",
+        "obligatorio": true,
+        "valor": "Débito",
+        "revision": "Pendiente",
+        "notaAprobador": ""
+      },
+      {
+        "id": "4164c375-d1f8-43f0-bdf9-e130e432aa23",
+        "nombre": "Cartas de renovación / Renovación AB con Fiador",
+        "producto": "Todos",
+        "obligatorio": false,
+        "valor": "",
+        "revision": "Pendiente",
+        "notaAprobador": ""
+      },
+      {
+        "id": "eb5aec21-d0f6-4715-bed9-079b5afc4039",
+        "nombre": "Cartas de renovación / Renovación AB sin Fiador",
+        "producto": "Todos",
+        "obligatorio": false,
+        "valor": "",
+        "revision": "Pendiente",
+        "notaAprobador": ""
+      },
+      {
+        "id": "991427cf-a338-4cea-bd42-c594bdd9ddf8",
+        "nombre": "Cartas de renovación / Renovación C",
+        "producto": "Todos",
+        "obligatorio": false,
+        "valor": "",
+        "revision": "Pendiente",
+        "notaAprobador": ""
+      },
+      {
+        "id": "9e972413-e9b4-4725-a081-4c41d00aaea6",
+        "nombre": "Cartas de aprobación/ Carta de Bienvenida",
+        "producto": "Todos",
+        "obligatorio": false,
+        "valor": "",
+        "revision": "Pendiente",
+        "notaAprobador": ""
+      },
+      {
+        "id": "2d39e095-767c-4e5b-9966-129e597c6e7c",
+        "nombre": "Cartas de aprobación/Sin Fiador",
+        "producto": "Todos",
+        "obligatorio": false,
+        "valor": "",
+        "revision": "Pendiente",
+        "notaAprobador": ""
+      },
+      {
+        "id": "3de307e9-191c-499f-aff6-964fe15b8bb3",
+        "nombre": "Descuento de Pagos (solo crédito).",
+        "producto": "Todos",
+        "obligatorio": false,
+        "valor": "",
+        "revision": "Pendiente",
+        "notaAprobador": ""
+      },
+      {
+        "id": "09c57cf0-36f7-4726-bc82-b6809272ae1e",
+        "nombre": "Estado en q/Nace la Cuenta",
+        "producto": "Todos",
+        "obligatorio": true,
+        "valor": "00 = Activa",
+        "revision": "Pendiente",
+        "notaAprobador": ""
+      },
+      {
+        "id": "6fdef5b8-d757-402f-af56-a3a56e352bea",
+        "nombre": "Cantidad Autorizaciones Máximas por Día.",
+        "producto": "Todos",
+        "obligatorio": false,
+        "valor": "",
+        "revision": "Pendiente",
+        "notaAprobador": ""
+      },
+      {
+        "id": "51d6f6e8-5f3b-4f05-b8e7-e8b27614141e",
+        "nombre": "Tipo de Esquema de Premiación",
+        "producto": "Todos",
+        "obligatorio": false,
+        "valor": "",
+        "revision": "Pendiente",
+        "notaAprobador": ""
+      },
+      {
+        "id": "42fad63f-b346-4d1b-9db0-8b08587a143d",
+        "nombre": "Producto Asociado (Uso de Evertec)",
+        "producto": "Todos",
+        "obligatorio": false,
+        "valor": "",
+        "revision": "Pendiente",
+        "notaAprobador": ""
+      },
+      {
+        "id": "ee59804c-6411-42d0-abc1-54a72a1a6038",
+        "nombre": "Calcula",
+        "producto": "Todos",
+        "obligatorio": false,
+        "valor": "",
+        "revision": "Pendiente",
+        "notaAprobador": ""
+      },
+      {
+        "id": "7bf74fd6-d3db-4265-b03b-25031ec2f59b",
+        "nombre": "Imprime",
+        "producto": "Todos",
+        "obligatorio": false,
+        "valor": "",
+        "revision": "Pendiente",
+        "notaAprobador": ""
+      },
+      {
+        "id": "48ae3145-cdd3-4790-8ef3-8ffed7183959",
+        "nombre": "Actualiza",
+        "producto": "Todos",
+        "obligatorio": false,
+        "valor": "",
+        "revision": "Pendiente",
+        "notaAprobador": ""
+      },
+      {
+        "id": "624129eb-734f-45fd-9901-6eeeff56e695",
+        "nombre": "Carta E.Cta. Normal",
+        "producto": "Todos",
+        "obligatorio": false,
+        "valor": "",
+        "revision": "Pendiente",
+        "notaAprobador": ""
+      },
+      {
+        "id": "79192118-b729-4ace-87c4-5bc3a85bc849",
+        "nombre": "Carta Est. Cta. 3 Imp Ven",
+        "producto": "Todos",
+        "obligatorio": false,
+        "valor": "",
+        "revision": "Pendiente",
+        "notaAprobador": ""
+      },
+      {
+        "id": "c7cb13bc-73b2-4d2e-9557-3ddc0a37542a",
+        "nombre": "Prog. que Emboza",
+        "producto": "Todos",
+        "obligatorio": false,
+        "valor": "",
+        "revision": "Pendiente",
+        "notaAprobador": ""
+      },
+      {
+        "id": "3b62e961-b658-42d0-952e-db8262ac6be5",
+        "nombre": "Prog. Calc. Morosidad",
+        "producto": "Todos",
+        "obligatorio": false,
+        "valor": "",
+        "revision": "Pendiente",
+        "notaAprobador": ""
+      },
+      {
+        "id": "ff939d29-a46f-4e70-9c2b-b9b46fedcf3f",
+        "nombre": "Sincroniza saldo a Saeta",
+        "producto": "Todos",
+        "obligatorio": true,
+        "valor": "12",
+        "revision": "Pendiente",
+        "notaAprobador": ""
+      },
+      {
+        "id": "a9e0f9f9-2cc6-4ef4-860b-6d7144afff21",
+        "nombre": "Genera CVV2 (Card Verification Value 2)",
+        "producto": "Todos",
+        "obligatorio": true,
+        "valor": "S = Sí",
+        "revision": "Pendiente",
+        "notaAprobador": ""
+      },
+      {
+        "id": "04be9196-650e-42c0-8095-e7800ab9ec08",
+        "nombre": "Tipo de Emisor",
+        "producto": "Todos",
+        "obligatorio": true,
+        "valor": "Local",
+        "revision": "Pendiente",
+        "notaAprobador": ""
+      },
+      {
+        "id": "45f4574f-7b55-42dd-95bb-6fb72408563a",
+        "nombre": "Generación de Cuentas",
+        "producto": "Todos",
+        "obligatorio": true,
+        "valor": "C = Consecutivo",
+        "revision": "Pendiente",
+        "notaAprobador": ""
+      },
+      {
+        "id": "35daae05-51dc-4d86-98b1-8399a7d2341d",
+        "nombre": "Límite Superior de Rango de Cuentas",
+        "producto": "Todos",
+        "obligatorio": true,
+        "valor": "12",
+        "revision": "Pendiente",
+        "notaAprobador": ""
+      },
+      {
+        "id": "895bb843-a7b6-4b0e-8507-08eac7306b22",
+        "nombre": "Código de banco",
+        "producto": "Todos",
+        "obligatorio": false,
+        "valor": "",
+        "revision": "Pendiente",
+        "notaAprobador": ""
+      },
+      {
+        "id": "3177a519-a40c-437c-824f-f91abc8edd67",
+        "nombre": "Cuenta Valor",
+        "producto": "Todos",
+        "obligatorio": true,
+        "valor": "S = Sí",
+        "revision": "Pendiente",
+        "notaAprobador": ""
+      },
+      {
+        "id": "2cd76807-1980-4366-8367-5cdf51662baa",
+        "nombre": "Fecha Validación CVV2 (Card Verification Value2 (Uso Evertec)",
+        "producto": "Todos",
+        "obligatorio": false,
+        "valor": "",
+        "revision": "Pendiente",
+        "notaAprobador": ""
+      },
+      {
+        "id": "25fe655a-b4bf-4a3f-bb69-41737da13184",
+        "nombre": "Meses Exception File",
+        "producto": "Todos",
+        "obligatorio": false,
+        "valor": "",
+        "revision": "Pendiente",
+        "notaAprobador": ""
+      },
+      {
+        "id": "2955b148-1908-4dc2-aa90-f0cae0dcec58",
+        "nombre": "Llave vigente por BIN (Set de llaves)",
+        "producto": "Todos",
+        "obligatorio": false,
+        "valor": "",
+        "revision": "Pendiente",
+        "notaAprobador": ""
+      },
+      {
+        "id": "6178626f-9df6-444f-9405-29001ea6f4b0",
+        "nombre": "Permite cambiar nombre a embozar",
+        "producto": "Todos",
+        "obligatorio": true,
+        "valor": "S = Sí",
+        "revision": "Pendiente",
+        "notaAprobador": ""
+      },
+      {
+        "id": "ca273f4f-a5f0-45ae-90e5-2cc15edd4d7f",
+        "nombre": "Genera Acciones",
+        "producto": "Todos",
+        "obligatorio": true,
+        "valor": "S = Sí",
+        "revision": "Pendiente",
+        "notaAprobador": ""
+      },
+      {
+        "id": "20b940bf-5548-48c7-9509-ec5c07d2c35f",
+        "nombre": "Múltiples Cuentas Activas por Ente / Cuentas Activas por Ente",
+        "producto": "Todos",
+        "obligatorio": true,
+        "valor": "S = Sí",
+        "revision": "Pendiente",
+        "notaAprobador": ""
+      },
+      {
+        "id": "bd64ac34-6cf1-4b04-88af-16a297bf947f",
+        "nombre": "Graba Bitácora de Pantallas Críticas",
+        "producto": "Todos",
+        "obligatorio": false,
+        "valor": "",
+        "revision": "Pendiente",
+        "notaAprobador": ""
+      },
+      {
+        "id": "0cb7cb57-83fe-4c7c-867c-23780a6d2132",
+        "nombre": "Monitoreo y Control de Fraude",
+        "producto": "Todos",
+        "obligatorio": false,
+        "valor": "",
+        "revision": "Pendiente",
+        "notaAprobador": ""
+      },
+      {
+        "id": "e1212f4d-a13b-4533-8c0e-1752302bc642",
+        "nombre": "Pin Aleatorio",
+        "producto": "Todos",
+        "obligatorio": true,
+        "valor": "S = Sí",
+        "revision": "Pendiente",
+        "notaAprobador": ""
+      },
+      {
+        "id": "6ecbddcf-422d-4731-b601-8f00fd7ba3db",
+        "nombre": "Genera Pin en Renovación",
+        "producto": "Todos",
+        "obligatorio": true,
+        "valor": "N = No",
+        "revision": "Pendiente",
+        "notaAprobador": ""
+      },
+      {
+        "id": "fa2bdbef-c618-4383-880e-ad17e0220312",
+        "nombre": "Meses Bloqueo Adelantos",
+        "producto": "Todos",
+        "obligatorio": false,
+        "valor": "",
+        "revision": "Pendiente",
+        "notaAprobador": ""
+      },
+      {
+        "id": "66308c75-0a58-4608-82c5-69e0780c513c",
+        "nombre": "Cantidad de Adelantos Para Bloquear",
+        "producto": "Todos",
+        "obligatorio": false,
+        "valor": "",
+        "revision": "Pendiente",
+        "notaAprobador": ""
+      },
+      {
+        "id": "c71d0f71-5f26-4e2f-8e53-78085c7a1679",
+        "nombre": "Meses a Bloquear",
+        "producto": "Todos",
+        "obligatorio": false,
+        "valor": "",
+        "revision": "Pendiente",
+        "notaAprobador": ""
+      },
+      {
+        "id": "f7b9cf51-b108-4d78-bf81-e749625f123a",
+        "nombre": "Permite Autorización Manual",
+        "producto": "Todos",
+        "obligatorio": true,
+        "valor": "S = Sí",
+        "revision": "Pendiente",
+        "notaAprobador": ""
+      },
+      {
+        "id": "ffa43e41-8115-4a74-a462-2a034bd33eca",
+        "nombre": "Porcentaje de Descuento Pago Puntual",
+        "producto": "Todos",
+        "obligatorio": false,
+        "valor": "",
+        "revision": "Pendiente",
+        "notaAprobador": ""
+      },
+      {
+        "id": "fcc1f954-3ba4-4b83-9987-948e79cb9736",
+        "nombre": "Inicializar Frecuencia de Pin",
+        "producto": "Todos",
+        "obligatorio": true,
+        "valor": "S = Sí",
+        "revision": "Pendiente",
+        "notaAprobador": ""
+      },
+      {
+        "id": "86bb4166-304a-4c6b-bb4a-d93f6789d18d",
+        "nombre": "Inicializar Frecuencia",
+        "producto": "Todos",
+        "obligatorio": true,
+        "valor": "S = Sí",
+        "revision": "Pendiente",
+        "notaAprobador": ""
+      },
+      {
+        "id": "e6ec6c1b-3b8f-41ca-9240-9fbed5790f5c",
+        "nombre": "Días para Eliminar pin No impreso",
+        "producto": "Todos",
+        "obligatorio": false,
+        "valor": "",
+        "revision": "Pendiente",
+        "notaAprobador": ""
+      },
+      {
+        "id": "bd1b6b99-3415-47f9-afc0-79be304431a0",
+        "nombre": "Días para Eliminar Pin Impreso",
+        "producto": "Todos",
+        "obligatorio": false,
+        "valor": "",
+        "revision": "Pendiente",
+        "notaAprobador": ""
+      },
+      {
+        "id": "ea028c8c-0198-496d-9be0-9c170d76a3d6",
+        "nombre": "Permite Tarjeta Titular Minicard",
+        "producto": "Todos",
+        "obligatorio": false,
+        "valor": "",
+        "revision": "Pendiente",
+        "notaAprobador": ""
+      },
+      {
+        "id": "e8c9d8ce-1ed3-4315-8a48-634ee51de447",
+        "nombre": "Permite Tarjetas Instantáneas",
+        "producto": "Todos",
+        "obligatorio": true,
+        "valor": "S = Sí",
+        "revision": "Pendiente",
+        "notaAprobador": ""
+      },
+      {
+        "id": "4ecc402d-b702-4021-8ccf-0735d553c7de",
+        "nombre": "Cálculo de Intereses S/ Intereses",
+        "producto": "Todos",
+        "obligatorio": false,
+        "valor": "",
+        "revision": "Pendiente",
+        "notaAprobador": ""
+      },
+      {
+        "id": "dfa6c6f8-d297-49fd-aa75-8024a2fc61c0",
+        "nombre": "Tipo de Autorización Visa",
+        "producto": "Todos",
+        "obligatorio": true,
+        "valor": "2 – Autorización Visa Mandataria.",
+        "revision": "Pendiente",
+        "notaAprobador": ""
+      },
+      {
+        "id": "e996e5aa-ba9a-41a3-884d-65d9a2440713",
+        "nombre": "Tipo de Tarjeta (Banda Magnética / Chip)",
+        "producto": "Todos",
+        "obligatorio": true,
+        "valor": "B – Tarjeta de banda magnética.",
+        "revision": "Pendiente",
+        "notaAprobador": ""
+      },
+      {
+        "id": "0d6f98e0-8925-46b5-9841-f8a8c0c67a83",
+        "nombre": "Emisor Preferente",
+        "producto": "Todos",
+        "obligatorio": false,
+        "valor": "",
+        "revision": "Pendiente",
+        "notaAprobador": ""
+      },
+      {
+        "id": "6b2d454e-6243-45b7-ba4a-995cfc27a1cb",
+        "nombre": "Imprime DADO VISA/MC",
+        "producto": "Todos",
+        "obligatorio": false,
+        "valor": "",
+        "revision": "Pendiente",
+        "notaAprobador": ""
+      },
+      {
+        "id": "db1e5313-0f01-4e98-b244-f79009019b9a",
+        "nombre": "Monitoreo Denegación",
+        "producto": "Todos",
+        "obligatorio": true,
+        "valor": "S = Sí",
+        "revision": "Pendiente",
+        "notaAprobador": ""
+      },
+      {
+        "id": "f56d917a-a993-4937-a5e4-fb8e1c115b32",
+        "nombre": "Prefijo Cuenta Valor",
+        "producto": "Todos",
+        "obligatorio": false,
+        "valor": "",
+        "revision": "Pendiente",
+        "notaAprobador": ""
+      },
+      {
+        "id": "b87322cb-e7cf-4114-8b48-9da66c478cee",
+        "nombre": "Programa Impresión Acuse Recibido",
+        "producto": "Todos",
+        "obligatorio": false,
+        "valor": "",
+        "revision": "Pendiente",
+        "notaAprobador": ""
+      },
+      {
+        "id": "5d0ea6be-10c2-459a-ae44-7e9a8bddae71",
+        "nombre": "IV Cuota Fija *Actualmente no se utiliza*",
+        "producto": "Todos",
+        "obligatorio": false,
+        "valor": "",
+        "revision": "Pendiente",
+        "notaAprobador": ""
+      },
+      {
+        "id": "7f5ef381-ca12-46c6-a1d4-5fe7f525e4b9",
+        "nombre": "Permite Prospectar Cuenta",
+        "producto": "Todos",
+        "obligatorio": false,
+        "valor": "",
+        "revision": "Pendiente",
+        "notaAprobador": ""
+      },
+      {
+        "id": "b46f4a55-5e58-4ea8-ba03-92f38aacbeeb",
+        "nombre": "Períodos de consumo Tarjeta Adicional",
+        "producto": "Todos",
+        "obligatorio": false,
+        "valor": "",
+        "revision": "Pendiente",
+        "notaAprobador": ""
+      },
+      {
+        "id": "ee795564-8a9c-40c8-ad0e-f5cc90a4a232",
+        "nombre": "Datos Discrecionales TRACK1",
+        "producto": "Todos",
+        "obligatorio": true,
+        "valor": "S = Sí",
+        "revision": "Pendiente",
+        "notaAprobador": ""
+      },
+      {
+        "id": "e24872f6-1dc3-48c3-a2ec-e0a76c5d3cb5",
+        "nombre": "Excluir Emisor del MasterData",
+        "producto": "Todos",
+        "obligatorio": false,
+        "valor": "",
+        "revision": "Pendiente",
+        "notaAprobador": ""
+      },
+      {
+        "id": "d71380a9-708e-47f0-a909-6d90523f1d23",
+        "nombre": "Utilizar Fecha Vencimiento Tarjeta",
+        "producto": "Todos",
+        "obligatorio": false,
+        "valor": "",
+        "revision": "Pendiente",
+        "notaAprobador": ""
+      },
+      {
+        "id": "4428e72e-2362-49b7-94d0-67454d78faf1",
+        "nombre": "Días a retener Pre-autorización",
+        "producto": "Todos",
+        "obligatorio": false,
+        "valor": "",
+        "revision": "Pendiente",
+        "notaAprobador": ""
+      },
+      {
+        "id": "188ac4c8-0182-4967-9323-fbd34b3d76f5",
+        "nombre": "Estado en que nace el Pin",
+        "producto": "Todos",
+        "obligatorio": true,
+        "valor": "Dormido",
+        "revision": "Pendiente",
+        "notaAprobador": ""
+      },
+      {
+        "id": "ea2b3b93-0554-4a28-bb87-27d3682ba3a0",
+        "nombre": "Producto de la Marca",
+        "producto": "Todos",
+        "obligatorio": true,
+        "valor": "12",
+        "revision": "Pendiente",
+        "notaAprobador": ""
+      },
+      {
+        "id": "b1302ffa-3624-42d6-bb0d-0dd1fa3c2ea5",
+        "nombre": "Imprime Plástico",
+        "producto": "Todos",
+        "obligatorio": true,
+        "valor": "S = Sí",
+        "revision": "Pendiente",
+        "notaAprobador": ""
+      },
+      {
+        "id": "b5338ae9-b315-4328-92e2-ce594601d24a",
+        "nombre": "Asigna Plan Prem Auto Workflow",
+        "producto": "Todos",
+        "obligatorio": false,
+        "valor": "",
+        "revision": "Pendiente",
+        "notaAprobador": ""
+      },
+      {
+        "id": "ec891891-bea6-4500-a47c-63a649371d43",
+        "nombre": "Trabaja con ABU",
+        "producto": "Todos",
+        "obligatorio": true,
+        "valor": "S = Sí",
+        "revision": "Pendiente",
+        "notaAprobador": ""
+      },
+      {
+        "id": "2c7ae2d2-4d4f-4637-9d4b-221d93e04651",
+        "nombre": "Trabaja con Cross Border",
+        "producto": "Todos",
+        "obligatorio": true,
+        "valor": "S = Sí",
+        "revision": "Pendiente",
+        "notaAprobador": ""
+      },
+      {
+        "id": "605d0318-b5ff-4098-8e73-cc9abb2f505a",
+        "nombre": "Tipo de Tarjeta Permitido",
+        "producto": "Todos",
+        "obligatorio": true,
+        "valor": "C = Chip",
+        "revision": "Pendiente",
+        "notaAprobador": ""
+      },
+      {
+        "id": "357818af-199d-46b0-964a-e9dd778e0bbd",
+        "nombre": "Gestión Transacción Emisor/Adquirente en Cámara",
+        "producto": "Todos",
+        "obligatorio": true,
+        "valor": "S = Sí",
+        "revision": "Pendiente",
+        "notaAprobador": ""
+      },
+      {
+        "id": "1e9b45e3-12e1-4e6c-b2b1-2650824704d7",
+        "nombre": "Cambio Diseño al Renovar.",
+        "producto": "Todos",
+        "obligatorio": true,
+        "valor": "S = Sí",
+        "revision": "Pendiente",
+        "notaAprobador": ""
+      },
+      {
+        "id": "3ff596e4-0b0f-4507-8cc7-949bf3f2b998",
+        "nombre": "Permite país Residencia",
+        "producto": "Todos",
+        "obligatorio": false,
+        "valor": "",
+        "revision": "Pendiente",
+        "notaAprobador": ""
+      },
+      {
+        "id": "c4c36cb9-abbc-4416-a3fd-e7cf2f12c932",
+        "nombre": "Tipo Cliente Ciudadano Oro",
+        "producto": "Todos",
+        "obligatorio": false,
+        "valor": "",
+        "revision": "Pendiente",
+        "notaAprobador": ""
+      }
+    ]
+  },
+  {
     "id": "DEMODEMO105100926",
     "tipo": "formulario-parametros",
     "opcion": "05",
