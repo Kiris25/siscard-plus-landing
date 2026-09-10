@@ -509,14 +509,14 @@
             {
                 page: "formularios.html",
                 module: "Formularios",
-                target: "[href*='formulario-parametros'], .form-card, .service-card, .module-card, main",
+                target: ".catalog-grid, .forms-grid, .documents-grid, .cards-grid, #formsContainer, main",
                 title: "Lista de formularios",
                 text: "Desde la lista se selecciona la opción que corresponde al trámite requerido. Para esta demostración se continuará con la opción 05."
             },
             {
                 page: "formularios.html",
                 module: "Formularios",
-                target: "[href*='opcion=05'], [data-option='05'], [data-option='5'], .form-card, .service-card, main",
+                target: "[href*='opcion=05'], [data-option='05'], [data-option='5'], .option-card, .catalog-card, .service-card, main",
                 title: "Abrir la opción 05",
                 text: "La opción 05 corresponde a Parámetros generales del emisor. Al seleccionar Siguiente se abrirá ese formulario."
             },
@@ -672,7 +672,7 @@
             {
                 page: "aprobaciones.html",
                 module: "Aprobaciones",
-                target: "#rowOptionsMenu:not([hidden]), #rowOptionsMenu, .row-options-menu",
+                target: "[data-options-request-id]",
                 title: "Ver, tomar o consultar historial",
                 text: "Desde Más opciones se abre el detalle, se toma una solicitud disponible o se consulta su historial. Al seleccionar Siguiente, la guía abrirá una solicitud para mostrar la revisión.",
                 action: "openApprovalMenu",
@@ -682,7 +682,7 @@
             {
                 page: "aprobaciones.html",
                 module: "Aprobaciones",
-                target: ".approval-inbox-header .approval-request-actions",
+                target: ".toolbar-actions, .approval-actions, .approval-toolbar, main",
                 title: "Actualizar y exportar historial",
                 text: "Actualizar vuelve a cargar la bandeja. Descargar historial Excel genera el registro consolidado de solicitudes y movimientos."
             },
@@ -697,11 +697,9 @@
             {
                 page: "mis-solicitudes.html",
                 module: "Corrección por el solicitante",
-                target: "#rowOptionsMenu:not([hidden]), [data-action='correct'], [data-action='corregir'], .row-options-menu, #requestsListView",
+                target: "#requestsListView",
                 title: "Corregir información requerida",
-                text: "Cuando el aprobador solicita información, la opción Corregir permite abrir únicamente los campos marcados para ajuste y enviarlos nuevamente a revisión.",
-                action: "openCorrectionMenu",
-                cardPosition: "left"
+                text: "Cuando el aprobador solicita información adicional o ajustes, el solicitante puede utilizar la opción Corregir para actualizar únicamente los datos requeridos y reenviar la solicitud."
             },
             {
                 page: "seguridad.html",
@@ -890,10 +888,15 @@
             const top = frameRectangle.top - guideStage.getBoundingClientRect().top + targetRectangle.top - padding;
             const left = frameRectangle.left - guideStage.getBoundingClientRect().left + targetRectangle.left - padding;
 
-            guideFocus.style.top = `${Math.max(6, top)}px`;
-            guideFocus.style.left = `${Math.max(6, left)}px`;
-            guideFocus.style.width = `${Math.min(guideStage.clientWidth - 12, targetRectangle.width + padding * 2)}px`;
-            guideFocus.style.height = `${Math.min(guideStage.clientHeight - 12, targetRectangle.height + padding * 2)}px`;
+            const safeTop = Math.max(12, top);
+            const safeLeft = Math.max(12, left);
+            const maximumWidth = Math.max(40, guideStage.clientWidth - safeLeft - 12);
+            const maximumHeight = Math.max(40, guideStage.clientHeight - safeTop - 12);
+
+            guideFocus.style.top = `${safeTop}px`;
+            guideFocus.style.left = `${safeLeft}px`;
+            guideFocus.style.width = `${Math.min(maximumWidth, targetRectangle.width + padding * 2)}px`;
+            guideFocus.style.height = `${Math.min(maximumHeight, targetRectangle.height + padding * 2)}px`;
             guideFocus.hidden = false;
         }
 
