@@ -3,571 +3,869 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Guía interactiva del Landing Siscard+">
+    <meta name="description" content="Recorrido guiado del Landing Siscard+">
     <title>Guía interactiva | Landing Siscard+</title>
     <link rel="stylesheet" href="css/styles.css">
     <style>
         :root {
             --guide-orange: #ff6c0c;
+            --guide-orange-dark: #e55d00;
             --guide-gray: #58595b;
             --guide-light: #f2f2f2;
-            --guide-line: #dddddd;
+            --guide-line: #d9d9d9;
         }
-        .guide-shell {
-            display: grid;
-            grid-template-columns: minmax(280px, 360px) minmax(0, 1fr);
-            gap: 16px;
-            min-height: calc(100vh - 150px);
+
+        * {
+            box-sizing: border-box;
         }
-        .guide-panel,
-        .guide-preview {
-            border: 1px solid var(--line, var(--guide-line));
-            border-radius: var(--radius-large, 12px);
-            background: #ffffff;
-            box-shadow: var(--shadow-small, 0 4px 16px rgba(0, 0, 0, 0.08));
-        }
-        .guide-panel {
-            display: flex;
-            flex-direction: column;
+
+        body {
+            margin: 0;
             overflow: hidden;
+            background: #f2f2f2;
         }
-        .guide-panel-header {
-            padding: 20px;
-            border-top: 5px solid var(--guide-orange);
+
+        .guide-app {
+            position: fixed;
+            inset: 0;
+            display: grid;
+            grid-template-rows: 58px minmax(0, 1fr);
+            background: #ffffff;
+        }
+
+        .guide-toolbar {
+            position: relative;
+            z-index: 30;
+            display: grid;
+            grid-template-columns: auto minmax(0, 1fr) auto;
+            gap: 16px;
+            align-items: center;
+            padding: 0 18px;
+            border-bottom: 1px solid #454648;
             background: var(--guide-gray);
             color: #ffffff;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
         }
-        .guide-panel-header span {
+
+        .guide-brand {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .guide-brand-mark {
+            width: 6px;
+            height: 30px;
+            border-radius: 999px;
+            background: var(--guide-orange);
+        }
+
+        .guide-brand strong,
+        .guide-brand small {
             display: block;
-            margin-bottom: 7px;
-            color: #ffd1ad;
+        }
+
+        .guide-brand strong {
+            font-size: 15px;
+        }
+
+        .guide-brand small {
+            margin-top: 2px;
+            color: #d9d9d9;
             font-size: 11px;
-            font-weight: 850;
-            letter-spacing: 0.08em;
-            text-transform: uppercase;
         }
-        .guide-panel-header h1 {
-            margin: 0;
-            color: #ffffff;
-            font-size: 28px;
-            font-weight: 350;
+
+        .guide-toolbar-progress {
+            display: grid;
+            grid-template-columns: auto minmax(120px, 460px) auto;
+            justify-content: center;
+            gap: 10px;
+            align-items: center;
+            color: #eeeeee;
+            font-size: 12px;
         }
-        .guide-progress {
+
+        .guide-progress-track {
             height: 7px;
-            background: #dedede;
+            overflow: hidden;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.22);
         }
-        .guide-progress span {
+
+        .guide-progress-bar {
             display: block;
             width: 0;
             height: 100%;
+            border-radius: inherit;
             background: var(--guide-orange);
             transition: width 0.3s ease;
         }
-        .guide-step {
-            flex: 1;
-            padding: 22px;
-        }
-        .guide-step-number {
-            color: var(--guide-orange);
-            font-size: 11px;
-            font-weight: 850;
-            text-transform: uppercase;
-        }
-        .guide-step h2 {
-            margin: 7px 0 10px;
-            color: var(--sidebar, var(--guide-gray));
-            font-size: 27px;
-            font-weight: 400;
-        }
-        .guide-step p {
-            margin: 0;
-            color: var(--muted, #666666);
-            line-height: 1.65;
-        }
-        .guide-functions {
-            display: grid;
-            gap: 8px;
-            margin: 18px 0 0;
-            padding: 0;
-            list-style: none;
-        }
-        .guide-functions li {
-            position: relative;
-            padding: 10px 11px 10px 36px;
-            border: 1px solid var(--line, var(--guide-line));
-            background: var(--surface-soft, var(--guide-light));
-            color: var(--ink, #333333);
-            line-height: 1.4;
-        }
-        .guide-functions li::before {
-            content: "✓";
-            position: absolute;
-            left: 12px;
-            color: var(--guide-orange);
-            font-weight: 900;
-        }
-        .guide-note {
-            margin-top: 16px;
-            padding: 12px;
-            border-left: 4px solid var(--guide-orange);
-            background: #fff4ec;
-            color: #555555;
-            font-size: 13px;
-            line-height: 1.5;
-        }
-        .guide-actions {
-            display: flex;
-            justify-content: space-between;
-            gap: 8px;
-            padding: 16px 20px;
-            border-top: 1px solid var(--line, var(--guide-line));
-            background: #fafafa;
-        }
-        .guide-action-group {
-            display: flex;
-            gap: 8px;
-        }
-        .guide-button {
-            min-height: 40px;
-            padding: 9px 14px;
-            border: 1px solid #b8b8b8;
-            border-radius: var(--radius-small, 6px);
-            background: #ffffff;
-            color: #444444;
+
+        .guide-exit {
+            min-height: 36px;
+            padding: 8px 13px;
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            border-radius: 6px;
+            background: transparent;
+            color: #ffffff;
             font-weight: 750;
             cursor: pointer;
         }
-        .guide-button.primary {
-            border-color: #e55d00;
-            background: var(--guide-orange);
-            color: #ffffff;
-        }
-        .guide-button:disabled {
-            opacity: 0.45;
-            cursor: not-allowed;
-        }
-        .guide-preview {
+
+        .guide-stage {
             position: relative;
-            min-height: 720px;
+            min-height: 0;
             overflow: hidden;
+            background: #ffffff;
         }
-        .preview-bar {
-            display: grid;
-            grid-template-columns: auto 1fr auto;
-            gap: 12px;
-            align-items: center;
-            min-height: 48px;
-            padding: 0 14px;
-            border-bottom: 1px solid var(--line, var(--guide-line));
-            background: var(--guide-light);
-        }
-        .preview-dots {
-            display: flex;
-            gap: 5px;
-        }
-        .preview-dots span {
-            width: 9px;
-            height: 9px;
-            border-radius: 50%;
-            background: #b8b8b8;
-        }
-        .preview-dots span:first-child {
-            background: var(--guide-orange);
-        }
-        .preview-title {
-            overflow: hidden;
-            color: #555555;
-            font-size: 12px;
-            text-align: center;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-        .open-module-link {
-            color: var(--guide-orange);
-            font-size: 12px;
-            font-weight: 800;
-            text-decoration: none;
-        }
+
         .guide-frame {
             width: 100%;
-            height: 670px;
+            height: 100%;
             border: 0;
             background: #ffffff;
         }
+
         .guide-welcome {
+            position: absolute;
+            inset: 0;
+            z-index: 5;
             display: grid;
             place-items: center;
-            height: 670px;
-            padding: 30px;
-            background: linear-gradient(135deg, #f7f7f7, #fff4ec);
+            padding: 32px;
+            background:
+                radial-gradient(circle at 18% 22%, rgba(255, 108, 12, 0.12), transparent 32%),
+                linear-gradient(135deg, #f7f7f7 0%, #ffffff 55%, #fff4ec 100%);
+        }
+
+        .guide-welcome[hidden] {
+            display: none;
+        }
+
+        .guide-welcome-content {
+            width: min(760px, 100%);
+            padding: clamp(30px, 6vw, 64px);
+            border: 1px solid var(--guide-line);
+            border-top: 5px solid var(--guide-orange);
+            border-radius: 14px;
+            background: rgba(255, 255, 255, 0.96);
+            box-shadow: 0 18px 48px rgba(0, 0, 0, 0.14);
             text-align: center;
         }
-        .guide-welcome-inner {
-            max-width: 650px;
-        }
+
         .guide-welcome-icon {
             display: grid;
             place-items: center;
-            width: 100px;
-            height: 100px;
+            width: 94px;
+            height: 94px;
             margin: 0 auto 22px;
             border: 1px solid #ffd1ad;
             border-radius: 50%;
-            background: #ffffff;
+            background: #fff4ec;
             color: var(--guide-orange);
-            font-size: 44px;
+            font-size: 40px;
         }
-        .guide-welcome h2 {
-            margin: 0;
+
+        .guide-welcome-label {
+            color: var(--guide-orange);
+            font-size: 11px;
+            font-weight: 850;
+            letter-spacing: 0.09em;
+            text-transform: uppercase;
+        }
+
+        .guide-welcome h1 {
+            margin: 8px 0 14px;
             color: var(--guide-gray);
             font-size: clamp(34px, 5vw, 52px);
             font-weight: 300;
         }
+
         .guide-welcome p {
-            margin: 15px 0 0;
+            max-width: 620px;
+            margin: 0 auto;
             color: #666666;
+            font-size: 16px;
             line-height: 1.7;
         }
-        .guide-finish-actions {
+
+        .guide-welcome-actions {
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
             gap: 9px;
-            margin-top: 22px;
+            margin-top: 25px;
         }
-        @media (max-width: 1020px) {
-            .guide-shell {
-                grid-template-columns: 1fr;
-            }
-            .guide-preview {
-                min-height: 620px;
-            }
-            .guide-frame,
-            .guide-welcome {
-                height: 570px;
-            }
+
+        .guide-button {
+            min-height: 40px;
+            padding: 9px 15px;
+            border: 1px solid #b8b8b8;
+            border-radius: 6px;
+            background: #ffffff;
+            color: #444444;
+            font-weight: 750;
+            cursor: pointer;
+            text-decoration: none;
         }
-        @media (max-width: 650px) {
-            .guide-actions {
+
+        .guide-button.primary {
+            border-color: var(--guide-orange-dark);
+            background: var(--guide-orange);
+            color: #ffffff;
+        }
+
+        .guide-button:disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+        }
+
+        .guide-focus {
+            position: absolute;
+            z-index: 14;
+            border: 3px solid var(--guide-orange);
+            border-radius: 10px;
+            box-shadow:
+                0 0 0 9999px rgba(20, 20, 20, 0.64),
+                0 0 0 7px rgba(255, 108, 12, 0.18),
+                0 0 28px rgba(255, 108, 12, 0.70);
+            pointer-events: none;
+            transition: top 0.32s ease, left 0.32s ease, width 0.32s ease, height 0.32s ease;
+        }
+
+        .guide-focus[hidden] {
+            display: none;
+        }
+
+        .guide-card {
+            position: absolute;
+            z-index: 20;
+            right: 22px;
+            bottom: 22px;
+            width: min(420px, calc(100vw - 44px));
+            overflow: hidden;
+            border: 1px solid var(--guide-line);
+            border-radius: 12px;
+            background: #ffffff;
+            box-shadow: 0 18px 52px rgba(0, 0, 0, 0.34);
+        }
+
+        .guide-card[hidden] {
+            display: none;
+        }
+
+        .guide-card-header {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            align-items: center;
+            padding: 12px 15px;
+            background: var(--guide-gray);
+            color: #ffffff;
+        }
+
+        .guide-card-header strong {
+            font-weight: 700;
+        }
+
+        .guide-card-header span {
+            color: #ffd1ad;
+            font-size: 11px;
+            font-weight: 800;
+        }
+
+        .guide-card-body {
+            padding: 17px;
+        }
+
+        .guide-card-kicker {
+            color: var(--guide-orange);
+            font-size: 11px;
+            font-weight: 850;
+            letter-spacing: 0.07em;
+            text-transform: uppercase;
+        }
+
+        .guide-card h2 {
+            margin: 6px 0 8px;
+            color: var(--guide-gray);
+            font-size: 25px;
+            font-weight: 400;
+        }
+
+        .guide-card p {
+            margin: 0;
+            color: #666666;
+            line-height: 1.58;
+        }
+
+        .guide-card-note {
+            margin-top: 12px;
+            padding: 10px 11px;
+            border-left: 4px solid var(--guide-orange);
+            background: #fff4ec;
+            color: #555555;
+            font-size: 12px;
+            line-height: 1.45;
+        }
+
+        .guide-card-note[hidden] {
+            display: none;
+        }
+
+        .guide-card-actions {
+            display: flex;
+            justify-content: space-between;
+            gap: 8px;
+            padding: 13px 17px;
+            border-top: 1px solid var(--guide-line);
+            background: #fafafa;
+        }
+
+        .guide-card-actions div {
+            display: flex;
+            gap: 8px;
+        }
+
+        .guide-loading {
+            position: absolute;
+            inset: 0;
+            z-index: 12;
+            display: grid;
+            place-items: center;
+            background: rgba(255, 255, 255, 0.88);
+            color: var(--guide-gray);
+            font-weight: 700;
+        }
+
+        .guide-loading[hidden] {
+            display: none;
+        }
+
+        @media (max-width: 760px) {
+            .guide-toolbar {
+                grid-template-columns: minmax(0, 1fr) auto;
+            }
+
+            .guide-toolbar-progress {
+                display: none;
+            }
+
+            .guide-card {
+                right: 12px;
+                bottom: 12px;
+                left: 12px;
+                width: auto;
+            }
+
+            .guide-card-actions {
                 align-items: stretch;
                 flex-direction: column;
             }
-            .guide-action-group {
+
+            .guide-card-actions div {
                 display: grid;
                 grid-template-columns: 1fr 1fr;
             }
-            .guide-button {
+
+            .guide-card-actions .guide-button {
                 width: 100%;
-            }
-            .preview-bar {
-                grid-template-columns: 1fr auto;
-            }
-            .preview-dots {
-                display: none;
-            }
-            .preview-title {
-                text-align: left;
             }
         }
     </style>
 </head>
-<body data-page-title="Guía interactiva Siscard+" data-page-subtitle="Recorrido de demostración">
-    <div class="app-shell">
-        <div id="sidebar-container"></div>
-        <div class="main-area">
-            <div id="topbar-container"></div>
-            <main class="content">
-                <section class="guide-shell" aria-label="Guía interactiva del portal">
-                    <aside class="guide-panel">
-                        <header class="guide-panel-header">
-                            <span>Demostración guiada</span>
-                            <h1>Conozca el Landing Siscard+</h1>
-                        </header>
-                        <div class="guide-progress" aria-hidden="true">
-                            <span id="guideProgress"></span>
-                        </div>
-                        <div class="guide-step">
-                            <span class="guide-step-number" id="guideStepNumber"></span>
-                            <h2 id="guideTitle"></h2>
-                            <p id="guideText"></p>
-                            <ul class="guide-functions" id="guideFunctions"></ul>
-                            <div class="guide-note" id="guideNote" hidden></div>
-                        </div>
-                        <footer class="guide-actions">
-                            <button class="guide-button" id="exitGuideButton" type="button">Salir</button>
-                            <div class="guide-action-group">
-                                <button class="guide-button" id="previousGuideButton" type="button">Anterior</button>
-                                <button class="guide-button primary" id="nextGuideButton" type="button">Iniciar</button>
-                            </div>
-                        </footer>
-                    </aside>
-                    <section class="guide-preview" aria-label="Vista del módulo">
-                        <div class="preview-bar">
-                            <div class="preview-dots" aria-hidden="true"><span></span><span></span><span></span></div>
-                            <span class="preview-title" id="previewTitle">Landing Siscard+</span>
-                            <a class="open-module-link" id="openModuleLink" href="index.html" target="_blank" rel="noopener">Abrir módulo</a>
-                        </div>
-                        <div class="guide-welcome" id="guideWelcome">
-                            <div class="guide-welcome-inner">
-                                <div class="guide-welcome-icon" aria-hidden="true">▶</div>
-                                <h2>Recorrido interactivo</h2>
-                                <p>La demostración abrirá cada módulo dentro de esta página y explicará las funciones disponibles. No se enviarán solicitudes ni se modificarán datos durante el recorrido.</p>
-                            </div>
-                        </div>
-                        <iframe class="guide-frame" id="guideFrame" title="Vista previa del módulo" hidden></iframe>
-                    </section>
-                </section>
-            </main>
-            <div id="footer-container"></div>
-        </div>
+<body>
+    <div class="guide-app">
+        <header class="guide-toolbar">
+            <div class="guide-brand">
+                <span class="guide-brand-mark" aria-hidden="true"></span>
+                <span>
+                    <strong>Guía interactiva Siscard+</strong>
+                    <small id="toolbarModule">Recorrido de demostración</small>
+                </span>
+            </div>
+
+            <div class="guide-toolbar-progress" aria-label="Progreso del recorrido">
+                <span id="toolbarStep">Paso 1</span>
+                <span class="guide-progress-track">
+                    <span class="guide-progress-bar" id="guideProgressBar"></span>
+                </span>
+                <span id="toolbarTotal"></span>
+            </div>
+
+            <button class="guide-exit" id="exitGuideButton" type="button">
+                Salir de la guía
+            </button>
+        </header>
+
+        <main class="guide-stage" id="guideStage">
+            <iframe
+                class="guide-frame"
+                id="guideFrame"
+                title="Módulo actual del recorrido"
+                hidden
+            ></iframe>
+
+            <section class="guide-welcome" id="guideWelcome">
+                <div class="guide-welcome-content">
+                    <div class="guide-welcome-icon" aria-hidden="true">▶</div>
+                    <span class="guide-welcome-label">Demostración guiada</span>
+                    <h1>Conozca el Landing Siscard+</h1>
+                    <p>
+                        El recorrido abrirá el sistema a pantalla completa, señalará
+                        las áreas principales y explicará las funciones disponibles
+                        en cada módulo. La guía no enviará solicitudes ni modificará datos.
+                    </p>
+                    <div class="guide-welcome-actions">
+                        <a class="guide-button" href="index.html">Volver al Inicio</a>
+                        <button class="guide-button primary" id="startGuideButton" type="button">
+                            Iniciar recorrido
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <div class="guide-loading" id="guideLoading" hidden>
+                Abriendo módulo...
+            </div>
+
+            <div class="guide-focus" id="guideFocus" hidden></div>
+
+            <section class="guide-card" id="guideCard" aria-live="polite" hidden>
+                <header class="guide-card-header">
+                    <strong id="cardModule">Landing Siscard+</strong>
+                    <span id="cardCounter">1 de 1</span>
+                </header>
+                <div class="guide-card-body">
+                    <span class="guide-card-kicker" id="cardKicker">Recorrido</span>
+                    <h2 id="cardTitle"></h2>
+                    <p id="cardText"></p>
+                    <div class="guide-card-note" id="cardNote" hidden></div>
+                </div>
+                <footer class="guide-card-actions">
+                    <button class="guide-button" id="openPageButton" type="button">
+                        Usar esta pantalla
+                    </button>
+                    <div>
+                        <button class="guide-button" id="previousButton" type="button">
+                            Anterior
+                        </button>
+                        <button class="guide-button primary" id="nextButton" type="button">
+                            Siguiente
+                        </button>
+                    </div>
+                </footer>
+            </section>
+        </main>
     </div>
-    <script src="js/layout.js"></script>
-    <script src="js/app.js"></script>
+
     <script>
         "use strict";
 
         const guideSteps = [
             {
-                title: "Bienvenida",
-                page: "",
-                text: "Esta guía presenta los módulos disponibles y abre cada sección para mostrar, de forma guiada, qué puede hacerse en el portal.",
-                functions: [
-                    "Avanzar o retroceder entre los módulos.",
-                    "Abrir el módulo mostrado en una pestaña independiente.",
-                    "Salir del recorrido y regresar al Inicio en cualquier momento."
-                ],
-                note: "Seleccione Iniciar para comenzar la primera demostración."
-            },
-            {
-                title: "Inicio",
                 page: "index.html",
-                text: "El Inicio funciona como punto central para acceder a los servicios del Landing Siscard+.",
-                functions: [
-                    "Explorar las tarjetas de los módulos disponibles.",
-                    "Buscar un servicio desde el buscador principal.",
-                    "Consultar accesos rápidos y novedades del portal.",
-                    "Volver a iniciar esta guía rápida."
-                ]
+                module: "Inicio",
+                target: ".service-hero",
+                title: "Centro de Servicios Siscard+",
+                text: "El Inicio concentra el acceso a los servicios disponibles en el Landing Siscard+.",
+                note: "La guía señalará cada área sin ejecutar acciones."
             },
             {
-                title: "Manuales",
+                page: "index.html",
+                module: "Inicio",
+                target: "#serviceSearchForm",
+                title: "Buscar un servicio",
+                text: "El buscador permite localizar rápidamente un módulo disponible en el portal."
+            },
+            {
+                page: "index.html",
+                module: "Inicio",
+                target: "#modules",
+                title: "Módulos disponibles",
+                text: "Las tarjetas permiten abrir Manuales, Parámetros, Formularios, Seguridad, Aprobaciones, Mis solicitudes, Landing IA y Comunicados."
+            },
+            {
                 page: "manuales.html",
-                text: "El Centro de Conocimiento reúne la documentación disponible para consulta.",
-                functions: [
-                    "Buscar documentos por nombre o palabra clave.",
-                    "Filtrar el contenido por categoría.",
-                    "Abrir manuales y guías disponibles.",
-                    "Acceder al visor de Parámetros del Emisor TRT08SN0."
-                ]
+                module: "Manuales",
+                target: "main",
+                title: "Centro de Conocimiento",
+                text: "Manuales reúne la documentación funcional, operativa y técnica disponible para consulta."
             },
             {
-                title: "Parámetros del Emisor TRT08SN0",
+                page: "manuales.html",
+                module: "Manuales",
+                target: "input[type='search'], input[type='text']",
+                title: "Buscar documentación",
+                text: "El campo de búsqueda permite localizar documentos por nombre o palabra clave."
+            },
+            {
+                page: "manuales.html",
+                module: "Manuales",
+                target: "table, .documents-grid, .document-list, .panel",
+                title: "Consultar y abrir contenidos",
+                text: "Desde el listado disponible se puede revisar la categoría, versión y acción asociada a cada contenido."
+            },
+            {
                 page: "manuales.html#parametros-emisor",
-                text: "Desde Manuales se accede al repositorio dinámico de parámetros del emisor.",
-                functions: [
-                    "Abrir el visor publicado de parámetros.",
-                    "Localizar opciones y configuraciones documentadas.",
-                    "Consultar la información funcional disponible para cada parámetro."
-                ],
-                note: "El acceso se encuentra integrado dentro del Centro de Conocimiento."
+                module: "Parámetros del Emisor TRT08SN0",
+                target: "#parametros-emisor, a[href*='parametros'], main",
+                title: "Acceso al visor de parámetros",
+                text: "El acceso al repositorio dinámico de Parámetros del Emisor TRT08SN0 se encuentra integrado en Manuales."
             },
             {
-                title: "Formularios",
                 page: "formularios.html",
-                text: "Este módulo permite seleccionar y completar los formularios habilitados para los distintos procesos.",
-                functions: [
-                    "Seleccionar el formulario requerido.",
-                    "Completar la información solicitada en cada sección.",
-                    "Conservar la información registrada durante la preparación.",
-                    "Enviar la solicitud para su revisión."
-                ],
-                note: "Durante esta guía no se enviará ningún formulario."
+                module: "Formularios",
+                target: "main",
+                title: "Seleccionar un formulario",
+                text: "Formularios reúne las gestiones disponibles para completar información y preparar una solicitud."
             },
             {
-                title: "Aprobaciones",
+                page: "formularios.html",
+                module: "Formularios",
+                target: "form, .form-card, .panel, .forms-grid",
+                title: "Completar la información",
+                text: "Cada formulario presenta los campos y secciones correspondientes al proceso seleccionado.",
+                note: "Durante el recorrido no se enviará información."
+            },
+            {
+                page: "formularios.html",
+                module: "Formularios",
+                target: "button[type='submit'], [data-action='submit'], .primary-button",
+                title: "Enviar la solicitud",
+                text: "Al finalizar el registro, la opción de envío remite la solicitud al flujo de revisión correspondiente.",
+                note: "La guía solamente explica el control y no realiza el envío."
+            },
+            {
                 page: "aprobaciones.html",
-                text: "Aprobaciones centraliza la revisión de formularios y solicitudes pendientes.",
-                functions: [
-                    "Consultar solicitudes pendientes de revisión.",
-                    "Abrir el detalle y revisar las respuestas enviadas.",
-                    "Aprobar o rechazar una solicitud.",
-                    "Registrar observaciones y consultar la bitácora disponible."
-                ],
-                note: "Los botones de decisión se muestran únicamente para explicar el flujo."
+                module: "Aprobaciones",
+                target: "main",
+                title: "Solicitudes pendientes",
+                text: "Aprobaciones centraliza las solicitudes que requieren revisión."
             },
             {
-                title: "Mis solicitudes",
+                page: "aprobaciones.html",
+                module: "Aprobaciones",
+                target: "table, .requests-list, .approval-list, .panel",
+                title: "Revisar el detalle",
+                text: "Desde el listado se puede seleccionar una gestión para revisar la información y las respuestas registradas."
+            },
+            {
+                page: "aprobaciones.html",
+                module: "Aprobaciones",
+                target: "button, .approval-actions, .decision-actions",
+                title: "Aprobar o rechazar",
+                text: "Las acciones disponibles permiten registrar la decisión y las observaciones correspondientes.",
+                note: "La guía no ejecuta ninguna decisión."
+            },
+            {
                 page: "mis-solicitudes.html",
-                text: "Este espacio permite dar seguimiento a las gestiones registradas desde el portal.",
-                functions: [
-                    "Consultar las solicitudes enviadas.",
-                    "Identificar el estado actual de cada gestión.",
-                    "Abrir el detalle de una solicitud.",
-                    "Revisar respuestas y observaciones asociadas."
-                ]
+                module: "Mis solicitudes",
+                target: "main",
+                title: "Seguimiento de gestiones",
+                text: "Mis solicitudes permite consultar las gestiones registradas y revisar su estado actual."
             },
             {
-                title: "Seguridad",
+                page: "mis-solicitudes.html",
+                module: "Mis solicitudes",
+                target: "table, .requests-list, .request-card, .panel",
+                title: "Consultar el detalle",
+                text: "El listado permite abrir una solicitud y revisar la información, las respuestas y las observaciones asociadas."
+            },
+            {
                 page: "seguridad.html",
-                text: "El módulo de Seguridad se implementará en una etapa posterior.",
-                functions: [
-                    "Construcción y mantenimiento de usuarios.",
-                    "Administración de grupos de seguridad.",
-                    "Asignación de accesos según el grupo del usuario.",
-                    "Configuración futura de menús, opciones, subopciones, funciones y programas."
-                ],
-                note: "Actualmente se muestra un mensaje informativo de próxima implementación."
+                module: "Seguridad",
+                target: "main, .security-coming-soon, .security-message",
+                title: "Próxima implementación",
+                text: "Seguridad se implementará posteriormente para construir usuarios y asignar accesos según el grupo al que pertenezcan.",
+                note: "Actualmente el módulo muestra un mensaje informativo."
             },
             {
-                title: "Landing IA",
                 page: "landing-ia.html",
-                text: "Landing IA funciona como asistente para orientar consultas dentro del portal.",
-                functions: [
-                    "Escribir una consulta sobre los servicios disponibles.",
-                    "Utilizar las sugerencias de consulta.",
-                    "Localizar el módulo relacionado con una necesidad.",
-                    "Iniciar una nueva conversación de orientación."
-                ]
+                module: "Landing IA",
+                target: "main",
+                title: "Asistente del portal",
+                text: "Landing IA orienta consultas y ayuda a localizar el módulo relacionado con la necesidad planteada."
             },
             {
-                title: "Comunicados",
+                page: "landing-ia.html",
+                module: "Landing IA",
+                target: "textarea, input[type='text'], .conversation, .chat-panel",
+                title: "Realizar una consulta",
+                text: "El área de conversación permite escribir consultas y utilizar las sugerencias disponibles."
+            },
+            {
                 page: "comunicados.html",
-                text: "Comunicados concentra los avisos, novedades y actualizaciones publicados.",
-                functions: [
-                    "Consultar las publicaciones disponibles.",
-                    "Buscar comunicados.",
-                    "Aplicar los filtros disponibles.",
-                    "Abrir el detalle de un aviso o actualización."
-                ]
+                module: "Comunicados",
+                target: "main",
+                title: "Avisos y novedades",
+                text: "Comunicados reúne las publicaciones y actualizaciones disponibles en el portal."
             },
             {
-                title: "Recorrido completado",
-                page: "",
-                text: "La primera demostración ha finalizado. El Landing Siscard+ está listo para explorarse desde el Inicio o desde el menú lateral.",
-                functions: [
-                    "Repetir la guía cuando sea necesario.",
-                    "Regresar al Inicio.",
-                    "Abrir directamente cualquiera de los módulos presentados."
-                ],
-                note: "La guía permanecerá disponible para futuras demostraciones."
+                page: "comunicados.html",
+                module: "Comunicados",
+                target: "input[type='search'], .filters, .communications-grid, .panel",
+                title: "Buscar y consultar publicaciones",
+                text: "Las opciones disponibles permiten buscar, filtrar y abrir el detalle de un comunicado."
+            },
+            {
+                page: "index.html",
+                module: "Fin del recorrido",
+                target: "#modules",
+                title: "Demostración completada",
+                text: "El recorrido ha finalizado. El Landing Siscard+ queda disponible para explorar cada módulo directamente.",
+                note: "Seleccione Finalizar para regresar al Inicio."
             }
         ];
 
-        const guideProgress = document.getElementById("guideProgress");
-        const guideStepNumber = document.getElementById("guideStepNumber");
-        const guideTitle = document.getElementById("guideTitle");
-        const guideText = document.getElementById("guideText");
-        const guideFunctions = document.getElementById("guideFunctions");
-        const guideNote = document.getElementById("guideNote");
-        const previousGuideButton = document.getElementById("previousGuideButton");
-        const nextGuideButton = document.getElementById("nextGuideButton");
         const guideFrame = document.getElementById("guideFrame");
         const guideWelcome = document.getElementById("guideWelcome");
-        const previewTitle = document.getElementById("previewTitle");
-        const openModuleLink = document.getElementById("openModuleLink");
-        let currentGuideStep = 0;
+        const guideLoading = document.getElementById("guideLoading");
+        const guideFocus = document.getElementById("guideFocus");
+        const guideCard = document.getElementById("guideCard");
+        const guideStage = document.getElementById("guideStage");
+        const guideProgressBar = document.getElementById("guideProgressBar");
+        const toolbarStep = document.getElementById("toolbarStep");
+        const toolbarTotal = document.getElementById("toolbarTotal");
+        const toolbarModule = document.getElementById("toolbarModule");
+        const cardModule = document.getElementById("cardModule");
+        const cardCounter = document.getElementById("cardCounter");
+        const cardTitle = document.getElementById("cardTitle");
+        const cardText = document.getElementById("cardText");
+        const cardNote = document.getElementById("cardNote");
+        const previousButton = document.getElementById("previousButton");
+        const nextButton = document.getElementById("nextButton");
+        const openPageButton = document.getElementById("openPageButton");
 
-        function renderGuideStep() {
-            const step = guideSteps[currentGuideStep];
-            guideStepNumber.textContent = `Paso ${currentGuideStep + 1} de ${guideSteps.length}`;
-            guideTitle.textContent = step.title;
-            guideText.textContent = step.text;
-            guideFunctions.innerHTML = "";
-            step.functions.forEach(function (item) {
-                const listItem = document.createElement("li");
-                listItem.textContent = item;
-                guideFunctions.appendChild(listItem);
-            });
-            guideNote.hidden = !step.note;
-            guideNote.textContent = step.note || "";
-            guideProgress.style.width = `${((currentGuideStep + 1) / guideSteps.length) * 100}%`;
-            previousGuideButton.disabled = currentGuideStep === 0;
-            nextGuideButton.textContent = currentGuideStep === 0
-                ? "Iniciar"
-                : currentGuideStep === guideSteps.length - 1
-                    ? "Volver al inicio"
-                    : "Siguiente";
+        let currentStep = 0;
+        let currentPage = "";
+        let guideStarted = false;
 
-            if (step.page) {
-                guideWelcome.hidden = true;
-                guideFrame.hidden = false;
-                if (guideFrame.getAttribute("src") !== step.page) {
-                    guideFrame.setAttribute("src", step.page);
-                }
-                previewTitle.textContent = step.title;
-                openModuleLink.hidden = false;
-                openModuleLink.href = step.page;
-            } else {
-                guideFrame.hidden = true;
-                guideWelcome.hidden = false;
-                previewTitle.textContent = step.title;
-                openModuleLink.hidden = currentGuideStep === 0;
-                openModuleLink.href = "index.html";
-                if (currentGuideStep === guideSteps.length - 1) {
-                    guideWelcome.innerHTML = `
-                        <div class="guide-welcome-inner">
-                            <div class="guide-welcome-icon" aria-hidden="true">✓</div>
-                            <h2>Demostración completada</h2>
-                            <p>Ya se han presentado los módulos y las funciones principales del Landing Siscard+.</p>
-                            <div class="guide-finish-actions">
-                                <a class="guide-button primary" href="index.html">Ir al Inicio</a>
-                                <button class="guide-button" id="repeatGuideButton" type="button">Repetir guía</button>
-                            </div>
-                        </div>
-                    `;
-                    document.getElementById("repeatGuideButton").addEventListener("click", function () {
-                        currentGuideStep = 0;
-                        resetWelcome();
-                        renderGuideStep();
-                    });
-                    localStorage.setItem("siscardQuickGuideCompleted", "true");
+        toolbarTotal.textContent = `${guideSteps.length} pasos`;
+
+        function findTarget(frameDocument, selectorList)
+        {
+            const selectors = selectorList.split(",");
+
+            for (const selector of selectors)
+            {
+                const target = frameDocument.querySelector(selector.trim());
+
+                if (target)
+                {
+                    return target;
                 }
             }
-            localStorage.setItem("siscardGuideStep", String(currentGuideStep));
+
+            return frameDocument.body;
         }
 
-        function resetWelcome() {
-            guideWelcome.innerHTML = `
-                <div class="guide-welcome-inner">
-                    <div class="guide-welcome-icon" aria-hidden="true">▶</div>
-                    <h2>Recorrido interactivo</h2>
-                    <p>La demostración abrirá cada módulo dentro de esta página y explicará las funciones disponibles. No se enviarán solicitudes ni se modificarán datos durante el recorrido.</p>
-                </div>
-            `;
+        function positionFocus(target)
+        {
+            const frameRectangle = guideFrame.getBoundingClientRect();
+            const targetRectangle = target.getBoundingClientRect();
+            const padding = 8;
+
+            const top = frameRectangle.top - guideStage.getBoundingClientRect().top + targetRectangle.top - padding;
+            const left = frameRectangle.left - guideStage.getBoundingClientRect().left + targetRectangle.left - padding;
+
+            guideFocus.style.top = `${Math.max(6, top)}px`;
+            guideFocus.style.left = `${Math.max(6, left)}px`;
+            guideFocus.style.width = `${Math.min(guideStage.clientWidth - 12, targetRectangle.width + padding * 2)}px`;
+            guideFocus.style.height = `${Math.min(guideStage.clientHeight - 12, targetRectangle.height + padding * 2)}px`;
+            guideFocus.hidden = false;
         }
 
-        previousGuideButton.addEventListener("click", function () {
-            if (currentGuideStep > 0) {
-                currentGuideStep -= 1;
-                if (currentGuideStep === 0) {
-                    resetWelcome();
-                }
-                renderGuideStep();
-            }
-        });
+        function showCurrentStep()
+        {
+            const step = guideSteps[currentStep];
+            const frameDocument = guideFrame.contentDocument;
 
-        nextGuideButton.addEventListener("click", function () {
-            if (currentGuideStep === guideSteps.length - 1) {
-                window.location.href = "index.html";
+            if (!frameDocument)
+            {
                 return;
             }
-            currentGuideStep += 1;
-            renderGuideStep();
-        });
 
-        document.getElementById("exitGuideButton").addEventListener("click", function () {
-            window.location.href = "index.html";
-        });
+            const target = findTarget(frameDocument, step.target);
 
-        const requestedStep = new URLSearchParams(window.location.search).get("paso");
-        if (requestedStep !== null && Number.isInteger(Number(requestedStep))) {
-            currentGuideStep = Math.min(
-                Math.max(Number(requestedStep), 0),
-                guideSteps.length - 1
+            target.scrollIntoView(
+                {
+                    behavior: "smooth",
+                    block: "center",
+                    inline: "center"
+                }
             );
+
+            window.setTimeout(
+                function ()
+                {
+                    positionFocus(target);
+                    guideLoading.hidden = true;
+                    guideCard.hidden = false;
+                },
+                420
+            );
+
+            toolbarModule.textContent = step.module;
+            toolbarStep.textContent = `Paso ${currentStep + 1}`;
+            guideProgressBar.style.width = `${((currentStep + 1) / guideSteps.length) * 100}%`;
+            cardModule.textContent = step.module;
+            cardCounter.textContent = `${currentStep + 1} de ${guideSteps.length}`;
+            cardTitle.textContent = step.title;
+            cardText.textContent = step.text;
+            cardNote.hidden = !step.note;
+            cardNote.textContent = step.note || "";
+            previousButton.disabled = currentStep === 0;
+            nextButton.textContent = currentStep === guideSteps.length - 1
+                ? "Finalizar"
+                : "Siguiente";
+
+            localStorage.setItem("siscardGuideStep", String(currentStep));
         }
 
-        renderGuideStep();
+        function loadCurrentStep()
+        {
+            const step = guideSteps[currentStep];
+            guideStarted = true;
+            guideWelcome.hidden = true;
+            guideFrame.hidden = false;
+            guideCard.hidden = true;
+            guideFocus.hidden = true;
+            guideLoading.hidden = false;
+
+            if (currentPage === step.page && guideFrame.contentDocument)
+            {
+                showCurrentStep();
+                return;
+            }
+
+            currentPage = step.page;
+            guideFrame.src = step.page;
+        }
+
+        guideFrame.addEventListener(
+            "load",
+            function ()
+            {
+                if (!guideStarted)
+                {
+                    return;
+                }
+
+                try
+                {
+                    showCurrentStep();
+                }
+                catch (error)
+                {
+                    guideLoading.textContent = "No fue posible señalar el elemento. Continúe con el siguiente paso.";
+                    guideCard.hidden = false;
+                    guideFocus.hidden = true;
+                }
+            }
+        );
+
+        document.getElementById("startGuideButton").addEventListener(
+            "click",
+            function ()
+            {
+                currentStep = 0;
+                loadCurrentStep();
+            }
+        );
+
+        previousButton.addEventListener(
+            "click",
+            function ()
+            {
+                if (currentStep > 0)
+                {
+                    currentStep -= 1;
+                    loadCurrentStep();
+                }
+            }
+        );
+
+        nextButton.addEventListener(
+            "click",
+            function ()
+            {
+                if (currentStep === guideSteps.length - 1)
+                {
+                    localStorage.setItem("siscardQuickGuideCompleted", "true");
+                    window.location.href = "index.html";
+                    return;
+                }
+
+                currentStep += 1;
+                loadCurrentStep();
+            }
+        );
+
+        openPageButton.addEventListener(
+            "click",
+            function ()
+            {
+                const step = guideSteps[currentStep];
+                window.location.href = step.page;
+            }
+        );
+
+        document.getElementById("exitGuideButton").addEventListener(
+            "click",
+            function ()
+            {
+                window.location.href = "index.html";
+            }
+        );
+
+        window.addEventListener(
+            "resize",
+            function ()
+            {
+                if (!guideStarted || guideFrame.hidden)
+                {
+                    return;
+                }
+
+                try
+                {
+                    const step = guideSteps[currentStep];
+                    const target = findTarget(guideFrame.contentDocument, step.target);
+                    positionFocus(target);
+                }
+                catch (error)
+                {
+                    guideFocus.hidden = true;
+                }
+            }
+        );
+
+        document.addEventListener(
+            "keydown",
+            function (event)
+            {
+                if (!guideStarted)
+                {
+                    return;
+                }
+
+                if (event.key === "ArrowRight")
+                {
+                    nextButton.click();
+                }
+
+                if (event.key === "ArrowLeft")
+                {
+                    previousButton.click();
+                }
+
+                if (event.key === "Escape")
+                {
+                    window.location.href = "index.html";
+                }
+            }
+        );
     </script>
 </body>
 </html>
