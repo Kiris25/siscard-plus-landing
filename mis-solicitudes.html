@@ -1385,7 +1385,12 @@
                         <div class="detail-value-box">
                             <label>${canEdit ? "Valor corregido" : "Valor enviado"}</label>
                             ${canEdit ? correctionControl(parameter) : `
-                                <input value="${escapeHtml(parameter.valor || "Sin respuesta")}" readonly>
+                                <div class="parameter-value">
+                                    ${escapeHtml(
+                                        String(parameter.valor ?? "").trim() ||
+                                        "Sin respuesta"
+                                    )}
+                                </div>
                             `}
                             ${parameter.notaAprobador ? `
                                 <div class="review-note">
@@ -1409,11 +1414,42 @@
             `).join("");
         }
 
-        async function openDetail(requestId, correctionMode = false) {
-            const request = allRequests.find(
+        async function getLatestRequestById(requestId) {
+            const credential = readCredential();
+            let requests;
+            if (credential) {
+                try {
+                    requests = (await readRemoteRequests(credential)).requests;
+                } catch (error) {
+                    if (error.message !== "CREDENTIAL_INVALID") {
+                        throw error;
+                    }
+                    localStorage.removeItem(ACCESS_CREDENTIAL_KEY);
+                    requests = await readPublicRequests();
+                }
+            } else {
+                requests = await readPublicRequests();
+            }
+            allRequests = sortRequests(requests.map(normalizeRequest));
+            refreshColumnFilterOptions();
+            renderRequests();
+            return allRequests.find(
                 (item) => String(item.id) === String(requestId)
-            );
-            if (!request) return;
+            ) || null;
+        }
+        async function openDetail(requestId, correctionMode = false) {
+            let request;
+            try {
+                request = await getLatestRequestById(requestId);
+            } catch (error) {
+                console.error(error);
+                showToast("No fue posible actualizar el detalle de la solicitud.");
+                return;
+            }
+            if (!request) {
+                showToast("La solicitud ya no está disponible.");
+                return;
+            }
             selectedRequest = normalizeRequest(structuredClone(request));
             pendingCorrection = correctionMode ? selectedRequest : null;
             if (correctionMode && pendingCorrection) {
@@ -1815,7 +1851,9 @@
                     throw new Error(`WRITE_FAILED_${response.status}`);
                 }
                 localStorage.setItem(ACCESS_CREDENTIAL_KEY, credential.trim());
-                allRequests = sortRequests(current.requests);
+                allRequests = sortRequests(
+                    current.requests.map(normalizeRequest)
+                );
                 refreshColumnFilterOptions();
                 renderRequests();
                 closeCredentialDialog();
@@ -1897,6 +1935,11 @@
         });
 
         loadRequests();
+        window.addEventListener("focus", () => {
+            if (!document.getElementById("requestsListView").hidden) {
+                loadRequests();
+            }
+        });
     </script>
 </body>
 </html>
