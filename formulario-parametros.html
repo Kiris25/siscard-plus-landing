@@ -1852,11 +1852,11 @@
             return true;
         }
         function containsForbiddenDemoWord(value) {
-            return /(^|[^a-z0-9])demo([^a-z0-9]|$)/i.test(
-                String(value || "")
-                    .normalize("NFD")
-                    .replace(/[\u0300-\u036f]/g, "")
-            );
+            return String(value || "")
+                .normalize("NFD")
+                .replace(/[\u0300-\u036f]/g, "")
+                .toUpperCase()
+                .includes("DEMO");
         }
         function validateDemoWordRestriction() {
             if (guideDemoIsActive()) {
