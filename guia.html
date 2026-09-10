@@ -511,7 +511,14 @@
                 module: "Manuales",
                 target: "input[type='search'], input[type='text']",
                 title: "Buscar documentación",
-                text: "El campo de búsqueda y los filtros permiten localizar contenidos. Desde Manuales también está disponible el repositorio dinámico de Parámetros del Emisor TRT08SN0 para consultar su información, sin salir del Centro de Conocimiento durante este recorrido."
+                text: "Utilice la barra de búsqueda y los filtros para localizar los contenidos disponibles."
+            },
+            {
+                page: "manuales.html",
+                module: "Manuales",
+                target: "a[href*='parametros-emisor'], [data-title*='Parámetros del Emisor'], .document-card, main",
+                title: "Parámetros del Emisor TRT08SN0",
+                text: "Puede consultar contenido dinámico como el de Parámetros del Emisor desde esta pantalla una vez terminado el recorrido."
             },
             {
                 page: "formularios.html",
@@ -525,15 +532,15 @@
                 page: "formularios.html",
                 module: "Formularios",
                 target: "[href*='opcion=05'], [data-option='05'], [data-option='5'], [data-code='05'], [data-code='5']",
-                title: "Catálogo de solicitudes",
-                text: "La página bajó una sola vez hasta la sección donde se encuentra la opción 05. Seleccione Siguiente para destacar esa opción."
+                title: "Formularios de parámetros",
+                text: "En esta sección se encuentran todos los formularios disponibles para realizar solicitudes de parámetros."
             },
             {
                 page: "formularios.html",
                 module: "Formularios",
                 target: "[href*='opcion=05'], [data-option='05'], [data-option='5'], [data-code='05'], [data-code='5']",
                 title: "Opción 05",
-                text: "La opción 05 corresponde a Parámetros generales del emisor. Seleccione Siguiente para preparar su apertura."
+                text: "Para esta demostración se seleccionará la opción 05, correspondiente a Parámetros generales del emisor."
             },
             {
                 page: "formularios.html",
@@ -763,6 +770,7 @@
         let currentStep = 0;
         let currentPage = "";
         let guideStarted = false;
+        let guideTransitioning = false;
 
         toolbarTotal.textContent = `${guideSteps.length} pasos`;
 
@@ -892,6 +900,19 @@
 
             if (action === "openParameterRequests")
             {
+                const visibleOption05 = frameDocument.querySelector(
+                    "[href*='opcion=05'], [data-option='05'], " +
+                    "[data-option='5'], [data-code='05'], [data-code='5']"
+                );
+
+                if (
+                    visibleOption05 &&
+                    visibleOption05.getClientRects().length > 0
+                )
+                {
+                    return;
+                }
+
                 const trigger =
                     frameDocument.querySelector(
                         "[data-section='solicitudes-parametros'], " +
@@ -1069,6 +1090,23 @@
             }
         }
 
+        function prepareStepState(step, frameDocument)
+        {
+            if (
+                step.page === "formularios.html" &&
+                [
+                    "Formularios de parámetros",
+                    "Opción 05",
+                    "Abrir la opción 05"
+                ].includes(step.title)
+            )
+            {
+                performStepAction(frameDocument, "openParameterRequests");
+            }
+
+            performStepAction(frameDocument, step.action);
+        }
+
         function showCurrentStep()
         {
             const step = guideSteps[currentStep];
@@ -1079,26 +1117,46 @@
                 return;
             }
 
-            performStepAction(frameDocument, step.action);
-            const target = findTarget(frameDocument, step.target);
+            guideFocus.hidden = true;
+            guideCard.hidden = true;
+            guideCard.removeAttribute("style");
+            guideLoading.hidden = false;
 
-            target.scrollIntoView(
-                {
-                    behavior: "smooth",
-                    block: "center",
-                    inline: "center"
-                }
-            );
+            prepareStepState(step, frameDocument);
 
             window.setTimeout(
                 function ()
                 {
-                    positionFocus(target);
-                    positionGuideCard(step, target);
-                    guideLoading.hidden = true;
-                    guideCard.hidden = false;
+                    const target = findTarget(frameDocument, step.target);
+
+                    target.scrollIntoView(
+                        {
+                            behavior: "auto",
+                            block: "center",
+                            inline: "center"
+                        }
+                    );
+
+                    window.setTimeout(
+                        function ()
+                        {
+                            const settledTarget = findTarget(
+                                frameDocument,
+                                step.target
+                            );
+
+                            positionFocus(settledTarget);
+                            positionGuideCard(step, settledTarget);
+                            guideLoading.hidden = true;
+                            guideCard.hidden = false;
+                            guideTransitioning = false;
+                            previousButton.disabled = currentStep === 0;
+                            nextButton.disabled = false;
+                        },
+                        180
+                    );
                 },
-                step.action ? 420 : 260
+                step.action ? 240 : 100
             );
 
             toolbarModule.textContent = step.module;
@@ -1122,6 +1180,9 @@
         {
             const step = guideSteps[currentStep];
             guideStarted = true;
+            guideTransitioning = true;
+            previousButton.disabled = true;
+            nextButton.disabled = true;
             guideWelcome.hidden = true;
             guideFrame.hidden = false;
             guideInteractionBlocker.hidden = false;
@@ -1187,8 +1248,16 @@
             "click",
             function ()
             {
+                if (guideTransitioning)
+                {
+                    return;
+                }
+
                 if (currentStep > 0)
                 {
+                    guideFocus.hidden = true;
+                    guideCard.hidden = true;
+                    guideLoading.hidden = false;
                     currentStep -= 1;
                     loadCurrentStep();
                 }
@@ -1199,6 +1268,11 @@
             "click",
             function ()
             {
+                if (guideTransitioning)
+                {
+                    return;
+                }
+
                 if (currentStep === guideSteps.length - 1)
                 {
                     localStorage.setItem("siscardQuickGuideCompleted", "true");
