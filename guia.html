@@ -511,15 +511,7 @@
                 module: "Manuales",
                 target: "input[type='search'], input[type='text']",
                 title: "Buscar documentación",
-                text: "El campo de búsqueda y los filtros permiten localizar contenidos. Desde este módulo también se accede al repositorio de Parámetros del Emisor TRT08SN0."
-            },
-            {
-                page: "manuales.html",
-                module: "Manuales",
-                target: "a[href*='parametros-emisor'], [data-title*='Parámetros del Emisor'], .document-card, main",
-                title: "Contenido dinámico de Parámetros del Emisor",
-                text: "Este contenido abre el visor dinámico de Parámetros del Emisor TRT08SN0. Al seleccionar Siguiente, se abrirá en una pestaña independiente para mostrarlo sin interrumpir el recorrido.",
-                actionOnNext: "openDynamicParameters"
+                text: "El campo de búsqueda y los filtros permiten localizar contenidos. Desde Manuales también está disponible el repositorio dinámico de Parámetros del Emisor TRT08SN0 para consultar su información, sin salir del Centro de Conocimiento durante este recorrido."
             },
             {
                 page: "formularios.html",
@@ -873,27 +865,6 @@
                 return;
             }
 
-            if (action === "openDynamicParameters")
-            {
-                const contentLink =
-                    frameDocument.querySelector(
-                        "a[href*='parametros-emisor']"
-                    ) ||
-                    findClickableByText(
-                        frameDocument,
-                        ["Parámetros del Emisor TRT08SN0", "Parámetros del Emisor"]
-                    );
-
-                if (contentLink)
-                {
-                    window.open(
-                        contentLink.href,
-                        "siscardParametrosDinamicos"
-                    );
-                }
-
-                return;
-            }
 
             if (action === "filterDemo")
             {
@@ -1127,7 +1098,7 @@
                     guideLoading.hidden = true;
                     guideCard.hidden = false;
                 },
-                step.action ? 280 : 160
+                step.action ? 420 : 260
             );
 
             toolbarModule.textContent = step.module;
@@ -1271,9 +1242,7 @@
                                 ? 480
                                 : currentGuideStep.actionOnNext === "openOption05"
                                     ? 620
-                                    : currentGuideStep.actionOnNext === "openDynamicParameters"
-                                        ? 260
-                                        : 360
+                                    : 360
                     );
                 }
                 else
