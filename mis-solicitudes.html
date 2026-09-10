@@ -916,6 +916,157 @@
             overflow-y: auto;
             padding: 10px 12px 12px;
         }
+
+        /* Listado visualmente gemelo a Aprobaciones */
+        .requests-hero,
+        .requests-toolbar,
+        .requests-summary {
+            display: none !important;
+        }
+        .requests-panel {
+            margin-bottom: 14px;
+            padding: 14px;
+            overflow: visible;
+            border: 1px solid var(--line);
+            border-radius: var(--radius-large);
+            background: #ffffff;
+            box-shadow: var(--shadow-small);
+        }
+        .requests-inbox-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+        .requests-inbox-header h2 {
+            margin: 0;
+            color: var(--sidebar);
+            font-weight: 400;
+        }
+        .request-status-summary {
+            display: flex;
+            gap: 7px;
+            flex-wrap: wrap;
+            margin: 0 0 11px;
+            padding: 0;
+            border: 0;
+            background: transparent;
+        }
+        .requests-list-filters {
+            display: grid;
+            grid-template-columns: repeat(6, minmax(120px, 1fr)) auto;
+            gap: 6px;
+            margin-bottom: 10px;
+        }
+        .requests-list-filter {
+            width: 100%;
+            min-height: 32px;
+            padding: 6px 8px;
+            border: 1px solid var(--line);
+            border-radius: 5px;
+            background: #ffffff;
+            color: var(--sidebar);
+            font-size: 10px;
+        }
+        .table-wrap {
+            display: block;
+            overflow-x: auto;
+            padding-bottom: 0;
+        }
+        .requests-table {
+            width: 100%;
+            min-width: 980px;
+            border-collapse: collapse;
+        }
+        .requests-table th,
+        .requests-table td {
+            padding: 11px 10px;
+            border-bottom: 1px solid var(--line);
+            text-align: left;
+            vertical-align: middle;
+        }
+        .requests-table th {
+            background: var(--surface-soft);
+            color: var(--sidebar);
+            font-size: 10px;
+            font-weight: 850;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+        .requests-table tbody tr:hover {
+            background: #fffaf6;
+        }
+        .request-id {
+            color: var(--orange-dark);
+            font-size: 11px;
+            font-weight: 850;
+            overflow-wrap: anywhere;
+            white-space: normal;
+        }
+        .request-option strong,
+        .request-option small {
+            display: block;
+        }
+        .request-option small {
+            margin-top: 3px;
+            color: var(--muted);
+            font-size: 10px;
+        }
+        .status-badge {
+            display: inline-flex;
+            margin-top: 0;
+            padding: 4px 7px;
+            border-radius: 999px;
+            background: #e8f1ff;
+            color: #18599a;
+            font-size: 10px;
+            font-weight: 850;
+            white-space: nowrap;
+        }
+        .column-filters {
+            display: none !important;
+        }
+        .combined-request-filter {
+            min-width: 150px;
+        }
+        .combined-filter-panel {
+            border-color: var(--line);
+            border-top-color: var(--orange);
+        }
+        .combined-filter-option {
+            color: var(--sidebar);
+        }
+        .combined-filter-option input {
+            accent-color: var(--orange);
+        }
+        .row-options-button {
+            border-color: var(--line);
+        }
+        .row-options-button:hover,
+        .row-options-button.active {
+            border-color: var(--orange);
+        }
+        .row-options-menu {
+            border-color: var(--line);
+            border-top-color: var(--orange);
+        }
+        .row-options-menu button {
+            border-bottom-color: var(--line);
+            color: var(--sidebar);
+        }
+        .row-options-menu button:hover {
+            color: var(--orange-dark);
+        }
+        .history-popover {
+            border-color: var(--line);
+            border-top-color: var(--orange);
+        }
+        @media (max-width: 950px) {
+            .requests-list-filters {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
         @media (max-width: 850px) {
             .detail-grid {
                 grid-template-columns: 1fr;
@@ -952,107 +1103,171 @@
             <div id="topbar-container"></div>
             <main class="content">
                 <div id="requestsListView">
-                <section class="requests-hero">
-                    <span class="section-kicker">Seguimiento</span>
-                    <h1>Mis solicitudes</h1>
-                    <p>Consulte las solicitudes enviadas, su estado actual y las observaciones de la revisión.</p>
-                </section>
-
-                <section class="requests-toolbar" aria-label="Vista de solicitudes">
-                    <select id="requestScope" aria-label="Vista de solicitudes">
-                        <option value="all">Todas</option>
-                        <option value="corrections">Por corregir</option>
-                    </select>
-                </section>
-
-                <section class="requests-panel">
-                    <header class="requests-summary">
-                        <div>
-                            <strong id="requestCount">Cargando solicitudes...</strong>
-                            <small>Información sincronizada con el registro central.</small>
+                    <section class="requests-panel">
+                        <div class="requests-inbox-header">
+                            <div>
+                                <span class="section-kicker">Seguimiento</span>
+                                <h2>Mis solicitudes</h2>
+                            </div>
+                            <div class="row-actions">
+                                <button
+                                    class="tertiary-button"
+                                    id="refreshButton"
+                                    type="button"
+                                >
+                                    Actualizar
+                                </button>
+                            </div>
                         </div>
-                        <button
-                            class="tertiary-button"
-                            id="refreshButton"
-                            type="button"
-                        >
-                            Actualizar
-                        </button>
-                    </header>
-                    <div class="request-status-summary" id="requestStatusSummary"></div>
-                    <div class="table-wrap">
-                        <table class="requests-table">
-                            <thead>
-                                <tr>
-                                    <th>#</th>
-                                    <th><button class="sortable-heading" type="button" data-sort-key="id">Solicitud <span data-sort-indicator="id">↕</span></button></th>
-                                    <th><button class="sortable-heading" type="button" data-sort-key="fechaCreacion">Fecha de envío <span data-sort-indicator="fechaCreacion">↕</span></button></th>
-                                    <th><button class="sortable-heading" type="button" data-sort-key="cliente">Cliente <span data-sort-indicator="cliente">↕</span></button></th>
-                                    <th><button class="sortable-heading" type="button" data-sort-key="emisorOpcion">Emisor / opción <span data-sort-indicator="emisorOpcion">↕</span></button></th>
-                                    <th><button class="sortable-heading" type="button" data-sort-key="estado">Estado <span data-sort-indicator="estado">↕</span></button></th>
-                                    <th><button class="sortable-heading" type="button" data-sort-key="fechaActualizacion">Última actualización <span data-sort-indicator="fechaActualizacion">↕</span></button></th>
-                                    <th>Opciones</th>
-                                </tr>
-                                <tr class="column-filters">
-                                    <th></th>
-                                    <th>
-                                        <div class="combined-request-filter" id="combinedRequestFilter">
-                                            <input
-                                                class="column-filter"
-                                                id="filterRequestId"
-                                                placeholder="Solicitud"
-                                                autocomplete="off"
+                        <div
+                            class="request-status-summary"
+                            id="requestStatusSummary"
+                        ></div>
+                        <div class="requests-list-filters">
+                            <div
+                                class="combined-request-filter"
+                                id="combinedRequestFilter"
+                            >
+                                <input
+                                    class="requests-list-filter"
+                                    id="filterRequestId"
+                                    placeholder="Solicitud"
+                                    autocomplete="off"
+                                >
+                                <div
+                                    class="combined-filter-panel"
+                                    id="combinedFilterPanel"
+                                    hidden
+                                >
+                                    <strong>CLIENTE / EMISOR</strong>
+                                    <div
+                                        class="combined-filter-options"
+                                        id="combinedFilterOptions"
+                                    ></div>
+                                </div>
+                            </div>
+                            <input
+                                class="requests-list-filter"
+                                id="filterCreatedDate"
+                                type="date"
+                                title="Fecha de envío"
+                            >
+                            <select
+                                class="requests-list-filter"
+                                id="filterClient"
+                            >
+                                <option value="">Todos los clientes</option>
+                            </select>
+                            <select
+                                class="requests-list-filter"
+                                id="filterIssuerOption"
+                            >
+                                <option value="">Todos los emisores</option>
+                            </select>
+                            <select
+                                class="requests-list-filter"
+                                id="filterStatus"
+                            >
+                                <option value="">Todos los estados</option>
+                            </select>
+                            <input
+                                class="requests-list-filter"
+                                id="filterUpdatedDate"
+                                type="date"
+                                title="Última actualización"
+                            >
+                            <button
+                                class="tertiary-button"
+                                id="clearColumnFiltersButton"
+                                type="button"
+                            >
+                                Limpiar
+                            </button>
+                        </div>
+                        <div class="table-wrap">
+                            <table class="requests-table">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>
+                                            <button
+                                                class="sortable-heading"
+                                                type="button"
+                                                data-sort-key="id"
                                             >
-                                            <div
-                                                class="combined-filter-panel"
-                                                id="combinedFilterPanel"
-                                                hidden
+                                                Solicitud
+                                                <span data-sort-indicator="id">↕</span>
+                                            </button>
+                                        </th>
+                                        <th>
+                                            <button
+                                                class="sortable-heading"
+                                                type="button"
+                                                data-sort-key="fechaCreacion"
                                             >
-                                                <strong>CLIENTE / EMISOR</strong>
-                                                <div
-                                                    class="combined-filter-options"
-                                                    id="combinedFilterOptions"
-                                                ></div>
-                                            </div>
-                                        </div>
-                                    </th>
-                                    <th>
-                                        <input class="column-filter column-filter-date" id="filterCreatedDate" type="date" title="Fecha de envío">
-                                    </th>
-                                    <th>
-                                        <select class="column-filter" id="filterClient">
-                                            <option value="">Todos</option>
-                                        </select>
-                                    </th>
-                                    <th>
-                                        <select class="column-filter" id="filterIssuerOption">
-                                            <option value="">Todos</option>
-                                        </select>
-                                    </th>
-                                    <th>
-                                        <select class="column-filter" id="filterStatus">
-                                            <option value="">Todos</option>
-                                        </select>
-                                    </th>
-                                    <th>
-                                        <input class="column-filter column-filter-date" id="filterUpdatedDate" type="date" title="Última actualización">
-                                    </th>
-                                    <th>
-                                        <button class="tertiary-button clear-filters-button" id="clearColumnFiltersButton" type="button">
-                                            Limpiar
-                                        </button>
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody id="requestsBody"></tbody>
-                        </table>
-                    </div>
-                    <div class="loading-state" id="loadingState">Cargando solicitudes...</div>
-                    <div class="empty-state" id="emptyState" hidden>No hay solicitudes para mostrar.</div>
-                    <div class="error-state" id="errorState" hidden>No fue posible cargar las solicitudes.</div>
-                </section>
+                                                Fecha de envío
+                                                <span data-sort-indicator="fechaCreacion">↕</span>
+                                            </button>
+                                        </th>
+                                        <th>
+                                            <button
+                                                class="sortable-heading"
+                                                type="button"
+                                                data-sort-key="cliente"
+                                            >
+                                                Cliente
+                                                <span data-sort-indicator="cliente">↕</span>
+                                            </button>
+                                        </th>
+                                        <th>
+                                            <button
+                                                class="sortable-heading"
+                                                type="button"
+                                                data-sort-key="emisorOpcion"
+                                            >
+                                                Emisor / opción
+                                                <span data-sort-indicator="emisorOpcion">↕</span>
+                                            </button>
+                                        </th>
+                                        <th>Producto</th>
+                                        <th>
+                                            <button
+                                                class="sortable-heading"
+                                                type="button"
+                                                data-sort-key="estado"
+                                            >
+                                                Estado
+                                                <span data-sort-indicator="estado">↕</span>
+                                            </button>
+                                        </th>
+                                        <th>
+                                            <button
+                                                class="sortable-heading"
+                                                type="button"
+                                                data-sort-key="fechaActualizacion"
+                                            >
+                                                Última actualización
+                                                <span data-sort-indicator="fechaActualizacion">↕</span>
+                                            </button>
+                                        </th>
+                                        <th>Opciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="requestsBody"></tbody>
+                            </table>
+                        </div>
+                        <div class="loading-state" id="loadingState">
+                            Cargando solicitudes...
+                        </div>
+                        <div class="empty-state" id="emptyState" hidden>
+                            No hay solicitudes para mostrar.
+                        </div>
+                        <div class="error-state" id="errorState" hidden>
+                            No fue posible cargar las solicitudes.
+                        </div>
+                        <span id="requestCount" hidden></span>
+                    </section>
                 </div>
-
                 <section class="detail-page" id="requestDetailView">
                     <section class="form-document">
                         <div class="document-heading">
@@ -1390,7 +1605,12 @@
         function populateSelect(selectId, values, selectedValue) {
             const select = document.getElementById(selectId);
             const options = uniqueSorted(values);
-            select.innerHTML = '<option value="">Todos</option>' + options.map((value) => `
+            const labels = {
+                filterClient: "Todos los clientes",
+                filterIssuerOption: "Todos los emisores",
+                filterStatus: "Todos los estados"
+            };
+            select.innerHTML = `<option value="">${labels[selectId] || "Todos"}</option>` + options.map((value) => `
                 <option value="${escapeHtml(value)}" ${value === selectedValue ? "selected" : ""}>
                     ${escapeHtml(value)}
                 </option>
@@ -1427,7 +1647,6 @@
             ].forEach((id) => {
                 document.getElementById(id).value = "";
             });
-            document.getElementById("requestScope").value = "all";
             selectedClientIssuerFilters.clear();
             closeCombinedFilterPanel();
             closeRowOptionsMenu();
@@ -1514,7 +1733,6 @@
             );
         }
         function filteredRequests() {
-            const scope = document.getElementById("requestScope").value;
             const requestId = normalize(document.getElementById("filterRequestId").value);
             const createdDate = document.getElementById("filterCreatedDate").value;
             const client = document.getElementById("filterClient").value;
@@ -1524,9 +1742,7 @@
             const filtered = allRequests.filter((request) => {
                 const requestStatus = request.estado || "Enviada";
                 const requestIssuerOption = `${request.emisor || "Sin emisor"} · OP${request.opcion || ""}`;
-                const scopeMatches = scope !== "corrections" ||
-                    requestStatus === "Requiere información";
-                return scopeMatches &&
+                return
                     (
                         !requestId ||
                         normalize(request.id).includes(requestId) ||
@@ -1583,6 +1799,7 @@
                                 <small>OP${escapeHtml(request.opcion || "")} · ${escapeHtml(request.accion || "")}</small>
                             </div>
                         </td>
+                        <td>${escapeHtml(request.producto || "Todos")}</td>
                         <td>
                             <span class="status-badge" data-state="${escapeHtml(request.estado || "Enviada")}">
                                 ${escapeHtml(request.estado || "Enviada")}
@@ -2271,7 +2488,6 @@
             saveCorrection(credential);
         }
 
-        document.getElementById("requestScope").addEventListener("change", renderRequests);
         document.getElementById("refreshButton").addEventListener("click", loadRequests);
         [
             "filterCreatedDate",
