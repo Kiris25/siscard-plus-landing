@@ -500,12 +500,32 @@
                 text: "El campo de búsqueda y los filtros permiten localizar contenidos. Desde este módulo también se accede al repositorio de Parámetros del Emisor TRT08SN0."
             },
             {
+                page: "formularios.html",
+                module: "Formularios",
+                target: "main",
+                title: "Solicitudes de parámetros",
+                text: "Esta página reúne las solicitudes y formularios disponibles para gestionar parámetros."
+            },
+            {
+                page: "formularios.html",
+                module: "Formularios",
+                target: "[href*='formulario-parametros'], .form-card, .service-card, .module-card, main",
+                title: "Lista de formularios",
+                text: "Desde la lista se selecciona la opción que corresponde al trámite requerido. Para esta demostración se continuará con la opción 05."
+            },
+            {
+                page: "formularios.html",
+                module: "Formularios",
+                target: "[href*='opcion=05'], [data-option='05'], [data-option='5'], .form-card, .service-card, main",
+                title: "Abrir la opción 05",
+                text: "La opción 05 corresponde a Parámetros generales del emisor. Al seleccionar Siguiente se abrirá ese formulario."
+            },
+            {
                 page: "formulario-parametros.html?opcion=05",
                 module: "Solicitudes de parámetros",
                 target: ".form-document",
                 title: "Formulario de la opción 05",
-                text: "Para la demostración se abre directamente la Solicitud de parámetros correspondiente a la opción 05.",
-                note: "La opción 05 corresponde a Parámetros generales del emisor."
+                text: "El formulario de Parámetros generales del emisor permite registrar los datos de la solicitud y completar los parámetros requeridos."
             },
             {
                 page: "formulario-parametros.html?opcion=05",
@@ -600,15 +620,17 @@
                 target: "[data-options-request-id]",
                 title: "Más opciones",
                 text: "El menú de cada solicitud permite acceder a Ver detalle, Corregir o Ver historial, según el estado.",
-                action: "openMyRequestMenu"
+                action: "openMyRequestMenu",
+                cardPosition: "left"
             },
             {
                 page: "mis-solicitudes.html",
                 module: "Mis solicitudes",
-                target: "#rowOptionsMenu",
+                target: "#rowOptionsMenu:not([hidden]), #rowOptionsMenu, .row-options-menu",
                 title: "Ver detalle, corregir e historial",
                 text: "Ver detalle abre la solicitud completa. Corregir aparece cuando la solicitud requiere información. Ver historial muestra los movimientos registrados.",
-                action: "openMyRequestMenu"
+                action: "openMyRequestMenu",
+                cardPosition: "left"
             },
             {
                 page: "aprobaciones.html",
@@ -644,15 +666,18 @@
                 target: "[data-options-request-id]",
                 title: "Más opciones",
                 text: "El menú de la solicitud ofrece Ver, Tomar y Ver historial. Tomar asigna la solicitud y la pasa a revisión.",
-                action: "openApprovalMenu"
+                action: "openApprovalMenu",
+                cardPosition: "left"
             },
             {
                 page: "aprobaciones.html",
                 module: "Aprobaciones",
-                target: "#rowOptionsMenu",
+                target: "#rowOptionsMenu:not([hidden]), #rowOptionsMenu, .row-options-menu",
                 title: "Ver, tomar o consultar historial",
-                text: "Desde Más opciones se abre el detalle, se toma una solicitud disponible o se consulta su historial.",
-                action: "openApprovalMenu"
+                text: "Desde Más opciones se abre el detalle, se toma una solicitud disponible o se consulta su historial. Al seleccionar Siguiente, la guía abrirá una solicitud para mostrar la revisión.",
+                action: "openApprovalMenu",
+                actionOnNext: "openApprovalDetail",
+                cardPosition: "left"
             },
             {
                 page: "aprobaciones.html",
@@ -664,7 +689,7 @@
             {
                 page: "aprobaciones.html",
                 module: "Aprobaciones",
-                target: "#approvalParametersToolbar, .toolbar-actions",
+                target: "#approvalDetailView:not([hidden]), .approval-detail:not([hidden]), #approvalParametersToolbar, .review-actions, .decision-actions, main",
                 title: "Revisión y decisiones",
                 text: "Al tomar una solicitud, el detalle permite revisar parámetros, marcar Correcto o Requiere ajuste, agregar comentarios, aprobar, solicitar información o rechazar.",
                 note: "Las decisiones se explican sin ejecutarse durante la guía."
@@ -672,10 +697,11 @@
             {
                 page: "mis-solicitudes.html",
                 module: "Corrección por el solicitante",
-                target: "#rowOptionsMenu",
+                target: "#rowOptionsMenu:not([hidden]), [data-action='correct'], [data-action='corregir'], .row-options-menu, #requestsListView",
                 title: "Corregir información requerida",
                 text: "Cuando el aprobador solicita información, la opción Corregir permite abrir únicamente los campos marcados para ajuste y enviarlos nuevamente a revisión.",
-                action: "openMyRequestMenu"
+                action: "openCorrectionMenu",
+                cardPosition: "left"
             },
             {
                 page: "seguridad.html",
@@ -734,6 +760,55 @@
         toolbarTotal.textContent = `${guideSteps.length} pasos`;
 
 
+        function findClickableByText(frameDocument, texts)
+        {
+            const controls = Array.from(
+                frameDocument.querySelectorAll(
+                    "button, a, [role='button'], [data-action]"
+                )
+            );
+
+            return controls.find(
+                function (control)
+                {
+                    const label = String(control.textContent || "")
+                        .trim()
+                        .toLowerCase();
+
+                    return texts.some(
+                        function (text)
+                        {
+                            return label.includes(text.toLowerCase());
+                        }
+                    );
+                }
+            );
+        }
+
+        function openFirstOptionsMenu(frameDocument)
+        {
+            const menu = frameDocument.getElementById("rowOptionsMenu");
+
+            if (menu && !menu.hidden)
+            {
+                return menu;
+            }
+
+            const firstOptionsButton =
+                frameDocument.querySelector("[data-options-request-id]") ||
+                findClickableByText(frameDocument, ["más opciones", "mas opciones"]);
+
+            if (firstOptionsButton)
+            {
+                firstOptionsButton.scrollIntoView(
+                    { block: "center", inline: "center" }
+                );
+                firstOptionsButton.click();
+            }
+
+            return frameDocument.getElementById("rowOptionsMenu");
+        }
+
         function performStepAction(frameDocument, action)
         {
             if (!action)
@@ -743,34 +818,49 @@
 
             if (action === "usePreviousInformation")
             {
-                const usePreviousButton = frameDocument.getElementById(
-                    "loadTemplateButton"
-                );
-
-                if (usePreviousButton)
-                {
-                    usePreviousButton.click();
-                }
-
+                const button = frameDocument.getElementById("loadTemplateButton");
+                button?.click();
                 return;
             }
 
-            if (action === "openMyRequestMenu" || action === "openApprovalMenu")
+            if (
+                action === "openMyRequestMenu" ||
+                action === "openApprovalMenu" ||
+                action === "openCorrectionMenu"
+            )
             {
-                const menu = frameDocument.getElementById("rowOptionsMenu");
-                if (menu && !menu.hidden)
-                {
-                    return;
-                }
+                const menu = openFirstOptionsMenu(frameDocument);
 
-                const firstOptionsButton = frameDocument.querySelector(
-                    "[data-options-request-id]"
+                if (action === "openCorrectionMenu" && menu)
+                {
+                    const correctButton = findClickableByText(
+                        menu,
+                        ["corregir"]
+                    );
+                    correctButton?.scrollIntoView(
+                        { block: "center", inline: "center" }
+                    );
+                }
+                return;
+            }
+
+            if (action === "openApprovalDetail")
+            {
+                openFirstOptionsMenu(frameDocument);
+
+                window.setTimeout(
+                    function ()
+                    {
+                        const menu = frameDocument.getElementById("rowOptionsMenu");
+                        const scope = menu && !menu.hidden ? menu : frameDocument;
+                        const detailButton = findClickableByText(
+                            scope,
+                            ["tomar", "ver detalle", "ver"]
+                        );
+                        detailButton?.click();
+                    },
+                    250
                 );
-
-                if (firstOptionsButton)
-                {
-                    firstOptionsButton.click();
-                }
             }
         }
 
@@ -807,6 +897,34 @@
             guideFocus.hidden = false;
         }
 
+        function positionGuideCard(step, target)
+        {
+            guideCard.style.top = "auto";
+            guideCard.style.right = "22px";
+            guideCard.style.bottom = "22px";
+            guideCard.style.left = "auto";
+
+            const rectangle = target.getBoundingClientRect();
+
+            if (step.cardPosition === "left")
+            {
+                guideCard.style.right = "auto";
+                guideCard.style.left = "22px";
+
+                if (rectangle.left < window.innerWidth * 0.46)
+                {
+                    guideCard.style.left = "auto";
+                    guideCard.style.right = "22px";
+                }
+            }
+
+            if (rectangle.bottom > window.innerHeight * 0.64)
+            {
+                guideCard.style.bottom = "auto";
+                guideCard.style.top = "76px";
+            }
+        }
+
         function showCurrentStep()
         {
             const step = guideSteps[currentStep];
@@ -832,6 +950,7 @@
                 function ()
                 {
                     positionFocus(target);
+                    positionGuideCard(step, target);
                     guideLoading.hidden = true;
                     guideCard.hidden = false;
                 },
@@ -962,8 +1081,25 @@
                     }
                 }
 
-                currentStep += 1;
-                loadCurrentStep();
+                const advance = function ()
+                {
+                    currentStep += 1;
+                    loadCurrentStep();
+                };
+
+                if (currentGuideStep.actionOnNext)
+                {
+                    window.setTimeout(
+                        advance,
+                        currentGuideStep.actionOnNext === "usePreviousInformation"
+                            ? 900
+                            : 700
+                    );
+                }
+                else
+                {
+                    advance();
+                }
             }
         );
 
