@@ -9,10 +9,10 @@
     "producto": "Corporativo",
     "fechaSolicitud": "2026-09-10",
     "fechaRequerida": "2026-09-10T12:00",
-    "estado": "Enviada a corregir",
+    "estado": "En revisión",
     "aprobador": "Seguridad",
     "fechaCreacion": "2026-09-10T17:17:21.779Z",
-    "fechaActualizacion": "2026-09-10T17:18:18.034Z",
+    "fechaActualizacion": "2026-09-10T17:18:25.450Z",
     "comentarios": [],
     "historial": [
       {
@@ -38,6 +38,12 @@
         "fecha": "2026-09-10T17:18:18.034Z",
         "usuario": "TESTAPP6",
         "comentario": "Correcciones enviadas nuevamente para revisión."
+      },
+      {
+        "estado": "En revisión",
+        "fecha": "2026-09-10T17:18:25.450Z",
+        "usuario": "Seguridad",
+        "comentario": "Solicitud actualizada a En revisión."
       }
     ],
     "parametros": [
@@ -48,10 +54,7 @@
         "obligatorio": true,
         "valor": "PRUEBA NUEVA",
         "revision": "Pendiente",
-        "notaAprobador": "",
-        "valoresPermitidos": [
-          "No aplica (valor asignado automáticamente por el sistema)."
-        ]
+        "notaAprobador": ""
       },
       {
         "id": "27c505e3-c040-4851-8118-f6f07229531f",
@@ -60,10 +63,7 @@
         "obligatorio": true,
         "valor": "PRUEBA",
         "revision": "Correcto",
-        "notaAprobador": "",
-        "valoresPermitidos": [
-          "Código del producto"
-        ]
+        "notaAprobador": ""
       },
       {
         "id": "e1e5afe3-dc68-4bd3-a8f3-bb7b2ea15b18",
@@ -72,10 +72,7 @@
         "obligatorio": true,
         "valor": "CO",
         "revision": "Correcto",
-        "notaAprobador": "",
-        "valoresPermitidos": [
-          "DO o la moneda nacional del país correspondiente al emisor."
-        ]
+        "notaAprobador": ""
       },
       {
         "id": "4f47bcb0-e646-49f0-b06f-41635afa5224",
@@ -84,11 +81,7 @@
         "obligatorio": true,
         "valor": "S = Sí",
         "revision": "Correcto",
-        "notaAprobador": "",
-        "valoresPermitidos": [
-          "S = Sí",
-          "N = No"
-        ]
+        "notaAprobador": ""
       },
       {
         "id": "fda74d47-06e6-4f43-9361-caec14f9e76a",
@@ -97,10 +90,7 @@
         "obligatorio": false,
         "valor": "",
         "revision": "Correcto",
-        "notaAprobador": "",
-        "valoresPermitidos": [
-          "Valor numérico."
-        ]
+        "notaAprobador": ""
       },
       {
         "id": "5dfba02e-a6bc-4dc1-ac79-40afb2e440ad",
@@ -109,8 +99,7 @@
         "obligatorio": true,
         "valor": "12",
         "revision": "Correcto",
-        "notaAprobador": "",
-        "valoresPermitidos": []
+        "notaAprobador": ""
       },
       {
         "id": "d8ed33c7-82c0-4a96-9263-11724b329236",
@@ -119,8 +108,7 @@
         "obligatorio": false,
         "valor": "",
         "revision": "Correcto",
-        "notaAprobador": "",
-        "valoresPermitidos": []
+        "notaAprobador": ""
       },
       {
         "id": "d1f78e80-6755-4a49-a3a5-0ed77d1fd2eb",
@@ -129,10 +117,7 @@
         "obligatorio": true,
         "valor": "12",
         "revision": "Correcto",
-        "notaAprobador": "",
-        "valoresPermitidos": [
-          "Cantidad de días."
-        ]
+        "notaAprobador": ""
       },
       {
         "id": "6104d59d-3d14-47cb-aad3-052717d3f2c6",
@@ -141,11 +126,7 @@
         "obligatorio": true,
         "valor": "S = Sí",
         "revision": "Correcto",
-        "notaAprobador": "",
-        "valoresPermitidos": [
-          "S = Sí",
-          "N = No"
-        ]
+        "notaAprobador": ""
       },
       {
         "id": "5d237453-e34c-463e-b545-45f443de9db9",
@@ -154,8 +135,7 @@
         "obligatorio": false,
         "valor": "",
         "revision": "Correcto",
-        "notaAprobador": "",
-        "valoresPermitidos": []
+        "notaAprobador": ""
       },
       {
         "id": "7c1f526d-d772-4004-979f-519b04a8247d",
@@ -164,8 +144,7 @@
         "obligatorio": false,
         "valor": "",
         "revision": "Correcto",
-        "notaAprobador": "",
-        "valoresPermitidos": []
+        "notaAprobador": ""
       },
       {
         "id": "abc19c23-abaf-4f4c-8d67-4d4eae8a075f",
@@ -174,8 +153,7 @@
         "obligatorio": false,
         "valor": "",
         "revision": "Correcto",
-        "notaAprobador": "",
-        "valoresPermitidos": []
+        "notaAprobador": ""
       },
       {
         "id": "60db5cab-54ec-4f21-b233-c4715e62cecd",
@@ -184,8 +162,7 @@
         "obligatorio": false,
         "valor": "",
         "revision": "Correcto",
-        "notaAprobador": "",
-        "valoresPermitidos": []
+        "notaAprobador": ""
       },
       {
         "id": "167e318d-0392-49d6-8137-21c2dca68d34",
@@ -194,8 +171,7 @@
         "obligatorio": false,
         "valor": "",
         "revision": "Correcto",
-        "notaAprobador": "",
-        "valoresPermitidos": []
+        "notaAprobador": ""
       },
       {
         "id": "c6563aab-6451-4ce5-bebd-1fecaeafd344",
@@ -204,8 +180,7 @@
         "obligatorio": false,
         "valor": "",
         "revision": "Correcto",
-        "notaAprobador": "",
-        "valoresPermitidos": []
+        "notaAprobador": ""
       },
       {
         "id": "85990998-1d8c-4ef8-83c5-1e14db210926",
@@ -214,22 +189,7 @@
         "obligatorio": true,
         "valor": "Empresarial",
         "revision": "Correcto",
-        "notaAprobador": "",
-        "valoresPermitidos": [
-          "Corporativa",
-          "Regional",
-          "Débito",
-          "Empresarial",
-          "Infinite",
-          "Prepago",
-          "Internacional",
-          "Local",
-          "Mastercard Black",
-          "Oro",
-          "Platino",
-          "Propietaria",
-          "Signature"
-        ]
+        "notaAprobador": ""
       },
       {
         "id": "7017a0ea-0440-424c-ab92-801b0d354051",
@@ -238,20 +198,7 @@
         "obligatorio": true,
         "valor": "IP INFINITE PAYMENTS",
         "revision": "Correcto",
-        "notaAprobador": "",
-        "valoresPermitidos": [
-          "AT Tarjeta ATH",
-          "CH CHASE",
-          "DC DINERS CLUB",
-          "IP INFINITE PAYMENTS",
-          "KV Producto Clave",
-          "MC MasterCard",
-          "MD MENDELS",
-          "OF ORIFLAME",
-          "ST ST",
-          "TA Tarjeta aduanal",
-          "VI VISA"
-        ]
+        "notaAprobador": ""
       },
       {
         "id": "1423e762-9063-4c62-a62e-e9f2a93a93f7",
@@ -260,11 +207,7 @@
         "obligatorio": true,
         "valor": "Débito",
         "revision": "Correcto",
-        "notaAprobador": "",
-        "valoresPermitidos": [
-          "Crédito",
-          "Débito"
-        ]
+        "notaAprobador": ""
       },
       {
         "id": "4164c375-d1f8-43f0-bdf9-e130e432aa23",
@@ -273,8 +216,7 @@
         "obligatorio": false,
         "valor": "",
         "revision": "Correcto",
-        "notaAprobador": "",
-        "valoresPermitidos": []
+        "notaAprobador": ""
       },
       {
         "id": "eb5aec21-d0f6-4715-bed9-079b5afc4039",
@@ -283,8 +225,7 @@
         "obligatorio": false,
         "valor": "",
         "revision": "Correcto",
-        "notaAprobador": "",
-        "valoresPermitidos": []
+        "notaAprobador": ""
       },
       {
         "id": "991427cf-a338-4cea-bd42-c594bdd9ddf8",
@@ -293,8 +234,7 @@
         "obligatorio": false,
         "valor": "",
         "revision": "Correcto",
-        "notaAprobador": "",
-        "valoresPermitidos": []
+        "notaAprobador": ""
       },
       {
         "id": "9e972413-e9b4-4725-a081-4c41d00aaea6",
@@ -303,8 +243,7 @@
         "obligatorio": false,
         "valor": "",
         "revision": "Correcto",
-        "notaAprobador": "",
-        "valoresPermitidos": []
+        "notaAprobador": ""
       },
       {
         "id": "2d39e095-767c-4e5b-9966-129e597c6e7c",
@@ -313,8 +252,7 @@
         "obligatorio": false,
         "valor": "",
         "revision": "Correcto",
-        "notaAprobador": "",
-        "valoresPermitidos": []
+        "notaAprobador": ""
       },
       {
         "id": "3de307e9-191c-499f-aff6-964fe15b8bb3",
@@ -323,8 +261,7 @@
         "obligatorio": false,
         "valor": "",
         "revision": "Correcto",
-        "notaAprobador": "",
-        "valoresPermitidos": []
+        "notaAprobador": ""
       },
       {
         "id": "09c57cf0-36f7-4726-bc82-b6809272ae1e",
@@ -333,11 +270,7 @@
         "obligatorio": true,
         "valor": "00 = Activa",
         "revision": "Correcto",
-        "notaAprobador": "",
-        "valoresPermitidos": [
-          "00 = Activa",
-          "02 = Cuenta Nueva"
-        ]
+        "notaAprobador": ""
       },
       {
         "id": "6fdef5b8-d757-402f-af56-a3a56e352bea",
@@ -346,8 +279,7 @@
         "obligatorio": false,
         "valor": "",
         "revision": "Correcto",
-        "notaAprobador": "",
-        "valoresPermitidos": []
+        "notaAprobador": ""
       },
       {
         "id": "51d6f6e8-5f3b-4f05-b8e7-e8b27614141e",
@@ -356,8 +288,7 @@
         "obligatorio": false,
         "valor": "",
         "revision": "Correcto",
-        "notaAprobador": "",
-        "valoresPermitidos": []
+        "notaAprobador": ""
       },
       {
         "id": "42fad63f-b346-4d1b-9db0-8b08587a143d",
@@ -366,8 +297,7 @@
         "obligatorio": false,
         "valor": "",
         "revision": "Correcto",
-        "notaAprobador": "",
-        "valoresPermitidos": []
+        "notaAprobador": ""
       },
       {
         "id": "ee59804c-6411-42d0-abc1-54a72a1a6038",
@@ -376,8 +306,7 @@
         "obligatorio": false,
         "valor": "",
         "revision": "Correcto",
-        "notaAprobador": "",
-        "valoresPermitidos": []
+        "notaAprobador": ""
       },
       {
         "id": "7bf74fd6-d3db-4265-b03b-25031ec2f59b",
@@ -386,8 +315,7 @@
         "obligatorio": false,
         "valor": "",
         "revision": "Correcto",
-        "notaAprobador": "",
-        "valoresPermitidos": []
+        "notaAprobador": ""
       },
       {
         "id": "48ae3145-cdd3-4790-8ef3-8ffed7183959",
@@ -396,8 +324,7 @@
         "obligatorio": false,
         "valor": "",
         "revision": "Correcto",
-        "notaAprobador": "",
-        "valoresPermitidos": []
+        "notaAprobador": ""
       },
       {
         "id": "624129eb-734f-45fd-9901-6eeeff56e695",
@@ -406,8 +333,7 @@
         "obligatorio": false,
         "valor": "",
         "revision": "Correcto",
-        "notaAprobador": "",
-        "valoresPermitidos": []
+        "notaAprobador": ""
       },
       {
         "id": "79192118-b729-4ace-87c4-5bc3a85bc849",
@@ -416,8 +342,7 @@
         "obligatorio": false,
         "valor": "",
         "revision": "Correcto",
-        "notaAprobador": "",
-        "valoresPermitidos": []
+        "notaAprobador": ""
       },
       {
         "id": "c7cb13bc-73b2-4d2e-9557-3ddc0a37542a",
@@ -426,8 +351,7 @@
         "obligatorio": false,
         "valor": "",
         "revision": "Correcto",
-        "notaAprobador": "",
-        "valoresPermitidos": []
+        "notaAprobador": ""
       },
       {
         "id": "3b62e961-b658-42d0-952e-db8262ac6be5",
@@ -436,8 +360,7 @@
         "obligatorio": false,
         "valor": "",
         "revision": "Correcto",
-        "notaAprobador": "",
-        "valoresPermitidos": []
+        "notaAprobador": ""
       },
       {
         "id": "ff939d29-a46f-4e70-9c2b-b9b46fedcf3f",
@@ -446,8 +369,7 @@
         "obligatorio": true,
         "valor": "12",
         "revision": "Correcto",
-        "notaAprobador": "",
-        "valoresPermitidos": []
+        "notaAprobador": ""
       },
       {
         "id": "a9e0f9f9-2cc6-4ef4-860b-6d7144afff21",
@@ -456,11 +378,7 @@
         "obligatorio": true,
         "valor": "S = Sí",
         "revision": "Correcto",
-        "notaAprobador": "",
-        "valoresPermitidos": [
-          "S = Sí",
-          "N = No"
-        ]
+        "notaAprobador": ""
       },
       {
         "id": "04be9196-650e-42c0-8095-e7800ab9ec08",
@@ -469,11 +387,7 @@
         "obligatorio": true,
         "valor": "Local",
         "revision": "Correcto",
-        "notaAprobador": "",
-        "valoresPermitidos": [
-          "Local",
-          "Internacional"
-        ]
+        "notaAprobador": ""
       },
       {
         "id": "45f4574f-7b55-42dd-95bb-6fb72408563a",
@@ -482,11 +396,7 @@
         "obligatorio": true,
         "valor": "C = Consecutivo",
         "revision": "Correcto",
-        "notaAprobador": "",
-        "valoresPermitidos": [
-          "A = Aleatorio",
-          "C = Consecutivo"
-        ]
+        "notaAprobador": ""
       },
       {
         "id": "35daae05-51dc-4d86-98b1-8399a7d2341d",
@@ -495,10 +405,7 @@
         "obligatorio": true,
         "valor": "12",
         "revision": "Correcto",
-        "notaAprobador": "",
-        "valoresPermitidos": [
-          "Valor numérico hasta 99999."
-        ]
+        "notaAprobador": ""
       },
       {
         "id": "895bb843-a7b6-4b0e-8507-08eac7306b22",
@@ -507,10 +414,7 @@
         "obligatorio": false,
         "valor": "",
         "revision": "Correcto",
-        "notaAprobador": "",
-        "valoresPermitidos": [
-          "Código alfanumérico de hasta 3 caracteres"
-        ]
+        "notaAprobador": ""
       },
       {
         "id": "3177a519-a40c-437c-824f-f91abc8edd67",
@@ -519,11 +423,7 @@
         "obligatorio": true,
         "valor": "S = Sí",
         "revision": "Correcto",
-        "notaAprobador": "",
-        "valoresPermitidos": [
-          "S = Sí",
-          "N = No"
-        ]
+        "notaAprobador": ""
       },
       {
         "id": "2cd76807-1980-4366-8367-5cdf51662baa",
@@ -532,8 +432,7 @@
         "obligatorio": false,
         "valor": "",
         "revision": "Correcto",
-        "notaAprobador": "",
-        "valoresPermitidos": []
+        "notaAprobador": ""
       },
       {
         "id": "25fe655a-b4bf-4a3f-bb69-41737da13184",
@@ -542,10 +441,7 @@
         "obligatorio": false,
         "valor": "",
         "revision": "Correcto",
-        "notaAprobador": "",
-        "valoresPermitidos": [
-          "Valores numéricos de 0 a 12."
-        ]
+        "notaAprobador": ""
       },
       {
         "id": "2955b148-1908-4dc2-aa90-f0cae0dcec58",
@@ -554,10 +450,7 @@
         "obligatorio": false,
         "valor": "",
         "revision": "Correcto",
-        "notaAprobador": "",
-        "valoresPermitidos": [
-          "Código de llaves vigente definido por Evertec."
-        ]
+        "notaAprobador": ""
       },
       {
         "id": "6178626f-9df6-444f-9405-29001ea6f4b0",
@@ -566,11 +459,7 @@
         "obligatorio": true,
         "valor": "S = Sí",
         "revision": "Correcto",
-        "notaAprobador": "",
-        "valoresPermitidos": [
-          "S = Sí",
-          "N = No"
-        ]
+        "notaAprobador": ""
       },
       {
         "id": "ca273f4f-a5f0-45ae-90e5-2cc15edd4d7f",
@@ -579,11 +468,7 @@
         "obligatorio": true,
         "valor": "S = Sí",
         "revision": "Correcto",
-        "notaAprobador": "",
-        "valoresPermitidos": [
-          "S = Sí",
-          "N = No"
-        ]
+        "notaAprobador": ""
       },
       {
         "id": "20b940bf-5548-48c7-9509-ec5c07d2c35f",
@@ -592,11 +477,7 @@
         "obligatorio": true,
         "valor": "S = Sí",
         "revision": "Correcto",
-        "notaAprobador": "",
-        "valoresPermitidos": [
-          "S = Sí",
-          "N = No"
-        ]
+        "notaAprobador": ""
       },
       {
         "id": "bd64ac34-6cf1-4b04-88af-16a297bf947f",
@@ -605,11 +486,7 @@
         "obligatorio": false,
         "valor": "",
         "revision": "Correcto",
-        "notaAprobador": "",
-        "valoresPermitidos": [
-          "S = Sí",
-          "N = No"
-        ]
+        "notaAprobador": ""
       },
       {
         "id": "0cb7cb57-83fe-4c7c-867c-23780a6d2132",
@@ -618,11 +495,7 @@
         "obligatorio": false,
         "valor": "",
         "revision": "Correcto",
-        "notaAprobador": "",
-        "valoresPermitidos": [
-          "S = Sí",
-          "N = No"
-        ]
+        "notaAprobador": ""
       },
       {
         "id": "e1212f4d-a13b-4533-8c0e-1752302bc642",
@@ -631,11 +504,7 @@
         "obligatorio": true,
         "valor": "S = Sí",
         "revision": "Correcto",
-        "notaAprobador": "",
-        "valoresPermitidos": [
-          "S = Sí",
-          "N = No"
-        ]
+        "notaAprobador": ""
       },
       {
         "id": "6ecbddcf-422d-4731-b601-8f00fd7ba3db",
@@ -644,11 +513,7 @@
         "obligatorio": true,
         "valor": "N = No",
         "revision": "Correcto",
-        "notaAprobador": "",
-        "valoresPermitidos": [
-          "S = Sí",
-          "N = No"
-        ]
+        "notaAprobador": ""
       },
       {
         "id": "fa2bdbef-c618-4383-880e-ad17e0220312",
@@ -657,10 +522,7 @@
         "obligatorio": false,
         "valor": "",
         "revision": "Correcto",
-        "notaAprobador": "",
-        "valoresPermitidos": [
-          "En blanco o cantidad de meses."
-        ]
+        "notaAprobador": ""
       },
       {
         "id": "66308c75-0a58-4608-82c5-69e0780c513c",
@@ -669,10 +531,7 @@
         "obligatorio": false,
         "valor": "",
         "revision": "Correcto",
-        "notaAprobador": "",
-        "valoresPermitidos": [
-          "En blanco o cantidad de adelantos."
-        ]
+        "notaAprobador": ""
       },
       {
         "id": "c71d0f71-5f26-4e2f-8e53-78085c7a1679",
@@ -681,10 +540,7 @@
         "obligatorio": false,
         "valor": "",
         "revision": "Correcto",
-        "notaAprobador": "",
-        "valoresPermitidos": [
-          "En blanco o cantidad de meses."
-        ]
+        "notaAprobador": ""
       },
       {
         "id": "f7b9cf51-b108-4d78-bf81-e749625f123a",
@@ -693,11 +549,7 @@
         "obligatorio": true,
         "valor": "S = Sí",
         "revision": "Correcto",
-        "notaAprobador": "",
-        "valoresPermitidos": [
-          "S = Sí",
-          "N = No"
-        ]
+        "notaAprobador": ""
       },
       {
         "id": "ffa43e41-8115-4a74-a462-2a034bd33eca",
@@ -706,8 +558,7 @@
         "obligatorio": false,
         "valor": "",
         "revision": "Correcto",
-        "notaAprobador": "",
-        "valoresPermitidos": []
+        "notaAprobador": ""
       },
       {
         "id": "fcc1f954-3ba4-4b83-9987-948e79cb9736",
@@ -716,11 +567,7 @@
         "obligatorio": true,
         "valor": "S = Sí",
         "revision": "Correcto",
-        "notaAprobador": "",
-        "valoresPermitidos": [
-          "S = Sí",
-          "N = No"
-        ]
+        "notaAprobador": ""
       },
       {
         "id": "86bb4166-304a-4c6b-bb4a-d93f6789d18d",
@@ -729,11 +576,7 @@
         "obligatorio": true,
         "valor": "S = Sí",
         "revision": "Correcto",
-        "notaAprobador": "",
-        "valoresPermitidos": [
-          "S = Sí",
-          "N = No"
-        ]
+        "notaAprobador": ""
       },
       {
         "id": "e6ec6c1b-3b8f-41ca-9240-9fbed5790f5c",
@@ -742,10 +585,7 @@
         "obligatorio": false,
         "valor": "",
         "revision": "Correcto",
-        "notaAprobador": "",
-        "valoresPermitidos": [
-          "Cantidad de Días"
-        ]
+        "notaAprobador": ""
       },
       {
         "id": "bd1b6b99-3415-47f9-afc0-79be304431a0",
@@ -754,10 +594,7 @@
         "obligatorio": false,
         "valor": "",
         "revision": "Correcto",
-        "notaAprobador": "",
-        "valoresPermitidos": [
-          "Cantidad de Días"
-        ]
+        "notaAprobador": ""
       },
       {
         "id": "ea028c8c-0198-496d-9be0-9c170d76a3d6",
@@ -766,8 +603,7 @@
         "obligatorio": false,
         "valor": "",
         "revision": "Correcto",
-        "notaAprobador": "",
-        "valoresPermitidos": []
+        "notaAprobador": ""
       },
       {
         "id": "e8c9d8ce-1ed3-4315-8a48-634ee51de447",
@@ -776,11 +612,7 @@
         "obligatorio": true,
         "valor": "S = Sí",
         "revision": "Correcto",
-        "notaAprobador": "",
-        "valoresPermitidos": [
-          "S = Sí",
-          "N = No"
-        ]
+        "notaAprobador": ""
       },
       {
         "id": "4ecc402d-b702-4021-8ccf-0735d553c7de",
@@ -789,8 +621,7 @@
         "obligatorio": false,
         "valor": "",
         "revision": "Correcto",
-        "notaAprobador": "",
-        "valoresPermitidos": []
+        "notaAprobador": ""
       },
       {
         "id": "dfa6c6f8-d297-49fd-aa75-8024a2fc61c0",
@@ -799,11 +630,7 @@
         "obligatorio": true,
         "valor": "2 – Autorización Visa Mandataria.",
         "revision": "Correcto",
-        "notaAprobador": "",
-        "valoresPermitidos": [
-          "0 – Autorización Visa Normal.",
-          "2 – Autorización Visa Mandataria."
-        ]
+        "notaAprobador": ""
       },
       {
         "id": "e996e5aa-ba9a-41a3-884d-65d9a2440713",
@@ -812,11 +639,7 @@
         "obligatorio": true,
         "valor": "B – Tarjeta de banda magnética.",
         "revision": "Correcto",
-        "notaAprobador": "",
-        "valoresPermitidos": [
-          "B – Tarjeta de banda magnética.",
-          "C – Tarjeta con tecnología Chip."
-        ]
+        "notaAprobador": ""
       },
       {
         "id": "0d6f98e0-8925-46b5-9841-f8a8c0c67a83",
@@ -825,8 +648,7 @@
         "obligatorio": false,
         "valor": "",
         "revision": "Correcto",
-        "notaAprobador": "",
-        "valoresPermitidos": []
+        "notaAprobador": ""
       },
       {
         "id": "6b2d454e-6243-45b7-ba4a-995cfc27a1cb",
@@ -835,8 +657,7 @@
         "obligatorio": false,
         "valor": "",
         "revision": "Correcto",
-        "notaAprobador": "",
-        "valoresPermitidos": []
+        "notaAprobador": ""
       },
       {
         "id": "db1e5313-0f01-4e98-b244-f79009019b9a",
@@ -845,11 +666,7 @@
         "obligatorio": true,
         "valor": "S = Sí",
         "revision": "Correcto",
-        "notaAprobador": "",
-        "valoresPermitidos": [
-          "S = Sí",
-          "N = NO"
-        ]
+        "notaAprobador": ""
       },
       {
         "id": "f56d917a-a993-4937-a5e4-fb8e1c115b32",
@@ -858,10 +675,7 @@
         "obligatorio": false,
         "valor": "",
         "revision": "Correcto",
-        "notaAprobador": "",
-        "valoresPermitidos": [
-          "Texto alfanumérico de hasta 6 caracteres"
-        ]
+        "notaAprobador": ""
       },
       {
         "id": "b87322cb-e7cf-4114-8b48-9da66c478cee",
@@ -870,10 +684,7 @@
         "obligatorio": false,
         "valor": "",
         "revision": "Correcto",
-        "notaAprobador": "",
-        "valoresPermitidos": [
-          "Nombre de programa definido por el banco"
-        ]
+        "notaAprobador": ""
       },
       {
         "id": "5d0ea6be-10c2-459a-ae44-7e9a8bddae71",
@@ -882,8 +693,7 @@
         "obligatorio": false,
         "valor": "",
         "revision": "Correcto",
-        "notaAprobador": "",
-        "valoresPermitidos": []
+        "notaAprobador": ""
       },
       {
         "id": "7f5ef381-ca12-46c6-a1d4-5fe7f525e4b9",
@@ -892,11 +702,7 @@
         "obligatorio": false,
         "valor": "",
         "revision": "Correcto",
-        "notaAprobador": "",
-        "valoresPermitidos": [
-          "S = Sí",
-          "N = No"
-        ]
+        "notaAprobador": ""
       },
       {
         "id": "b46f4a55-5e58-4ea8-ba03-92f38aacbeeb",
@@ -905,14 +711,7 @@
         "obligatorio": false,
         "valor": "",
         "revision": "Correcto",
-        "notaAprobador": "",
-        "valoresPermitidos": [
-          "M = Mensual: El límite puede utilizarse durante el mes calendario.",
-          "D = Diario: El límite puede utilizarse dentro de cada día calendario.",
-          "A = Anual: El límite puede utilizarse durante el año calendario.",
-          "N",
-          "A = No aplica: El límite no tendrá restricciones de uso por período."
-        ]
+        "notaAprobador": ""
       },
       {
         "id": "ee795564-8a9c-40c8-ad0e-f5cc90a4a232",
@@ -921,11 +720,7 @@
         "obligatorio": true,
         "valor": "S = Sí",
         "revision": "Correcto",
-        "notaAprobador": "",
-        "valoresPermitidos": [
-          "S = Sí",
-          "N = No"
-        ]
+        "notaAprobador": ""
       },
       {
         "id": "e24872f6-1dc3-48c3-a2ec-e0a76c5d3cb5",
@@ -934,11 +729,7 @@
         "obligatorio": false,
         "valor": "",
         "revision": "Correcto",
-        "notaAprobador": "",
-        "valoresPermitidos": [
-          "S = Sí",
-          "N = No"
-        ]
+        "notaAprobador": ""
       },
       {
         "id": "d71380a9-708e-47f0-a909-6d90523f1d23",
@@ -947,11 +738,7 @@
         "obligatorio": false,
         "valor": "",
         "revision": "Correcto",
-        "notaAprobador": "",
-        "valoresPermitidos": [
-          "S = Sí",
-          "N = No"
-        ]
+        "notaAprobador": ""
       },
       {
         "id": "4428e72e-2362-49b7-94d0-67454d78faf1",
@@ -960,10 +747,7 @@
         "obligatorio": false,
         "valor": "",
         "revision": "Correcto",
-        "notaAprobador": "",
-        "valoresPermitidos": [
-          "Cantidad de días definida para mantener una preautorización antes de su anulación."
-        ]
+        "notaAprobador": ""
       },
       {
         "id": "188ac4c8-0182-4967-9323-fbd34b3d76f5",
@@ -972,12 +756,7 @@
         "obligatorio": true,
         "valor": "Dormido",
         "revision": "Correcto",
-        "notaAprobador": "",
-        "valoresPermitidos": [
-          "Activo",
-          "Dormido",
-          "No aplica"
-        ]
+        "notaAprobador": ""
       },
       {
         "id": "ea2b3b93-0554-4a28-bb87-27d3682ba3a0",
@@ -986,10 +765,7 @@
         "obligatorio": true,
         "valor": "12",
         "revision": "Correcto",
-        "notaAprobador": "",
-        "valoresPermitidos": [
-          "Tipo de producto definido por la marca"
-        ]
+        "notaAprobador": ""
       },
       {
         "id": "b1302ffa-3624-42d6-bb0d-0dd1fa3c2ea5",
@@ -998,11 +774,7 @@
         "obligatorio": true,
         "valor": "S = Sí",
         "revision": "Correcto",
-        "notaAprobador": "",
-        "valoresPermitidos": [
-          "S = Sí",
-          "N = No"
-        ]
+        "notaAprobador": ""
       },
       {
         "id": "b5338ae9-b315-4328-92e2-ce594601d24a",
@@ -1011,8 +783,7 @@
         "obligatorio": false,
         "valor": "",
         "revision": "Correcto",
-        "notaAprobador": "",
-        "valoresPermitidos": []
+        "notaAprobador": ""
       },
       {
         "id": "ec891891-bea6-4500-a47c-63a649371d43",
@@ -1021,11 +792,7 @@
         "obligatorio": true,
         "valor": "S = Sí",
         "revision": "Correcto",
-        "notaAprobador": "",
-        "valoresPermitidos": [
-          "S = Sí",
-          "N = No"
-        ]
+        "notaAprobador": ""
       },
       {
         "id": "2c7ae2d2-4d4f-4637-9d4b-221d93e04651",
@@ -1034,11 +801,7 @@
         "obligatorio": true,
         "valor": "S = Sí",
         "revision": "Correcto",
-        "notaAprobador": "",
-        "valoresPermitidos": [
-          "S = Sí",
-          "N = No"
-        ]
+        "notaAprobador": ""
       },
       {
         "id": "605d0318-b5ff-4098-8e73-cc9abb2f505a",
@@ -1047,11 +810,7 @@
         "obligatorio": true,
         "valor": "C = Chip",
         "revision": "Correcto",
-        "notaAprobador": "",
-        "valoresPermitidos": [
-          "C = Chip",
-          "L = Contactless"
-        ]
+        "notaAprobador": ""
       },
       {
         "id": "357818af-199d-46b0-964a-e9dd778e0bbd",
@@ -1060,11 +819,7 @@
         "obligatorio": true,
         "valor": "S = Sí",
         "revision": "Correcto",
-        "notaAprobador": "",
-        "valoresPermitidos": [
-          "S = Sí",
-          "N = No"
-        ]
+        "notaAprobador": ""
       },
       {
         "id": "1e9b45e3-12e1-4e6c-b2b1-2650824704d7",
@@ -1073,11 +828,7 @@
         "obligatorio": true,
         "valor": "S = Sí",
         "revision": "Correcto",
-        "notaAprobador": "",
-        "valoresPermitidos": [
-          "S = Sí",
-          "N = No"
-        ]
+        "notaAprobador": ""
       },
       {
         "id": "3ff596e4-0b0f-4507-8cc7-949bf3f2b998",
@@ -1086,11 +837,7 @@
         "obligatorio": false,
         "valor": "",
         "revision": "Correcto",
-        "notaAprobador": "",
-        "valoresPermitidos": [
-          "S = Sí",
-          "N = No"
-        ]
+        "notaAprobador": ""
       },
       {
         "id": "c4c36cb9-abbc-4416-a3fd-e7cf2f12c932",
@@ -1099,10 +846,7 @@
         "obligatorio": false,
         "valor": "",
         "revision": "Correcto",
-        "notaAprobador": "",
-        "valoresPermitidos": [
-          "Tipo de Cliente"
-        ]
+        "notaAprobador": ""
       }
     ],
     "fechaToma": "2026-09-10T17:17:40.149Z",
