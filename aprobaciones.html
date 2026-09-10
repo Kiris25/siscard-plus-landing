@@ -888,13 +888,22 @@
                                 <span class="section-kicker">Seguridad</span>
                                 <h2>Solicitudes para revisar</h2>
                             </div>
-                            <button
-                                class="tertiary-button"
-                                id="exportHistoryButton"
-                                type="button"
-                            >
-                                Descargar historial Excel
-                            </button>
+                            <div class="approval-request-actions">
+                                <button
+                                    class="tertiary-button"
+                                    id="refreshRequestsButton"
+                                    type="button"
+                                >
+                                    Actualizar
+                                </button>
+                                <button
+                                    class="tertiary-button"
+                                    id="exportHistoryButton"
+                                    type="button"
+                                >
+                                    Descargar historial Excel
+                                </button>
+                            </div>
                         </div>
                         <div
                             class="approval-request-list"
@@ -1845,8 +1854,22 @@
                 if (!Array.isArray(requests)) throw new Error("INVALID_STRUCTURE");
                 return { requests, sha: file.sha };
             }
-            async function storeRequests(requests, credential, retry = true) {
+            function sortRequestStore(requests) {
+                return requests.slice().sort((first, second) =>
+                    (Date.parse(second.fechaActualizacion || second.fechaCreacion || "") || 0) -
+                    (Date.parse(first.fechaActualizacion || first.fechaCreacion || "") || 0)
+                );
+            }
+            async function updateRemoteRequest(updatedRequest, credential, retry = true) {
                 const current = await fetchRemoteRequests(credential);
+                const index = current.requests.findIndex(
+                    (item) => String(item.id) === String(updatedRequest.id)
+                );
+                if (index < 0) {
+                    throw new Error("REQUEST_NOT_FOUND");
+                }
+                const requests = current.requests.slice();
+                requests[index] = structuredClone(updatedRequest);
                 const response = await fetch(githubApiUrl(), {
                     method: "PUT",
                     headers: {
@@ -1854,26 +1877,53 @@
                         "Content-Type": "application/json"
                     },
                     body: JSON.stringify({
-                        message: `Actualizar solicitud ${selectedRequestId || "Siscard+"}`,
-                        content: utf8ToBase64(`${JSON.stringify(requests, null, 2)}\n`),
+                        message: `Actualizar solicitud ${updatedRequest.id}`,
+                        content: utf8ToBase64(
+                            `${JSON.stringify(requests, null, 2)}
+`
+                        ),
                         sha: current.sha,
                         branch: GITHUB_SETTINGS.branch
                     })
                 });
-                if (response.status === 409 && retry) return storeRequests(requests, credential, false);
-                if (response.status === 401 || response.status === 403) throw new Error("CREDENTIAL_INVALID");
-                if (!response.ok) throw new Error(`WRITE_FAILED_${response.status}`);
-                requestStore = requests;
-                localStorage.setItem(ACCESS_CREDENTIAL_KEY, credential);
+                if (response.status === 409 && retry) {
+                    return updateRemoteRequest(updatedRequest, credential, false);
+                }
+                if (response.status === 401 || response.status === 403) {
+                    throw new Error("CREDENTIAL_INVALID");
+                }
+                if (!response.ok) {
+                    throw new Error(`WRITE_FAILED_${response.status}`);
+                }
+                requestStore = sortRequestStore(requests);
+                localStorage.setItem(
+                    ACCESS_CREDENTIAL_KEY,
+                    credential.trim()
+                );
+                return requestStore;
             }
             async function initializeRequests() {
                 try {
-                    const remote = await fetchRemoteRequests();
-                    requestStore = remote.requests.sort((a, b) => (Date.parse(b.fechaActualizacion || b.fechaCreacion || "") || 0) - (Date.parse(a.fechaActualizacion || a.fechaCreacion || "") || 0));
+                    const credential = (
+                        localStorage.getItem(ACCESS_CREDENTIAL_KEY) || ""
+                    ).trim();
+                    let remote;
+                    try {
+                        remote = await fetchRemoteRequests(credential);
+                    } catch (error) {
+                        if (error.message !== "CREDENTIAL_INVALID") {
+                            throw error;
+                        }
+                        localStorage.removeItem(ACCESS_CREDENTIAL_KEY);
+                        remote = await fetchRemoteRequests();
+                        showToast("La validación guardada venció. Ingrésela nuevamente al guardar.");
+                    }
+                    requestStore = sortRequestStore(remote.requests);
                     renderApprovalRequestList();
                 } catch (error) {
                     console.error(error);
-                    document.getElementById("approvalRequestList").innerHTML = '<div class="error-state">No fue posible cargar las solicitudes.</div>';
+                    document.getElementById("approvalRequestList").innerHTML =
+                        '<div class="error-state">No fue posible cargar las solicitudes.</div>';
                 }
             }
             function openCredentialDialog(action, message = "") {
@@ -1889,7 +1939,7 @@
                 document.getElementById("accessCredential").value = "";
             }
             async function withCredential(action) {
-                const saved = localStorage.getItem(ACCESS_CREDENTIAL_KEY) || "";
+                const saved = (localStorage.getItem(ACCESS_CREDENTIAL_KEY) || "").trim();
                 if (!saved) {
                     openCredentialDialog(action);
                     return;
@@ -1921,7 +1971,7 @@
                             >
                                 Ver solicitud
                             </button>
-                            ${["Enviada", "Pendiente"].includes(request.estado)
+                            ${["Enviada", "Pendiente", "Enviada a corregir"].includes(request.estado)
                                 ? `
                                 <button
                                     class="primary-button"
@@ -2011,7 +2061,7 @@
             function renderApprovalButtons() {
                 if (!selectedRequest) return;
                 const container = document.getElementById("approvalButtons");
-                if (["Enviada", "Pendiente"].includes(selectedRequest.estado)) {
+                if (["Enviada", "Pendiente", "Enviada a corregir"].includes(selectedRequest.estado)) {
                     container.innerHTML =
                         '<button class="primary-button" data-approval-state="En revisión">Tomar solicitud</button>';
                     return;
@@ -2050,53 +2100,105 @@
                 container.innerHTML = "";
             }
             async function changeApprovalState(nextState) {
-                if (nextState === "Aprobada") {
-                    allParameters.forEach((parameter) => {
-                        parameter.reviewStatus = "Correcto";
-                        parameter.approvalNote = "";
-                    });
-                    renderParameters();
-                }
+                if (!selectedRequestId) return;
                 saveCurrentReview();
-                const request = requestStore.find((item) => item.id === selectedRequestId);
-                if (!request) return;
-                const comment = document.getElementById("approvalGeneralComment").value.trim();
-                const adjustmentItems = (request.parametros || []).filter((item) => item.revision === "Requiere ajuste");
+                const sourceRequest = requestStore.find(
+                    (item) => String(item.id) === String(selectedRequestId)
+                );
+                if (!sourceRequest) return;
+                const updatedRequest = structuredClone(sourceRequest);
+                if (nextState === "Aprobada") {
+                    updatedRequest.parametros = (updatedRequest.parametros || []).map(
+                        (parameter) => ({
+                            ...parameter,
+                            revision: "Correcto",
+                            notaAprobador: ""
+                        })
+                    );
+                }
+                if (nextState === "Requiere información") {
+                    updatedRequest.parametros = (updatedRequest.parametros || []).map(
+                        (parameter) => ({
+                            ...parameter,
+                            revision: parameter.revision === "Requiere ajuste"
+                                ? "Requiere ajuste"
+                                : "Correcto"
+                        })
+                    );
+                }
+                const adjustmentItems = (updatedRequest.parametros || []).filter(
+                    (item) => item.revision === "Requiere ajuste"
+                );
+                const comment = document
+                    .getElementById("approvalGeneralComment")
+                    .value.trim();
                 if (nextState === "Requiere información" && !adjustmentItems.length) {
                     showToast("Marque al menos un registro como Requiere ajuste.");
                     return;
                 }
-                if (["Requiere información", "Rechazada"].includes(nextState) && !comment && !adjustmentItems.some((item) => item.notaAprobador)) {
+                if (
+                    ["Requiere información", "Rechazada"].includes(nextState) &&
+                    !comment &&
+                    !adjustmentItems.some((item) => item.notaAprobador)
+                ) {
                     showToast("Incluya una nota o comentario para continuar.");
                     return;
                 }
                 await withCredential(async (credential) => {
                     const now = new Date().toISOString();
-                    request.estado = nextState;
-                    request.fechaActualizacion = now;
-                    request.aprobador = "Seguridad";
-                    if (nextState === "En revisión" && !request.fechaToma) request.fechaToma = now;
-                    if (["Aprobada", "Requiere información", "Rechazada", "Completada"].includes(nextState)) request.fechaRevision = now;
-                    request.historial = request.historial || [];
-                    request.historial.push({
-                        estado: nextState,
-                        fecha: now,
-                        usuario: "Seguridad",
-                        comentario: comment || `Solicitud actualizada a ${nextState}.`
-                    });
+                    updatedRequest.estado = nextState;
+                    updatedRequest.fechaActualizacion = now;
+                    updatedRequest.aprobador = "Seguridad";
+                    if (nextState === "En revisión" && !updatedRequest.fechaToma) {
+                        updatedRequest.fechaToma = now;
+                    }
+                    if (
+                        [
+                            "Aprobada",
+                            "Requiere información",
+                            "Rechazada",
+                            "Completada"
+                        ].includes(nextState)
+                    ) {
+                        updatedRequest.fechaRevision = now;
+                    }
+                    updatedRequest.historial = Array.isArray(updatedRequest.historial)
+                        ? updatedRequest.historial.slice()
+                        : [];
+                    const duplicateMovement = updatedRequest.historial.some(
+                        (movement) =>
+                            movement.estado === nextState &&
+                            movement.fecha === now
+                    );
+                    if (!duplicateMovement) {
+                        updatedRequest.historial.push({
+                            estado: nextState,
+                            fecha: now,
+                            usuario: "Seguridad",
+                            comentario: comment || `Solicitud actualizada a ${nextState}.`
+                        });
+                    }
                     try {
-                        await storeRequests(requestStore, credential);
-                        selectedRequest = request;
+                        await updateRemoteRequest(updatedRequest, credential);
+                        selectedRequest = structuredClone(updatedRequest);
+                        selectedRequestId = updatedRequest.id;
                         document.getElementById("approvalGeneralComment").value = "";
                         renderApprovalRequestList();
-                        renderApprovalButtons();
+                        selectApprovalRequest(updatedRequest.id);
                         closeCredentialDialog();
                         showToast(`Solicitud actualizada a ${nextState}.`);
                     } catch (error) {
                         console.error(error);
                         if (error.message === "CREDENTIAL_INVALID") {
                             localStorage.removeItem(ACCESS_CREDENTIAL_KEY);
-                            openCredentialDialog((newCredential) => changeApprovalStateWithCredential(nextState, newCredential), "No fue posible validar la credencial.");
+                            openCredentialDialog(
+                                (newCredential) =>
+                                    changeApprovalStateWithCredential(
+                                        nextState,
+                                        newCredential
+                                    ),
+                                "No fue posible validar la credencial."
+                            );
                         } else {
                             showToast("No fue posible guardar la revisión.");
                         }
@@ -2112,7 +2214,7 @@
                 selectedRequestId = requestId;
                 selectedRequest = loadRequests().find((item) => item.id === requestId) || null;
                 if (!selectedRequest) return;
-                if (["Enviada", "Pendiente"].includes(selectedRequest.estado)) {
+                if (["Enviada", "Pendiente", "Enviada a corregir"].includes(selectedRequest.estado)) {
                     await changeApprovalState("En revisión");
                 }
                 selectApprovalRequest(requestId);
@@ -2334,6 +2436,9 @@
                     if (button) changeApprovalState(button.dataset.approvalState);
                 });
 
+            document
+                .getElementById("refreshRequestsButton")
+                .addEventListener("click", initializeRequests);
             document
                 .getElementById("exportHistoryButton")
                 .addEventListener("click", exportApprovalHistory);
