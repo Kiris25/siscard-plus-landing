@@ -525,8 +525,7 @@
                 module: "Formularios",
                 target: "[data-section='solicitudes-parametros'], [data-target*='parametro'], [href*='solicitudes-parametros'], main",
                 title: "Solicitudes de parámetros",
-                text: "Esta opción despliega la lista de formularios disponibles para gestionar parámetros. Al seleccionar Siguiente, la guía simulará el clic para mostrar el catálogo.",
-                actionOnNext: "openParameterRequests"
+                text: "Esta opción despliega la lista de formularios disponibles para gestionar parámetros. Al seleccionar Siguiente, la guía simulará el clic para mostrar el catálogo."
             },
             {
                 page: "formularios.html",
@@ -547,8 +546,7 @@
                 module: "Formularios",
                 target: "[href*='opcion=05'], [data-option='05'], [data-option='5'], [data-code='05'], [data-code='5']",
                 title: "Abrir la opción 05",
-                text: "Al seleccionar Siguiente, la guía simulará el clic sobre la opción 05 y abrirá el formulario.",
-                actionOnNext: "openOption05"
+                text: "Al seleccionar Siguiente, la guía simulará el clic sobre la opción 05 y abrirá el formulario."
             },
             {
                 page: "formulario-parametros.html?opcion=05",
@@ -570,8 +568,7 @@
                 module: "Solicitudes de parámetros",
                 target: "#loadTemplateButton",
                 title: "Utilizar información anterior",
-                text: "Para esta demostración se utilizará la información anterior. Al seleccionar Siguiente, la guía recuperará los datos guardados y continuará con el formulario.",
-                actionOnNext: "usePreviousInformation"
+                text: "Para esta demostración se utilizará la información anterior. Al seleccionar Siguiente, la guía recuperará los datos guardados y continuará con el formulario."
             },
             {
                 page: "formulario-parametros.html?opcion=05",
@@ -1092,16 +1089,37 @@
 
         function prepareStepState(step, frameDocument)
         {
+            const parameterCatalogSteps = [
+                "Formularios de parámetros",
+                "Opción 05",
+                "Abrir la opción 05"
+            ];
+
             if (
                 step.page === "formularios.html" &&
+                parameterCatalogSteps.includes(step.title)
+            )
+            {
+                performStepAction(
+                    frameDocument,
+                    "openParameterRequests"
+                );
+            }
+
+            if (
+                step.page.includes("formulario-parametros.html") &&
                 [
-                    "Formularios de parámetros",
-                    "Opción 05",
-                    "Abrir la opción 05"
+                    "Datos generales de la solicitud",
+                    "Buscar parámetros",
+                    "Herramientas del formulario",
+                    "Completar los parámetros"
                 ].includes(step.title)
             )
             {
-                performStepAction(frameDocument, "openParameterRequests");
+                performStepAction(
+                    frameDocument,
+                    "usePreviousInformation"
+                );
             }
 
             performStepAction(frameDocument, step.action);
@@ -1127,7 +1145,10 @@
             window.setTimeout(
                 function ()
                 {
-                    const target = findTarget(frameDocument, step.target);
+                    const target = findTarget(
+                        frameDocument,
+                        step.target
+                    );
 
                     target.scrollIntoView(
                         {
@@ -1137,48 +1158,62 @@
                         }
                     );
 
-                    window.setTimeout(
+                    frameDocument.defaultView.requestAnimationFrame(
                         function ()
                         {
-                            const settledTarget = findTarget(
-                                frameDocument,
-                                step.target
-                            );
+                            frameDocument.defaultView.requestAnimationFrame(
+                                function ()
+                                {
+                                    const settledTarget = findTarget(
+                                        frameDocument,
+                                        step.target
+                                    );
 
-                            positionFocus(settledTarget);
-                            positionGuideCard(step, settledTarget);
-                            guideLoading.hidden = true;
-                            guideCard.hidden = false;
-                            guideTransitioning = false;
-                            previousButton.disabled = currentStep === 0;
-                            nextButton.disabled = false;
-                        },
-                        180
+                                    positionFocus(settledTarget);
+                                    positionGuideCard(
+                                        step,
+                                        settledTarget
+                                    );
+                                    guideLoading.hidden = true;
+                                    guideCard.hidden = false;
+                                    guideTransitioning = false;
+                                    previousButton.disabled =
+                                        currentStep === 0;
+                                    nextButton.disabled = false;
+                                }
+                            );
+                        }
                     );
                 },
-                step.action ? 240 : 100
+                420
             );
 
             toolbarModule.textContent = step.module;
             toolbarStep.textContent = `Paso ${currentStep + 1}`;
-            guideProgressBar.style.width = `${((currentStep + 1) / guideSteps.length) * 100}%`;
+            guideProgressBar.style.width =
+                `${((currentStep + 1) / guideSteps.length) * 100}%`;
             cardModule.textContent = step.module;
-            cardCounter.textContent = `${currentStep + 1} de ${guideSteps.length}`;
+            cardCounter.textContent =
+                `${currentStep + 1} de ${guideSteps.length}`;
             cardTitle.textContent = step.title;
             cardText.textContent = step.text;
             cardNote.hidden = !step.note;
             cardNote.textContent = step.note || "";
-            previousButton.disabled = currentStep === 0;
-            nextButton.textContent = currentStep === guideSteps.length - 1
-                ? "Finalizar"
-                : "Siguiente";
+            nextButton.textContent =
+                currentStep === guideSteps.length - 1
+                    ? "Finalizar"
+                    : "Siguiente";
 
-            localStorage.setItem("siscardGuideStep", String(currentStep));
+            localStorage.setItem(
+                "siscardGuideStep",
+                String(currentStep)
+            );
         }
 
         function loadCurrentStep()
         {
             const step = guideSteps[currentStep];
+
             guideStarted = true;
             guideTransitioning = true;
             previousButton.disabled = true;
@@ -1189,27 +1224,24 @@
             guideCard.hidden = true;
             guideFocus.hidden = true;
             guideLoading.hidden = false;
-
-            if (currentPage === step.page && guideFrame.contentDocument)
-            {
-                showCurrentStep();
-                return;
-            }
+            guideLoading.textContent = "Preparando paso...";
 
             currentPage = step.page;
-            guideFrame.src = step.page;
+
+            const separator = step.page.includes("?")
+                ? "&"
+                : "?";
+            const stepUrl =
+                `${step.page}${separator}guiaPaso=${currentStep}`;
+
+            guideFrame.src = "about:blank";
 
             window.setTimeout(
                 function ()
                 {
-                    if (!guideLoading.hidden)
-                    {
-                        guideLoading.hidden = true;
-                        guideCard.hidden = false;
-                        guideFocus.hidden = true;
-                    }
+                    guideFrame.src = stepUrl;
                 },
-                2600
+                30
             );
         }
 
@@ -1244,23 +1276,29 @@
             }
         );
 
+        function goToGuideStep(nextStep)
+        {
+            if (
+                guideTransitioning ||
+                nextStep < 0 ||
+                nextStep >= guideSteps.length
+            )
+            {
+                return;
+            }
+
+            guideFocus.hidden = true;
+            guideCard.hidden = true;
+            guideLoading.hidden = false;
+            currentStep = nextStep;
+            loadCurrentStep();
+        }
+
         previousButton.addEventListener(
             "click",
             function ()
             {
-                if (guideTransitioning)
-                {
-                    return;
-                }
-
-                if (currentStep > 0)
-                {
-                    guideFocus.hidden = true;
-                    guideCard.hidden = true;
-                    guideLoading.hidden = false;
-                    currentStep -= 1;
-                    loadCurrentStep();
-                }
+                goToGuideStep(currentStep - 1);
             }
         );
 
@@ -1275,54 +1313,15 @@
 
                 if (currentStep === guideSteps.length - 1)
                 {
-                    localStorage.setItem("siscardQuickGuideCompleted", "true");
+                    localStorage.setItem(
+                        "siscardQuickGuideCompleted",
+                        "true"
+                    );
                     window.location.href = "index.html";
                     return;
                 }
 
-                const currentGuideStep = guideSteps[currentStep];
-
-                if (currentGuideStep.actionOnNext)
-                {
-                    try
-                    {
-                        performStepAction(
-                            guideFrame.contentDocument,
-                            currentGuideStep.actionOnNext
-                        );
-                    }
-                    catch (error)
-                    {
-                        console.info(
-                            "No fue posible ejecutar la acción guiada.",
-                            error
-                        );
-                    }
-                }
-
-                const advance = function ()
-                {
-                    currentStep += 1;
-                    loadCurrentStep();
-                };
-
-                if (currentGuideStep.actionOnNext)
-                {
-                    window.setTimeout(
-                        advance,
-                        currentGuideStep.actionOnNext === "usePreviousInformation"
-                            ? 520
-                            : currentGuideStep.actionOnNext === "openParameterRequests"
-                                ? 480
-                                : currentGuideStep.actionOnNext === "openOption05"
-                                    ? 620
-                                    : 360
-                    );
-                }
-                else
-                {
-                    advance();
-                }
+                goToGuideStep(currentStep + 1);
             }
         );
 
