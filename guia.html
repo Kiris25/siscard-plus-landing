@@ -338,9 +338,8 @@
             z-index: 12;
             display: grid;
             place-items: center;
-            background: rgba(255, 255, 255, 0.05);
-            color: transparent;
-            font-size: 0;
+            background: rgba(255, 255, 255, 0.72);
+            color: var(--guide-gray);
             opacity: 1;
             transition: opacity 0.18s ease;
             font-weight: 700;
@@ -1101,7 +1100,7 @@
         async function waitForStableLayout(frameDocument)
         {
             await (frameDocument.fonts?.ready || Promise.resolve());
-            await new Promise(resolve => window.setTimeout(resolve, 80));
+            await new Promise(resolve => window.setTimeout(resolve, 220));
             await new Promise(resolve =>
                 frameDocument.defaultView.requestAnimationFrame(() =>
                     frameDocument.defaultView.requestAnimationFrame(resolve)
@@ -1184,7 +1183,7 @@
                     guideFrame.src =
                         `${step.page}${separator}guiaPaso=${currentStep}`;
                 },
-                5
+                20
             );
         }
 
@@ -1211,7 +1210,7 @@
             if(direction==="next" && leaving.actionOnNext)
             {
                 performStepAction(guideFrame.contentDocument,leaving.actionOnNext);
-                await new Promise(resolve=>window.setTimeout(resolve,120));
+                await new Promise(resolve=>window.setTimeout(resolve, 120));
             }
             currentStep=nextStep; loadCurrentStep();
         }
