@@ -360,12 +360,31 @@
 
         .comunicado-meta
         {
-            min-width: 105px;
+            min-width: 125px;
             color: #777777;
             font-size: 11px;
             text-align: right;
         }
 
+        .acciones-registro
+        {
+            display: flex;
+            justify-content: flex-end;
+            gap: 6px;
+            margin-top: 7px;
+            flex-wrap: wrap;
+        }
+        .boton.peligro
+        {
+            border: 1px solid #b33a2d;
+            background: #ffffff;
+            color: #b33a2d;
+        }
+        .boton.peligro:hover
+        {
+            background: #b33a2d;
+            color: #ffffff;
+        }
         .timeline-item
         {
             position: relative;
@@ -1392,6 +1411,7 @@
                     class="formulario-comunicado"
                     id="formularioComunicado"
                 >
+                    <input id="idComunicado" type="hidden">
                     <div class="campo-comunicado">
                         <label for="tituloComunicado">Título</label>
                         <input id="tituloComunicado" required maxlength="160">
@@ -1575,20 +1595,37 @@
                         </div>
                         <div class="comunicado-meta">
                             <span>${fechaCorta(comunicado.fechaCreacion)}</span>
-                            <button
-                                class="boton claro"
-                                type="button"
-                                data-open-title="${escaparHtml(comunicado.titulo)}"
-                                data-open-body="${escaparHtml(comunicado.detalle)}"
-                            >
-                                Ver
-                            </button>
+                            <div class="acciones-registro">
+                                <button
+                                    class="boton claro"
+                                    type="button"
+                                    data-open-title="${escaparHtml(comunicado.titulo)}"
+                                    data-open-body="${escaparHtml(comunicado.detalle)}"
+                                >
+                                    Ver
+                                </button>
+                                <button
+                                    class="boton claro"
+                                    type="button"
+                                    data-edit-id="${escaparHtml(comunicado.id)}"
+                                >
+                                    Editar
+                                </button>
+                                <button
+                                    class="boton peligro"
+                                    type="button"
+                                    data-delete-id="${escaparHtml(comunicado.id)}"
+                                >
+                                    Eliminar
+                                </button>
+                            </div>
                         </div>
                     </article>
                 `)
                 .join("");
             listaComunicados.insertAdjacentHTML("afterbegin", contenido);
             conectarBotonesDetalle();
+            conectarAccionesComunicados();
             aplicarFiltros();
         }
         async function cargarComunicados()
@@ -1689,7 +1726,7 @@
             bytes.forEach(byte => binario += String.fromCharCode(byte));
             return btoa(binario);
         }
-        async function guardarComunicadoRemoto(comunicado, credencial)
+        async function leerArchivoComunicados(credencial)
         {
             const lectura = await fetch(
                 `${githubApiUrl()}?ref=${encodeURIComponent(COMUNICADOS_CONFIG.branch)}&v=${Date.now()}`,
@@ -1702,28 +1739,36 @@
             {
                 throw new Error("CREDENTIAL_INVALID");
             }
-            let actuales = [];
-            let sha = "";
-            if (lectura.ok)
+            if (lectura.status === 404)
             {
-                const archivo = await lectura.json();
-                sha = archivo.sha || "";
-                const contenido = base64AUtf8(archivo.content || "").trim();
-                actuales = contenido ? JSON.parse(contenido) : [];
-                if (!Array.isArray(actuales))
-                {
-                    throw new Error("INVALID_JSON");
-                }
+                return { comunicados: [], sha: "" };
             }
-            else if (lectura.status !== 404)
+            if (!lectura.ok)
             {
                 throw new Error(`READ_${lectura.status}`);
             }
-            actuales.unshift(comunicado);
+            const archivo = await lectura.json();
+            const contenido = base64AUtf8(archivo.content || "").trim();
+            const comunicados = contenido ? JSON.parse(contenido) : [];
+            if (!Array.isArray(comunicados))
+            {
+                throw new Error("INVALID_JSON");
+            }
+            return { comunicados, sha: archivo.sha || "" };
+        }
+        async function escribirArchivoComunicados(
+            comunicados,
+            sha,
+            credencial,
+            mensaje
+        )
+        {
             const cuerpo = {
-                message: `Agregar comunicado ${comunicado.id}`,
-                content: utf8ABase64(`${JSON.stringify(actuales, null, 2)}
-`),
+                message: mensaje,
+                content: utf8ABase64(
+                    `${JSON.stringify(comunicados, null, 2)}
+`
+                ),
                 branch: COMUNICADOS_CONFIG.branch
             };
             if (sha) cuerpo.sha = sha;
@@ -1743,13 +1788,83 @@
             {
                 throw new Error(`WRITE_${escritura.status}`);
             }
-            return actuales;
+        }
+        async function guardarComunicadoRemoto(comunicado, credencial)
+        {
+            const archivo = await leerArchivoComunicados(credencial);
+            const indice = archivo.comunicados.findIndex(
+                item => String(item.id) === String(comunicado.id)
+            );
+            if (indice >= 0)
+            {
+                archivo.comunicados[indice] = comunicado;
+            }
+            else
+            {
+                archivo.comunicados.unshift(comunicado);
+            }
+            await escribirArchivoComunicados(
+                archivo.comunicados,
+                archivo.sha,
+                credencial,
+                indice >= 0
+                    ? `Editar comunicado ${comunicado.id}`
+                    : `Agregar comunicado ${comunicado.id}`
+            );
+            return archivo.comunicados;
+        }
+        async function eliminarComunicadoRemoto(id, credencial)
+        {
+            const archivo = await leerArchivoComunicados(credencial);
+            const actualizados = archivo.comunicados.filter(
+                item => String(item.id) !== String(id)
+            );
+            if (actualizados.length === archivo.comunicados.length)
+            {
+                throw new Error("NOT_FOUND");
+            }
+            await escribirArchivoComunicados(
+                actualizados,
+                archivo.sha,
+                credencial,
+                `Eliminar comunicado ${id}`
+            );
+            return actualizados;
         }
         function abrirAgregarComunicado()
         {
             formularioComunicado.reset();
+            document.getElementById("idComunicado").value = "";
+            document.getElementById("tituloAgregarComunicado").textContent =
+                "Agregar comunicado";
+            document.getElementById("guardarComunicado").textContent =
+                "Guardar comunicado";
             document.getElementById("credencialComunicado").value =
                 localStorage.getItem(CREDENTIAL_KEY) || "";
+            mensajeComunicado.textContent = "";
+            modalAgregar.hidden = false;
+        }
+        function abrirEditarComunicado(id)
+        {
+            const comunicado = comunicadosDinamicos.find(
+                item => String(item.id) === String(id)
+            );
+            if (!comunicado) return;
+            document.getElementById("idComunicado").value = comunicado.id;
+            document.getElementById("tituloComunicado").value =
+                comunicado.titulo || "";
+            document.getElementById("categoriaComunicado").value =
+                comunicado.categoria || "";
+            document.getElementById("resumenComunicado").value =
+                comunicado.resumen || "";
+            document.getElementById("detalleComunicado").value =
+                comunicado.detalle || "";
+            document.getElementById("credencialComunicado").value =
+                localStorage.getItem(CREDENTIAL_KEY) || "";
+            document.getElementById("tituloAgregarComunicado").textContent =
+                "Editar comunicado";
+            document.getElementById("guardarComunicado").textContent =
+                "Guardar cambios";
             mensajeComunicado.textContent = "";
             modalAgregar.hidden = false;
         }
@@ -1757,6 +1872,65 @@
         {
             modalAgregar.hidden = true;
             mensajeComunicado.textContent = "";
+        }
+        function conectarAccionesComunicados()
+        {
+            document.querySelectorAll("[data-edit-id]").forEach(boton => {
+                boton.addEventListener("click", function() {
+                    abrirEditarComunicado(boton.dataset.editId);
+                });
+            });
+            document.querySelectorAll("[data-delete-id]").forEach(boton => {
+                boton.addEventListener("click", async function() {
+                    const id = boton.dataset.deleteId;
+                    const comunicado = comunicadosDinamicos.find(
+                        item => String(item.id) === String(id)
+                    );
+                    if (!comunicado) return;
+                    if (!window.confirm(
+                        `¿Eliminar el comunicado "${comunicado.titulo}"?`
+                    )) return;
+                    const credencial = (
+                        localStorage.getItem(CREDENTIAL_KEY) || ""
+                    ).trim();
+                    if (!credencial)
+                    {
+                        abrirEditarComunicado(id);
+                        mensajeComunicado.textContent =
+                            "Ingrese la credencial y guarde o cierre. Para eliminar, la credencial debe estar registrada en este navegador.";
+                        return;
+                    }
+                    boton.disabled = true;
+                    try
+                    {
+                        comunicadosDinamicos = await eliminarComunicadoRemoto(
+                            id,
+                            credencial
+                        );
+                        renderizarComunicadosDinamicos();
+                        window.dispatchEvent(new CustomEvent("siscard-toast", {
+                            detail: "Comunicado eliminado correctamente."
+                        }));
+                    }
+                    catch (error)
+                    {
+                        console.error(error);
+                        if (error.message === "CREDENTIAL_INVALID")
+                        {
+                            localStorage.removeItem(CREDENTIAL_KEY);
+                        }
+                        window.alert(
+                            error.message === "CREDENTIAL_INVALID"
+                                ? "No fue posible validar la credencial."
+                                : "No fue posible eliminar el comunicado."
+                        );
+                    }
+                    finally
+                    {
+                        boton.disabled = false;
+                    }
+                });
+            });
         }
         formularioComunicado.addEventListener("submit", async function(evento)
         {
@@ -1770,13 +1944,19 @@
                 return;
             }
             const ahora = new Date();
+            const idExistente = document.getElementById("idComunicado").value;
+            const comunicadoAnterior = comunicadosDinamicos.find(
+                item => String(item.id) === String(idExistente)
+            );
             const comunicado = {
-                id: `COM-${ahora.getTime()}`,
+                id: idExistente || `COM-${ahora.getTime()}`,
                 titulo: document.getElementById("tituloComunicado").value.trim(),
                 categoria: document.getElementById("categoriaComunicado").value,
                 resumen: document.getElementById("resumenComunicado").value.trim(),
                 detalle: document.getElementById("detalleComunicado").value.trim(),
-                fechaCreacion: ahora.toISOString(),
+                fechaCreacion:
+                    comunicadoAnterior?.fechaCreacion || ahora.toISOString(),
+                fechaActualizacion: ahora.toISOString(),
                 estado: "Publicado"
             };
             const boton = document.getElementById("guardarComunicado");
@@ -1793,7 +1973,9 @@
                 cerrarAgregarComunicado();
                 renderizarComunicadosDinamicos();
                 window.dispatchEvent(new CustomEvent("siscard-toast", {
-                    detail: "Comunicado guardado correctamente."
+                    detail: idExistente
+                        ? "Comunicado actualizado correctamente."
+                        : "Comunicado guardado correctamente."
                 }));
             }
             catch (error)
