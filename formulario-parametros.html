@@ -2132,6 +2132,12 @@
                 : "Continuar";
         }
         async function completeRemoteSave(credential) {
+            if (!validateDemoWordRestriction()) {
+                pendingRequestPayload = null;
+                closeAccessDialog();
+                closeConfirmation();
+                return;
+            }
             setSendingState(true);
             localStorage.setItem(
                 "siscardPendingRequest",
@@ -2188,6 +2194,12 @@
             );
         }
         function completeLocalSave() {
+            if (!validateDemoWordRestriction()) {
+                pendingRequestPayload = null;
+                closeAccessDialog();
+                closeConfirmation();
+                return;
+            }
             pendingRequestPayload.id = buildLocalDemoRequestId(
                 pendingRequestPayload
             );
