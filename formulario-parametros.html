@@ -935,7 +935,7 @@
         >
             <header class="access-header">
                 <h2 id="accessTitle">Autenticación requerida</h2>
-                <p>Para continuar con el envío, ingrese la credencial de acceso. Esta validación solo se solicitará una vez en este navegador.</p>
+                <p>Ingrese la credencial para publicar en el repositorio compartido o active el modo demo para guardar únicamente en este navegador.</p>
             </header>
             <div class="access-body">
                 <label for="accessCredential">Credencial de acceso</label>
@@ -961,7 +961,8 @@
             </div>
             <footer class="access-actions">
                 <button class="tertiary-button" id="cancelAccessButton" type="button">Cancelar</button>
-                <button class="primary-button" id="continueAccessButton" type="button">Continuar</button>
+                <button class="tertiary-button" id="activateDemoButton" type="button">Activar modo demo</button>
+                <button class="primary-button" id="continueAccessButton" type="button">Ingresar credencial</button>
             </footer>
         </section>
     </div>
@@ -2121,9 +2122,53 @@
                 setSendingState(false);
             }
         }
+        function buildLocalDemoRequestId(payload) {
+            const requests = JSON.parse(
+                localStorage.getItem("siscardRequests") || "[]"
+            );
+            const dateCode = requestDateCode();
+            return buildRequestId(
+                requests,
+                payload.cliente,
+                payload.emisor,
+                payload.opcion,
+                dateCode
+            );
+        }
+        function completeLocalSave() {
+            pendingRequestPayload.id = buildLocalDemoRequestId(
+                pendingRequestPayload
+            );
+            pendingRequestPayload.modoGuardado = "local";
+            saveLocalCopies(pendingRequestPayload);
+            const savedId = pendingRequestPayload.id;
+            pendingRequestPayload = null;
+            closeAccessDialog();
+            closeConfirmation();
+            document.getElementById("successRequestId").textContent =
+                `Solicitud ${savedId} registrada en este navegador.`;
+            document.getElementById("successOverlay").hidden = false;
+            document.body.style.overflow = "hidden";
+        }
+        function guideDemoIsActive() {
+            const parameters = new URLSearchParams(window.location.search);
+            return (
+                parameters.get("modoDemo") === "true" ||
+                sessionStorage.getItem("siscardGuideMode") === "true" ||
+                sessionStorage.getItem("siscardDemoMode") === "true"
+            );
+        }
+        function activateDemoMode() {
+            sessionStorage.setItem("siscardDemoMode", "true");
+            completeLocalSave();
+        }
         async function saveRequest() {
             if (!pendingRequestPayload) {
                 pendingRequestPayload = requestPayload();
+            }
+            if (guideDemoIsActive()) {
+                completeLocalSave();
+                return;
             }
             const credential = readCredential();
             if (!credential) {
@@ -2364,6 +2409,7 @@
         document.getElementById("cancelSendButton").addEventListener("click", closeConfirmation);
         document.getElementById("confirmSendButton").addEventListener("click", saveRequest);
         document.getElementById("cancelAccessButton").addEventListener("click", closeAccessDialog);
+        document.getElementById("activateDemoButton").addEventListener("click", activateDemoMode);
         document.getElementById("continueAccessButton").addEventListener("click", continueWithCredential);
         document.getElementById("toggleCredentialButton").addEventListener("click", () => {
             const input = document.getElementById("accessCredential");
