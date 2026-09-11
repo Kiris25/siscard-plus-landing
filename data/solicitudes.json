@@ -9,10 +9,10 @@
     "producto": "Corporativo",
     "fechaSolicitud": "2026-09-11",
     "fechaRequerida": "2026-09-10T12:00",
-    "estado": "En revisión",
+    "estado": "Aprobada",
     "aprobador": "Seguridad",
     "fechaCreacion": "2026-09-11T15:50:59.889Z",
-    "fechaActualizacion": "2026-09-11T15:54:06.203Z",
+    "fechaActualizacion": "2026-09-11T15:54:21.157Z",
     "comentarios": [],
     "historial": [
       {
@@ -44,6 +44,12 @@
         "fecha": "2026-09-11T15:54:06.203Z",
         "usuario": "Seguridad",
         "comentario": "Solicitud actualizada a En revisión."
+      },
+      {
+        "estado": "Aprobada",
+        "fecha": "2026-09-11T15:54:21.157Z",
+        "usuario": "Seguridad",
+        "comentario": "Solicitud actualizada a Aprobada."
       }
     ],
     "parametros": [
@@ -98,7 +104,7 @@
         "producto": "Todos",
         "obligatorio": true,
         "valor": "TAL COSA",
-        "revision": "Pendiente",
+        "revision": "Correcto",
         "notaAprobador": ""
       },
       {
@@ -850,7 +856,7 @@
       }
     ],
     "fechaToma": "2026-09-11T15:52:10.391Z",
-    "fechaRevision": "2026-09-11T15:53:02.147Z"
+    "fechaRevision": "2026-09-11T15:54:21.157Z"
   },
   {
     "id": "DEMO3DEMO3205100926",
