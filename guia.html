@@ -424,7 +424,7 @@
                         en cada módulo. La guía no enviará solicitudes ni modificará datos.
                     </p>
                     <div class="guide-welcome-actions">
-                        <a class="guide-button" href="index.html">Volver al Inicio</a>
+                        <a class="guide-button" id="welcomeBackButton" href="index.html">Volver al Inicio</a>
                         <button class="guide-button primary" id="startGuideButton" type="button">
                             Iniciar recorrido
                         </button>
@@ -757,6 +757,12 @@
         let guideTransitioning = false;
 
         toolbarTotal.textContent = `${guideSteps.length} pasos`;
+
+        function clearGuideMode()
+        {
+            sessionStorage.removeItem("siscardGuideMode");
+            sessionStorage.removeItem("siscardDemoMode");
+        }
 
 
         function findClickableByText(frameDocument, texts)
@@ -1491,6 +1497,10 @@
         });
 
         document.getElementById("startGuideButton").addEventListener("click",function(){currentStep=0;loadCurrentStep();});
+        document.getElementById("welcomeBackButton").addEventListener(
+            "click",
+            clearGuideMode
+        );
 
         async function goToGuideStep(nextStep,direction)
         {
@@ -1510,17 +1520,38 @@
         }
 
         previousButton.addEventListener("click",()=>goToGuideStep(currentStep-1,"previous"));
-        nextButton.addEventListener("click",function(){
-            if(guideTransitioning)return;
-            if(currentStep===guideSteps.length-1){localStorage.setItem("siscardQuickGuideCompleted","true");window.location.href="index.html";return;}
-            goToGuideStep(currentStep+1,"next");
-        });
+        nextButton.addEventListener(
+            "click",
+            function ()
+            {
+                if (guideTransitioning)
+                {
+                    return;
+                }
+
+                if (currentStep === guideSteps.length - 1)
+                {
+                    localStorage.setItem(
+                        "siscardQuickGuideCompleted",
+                        "true"
+                    );
+
+                    clearGuideMode();
+                    window.location.href = "index.html";
+                    return;
+                }
+
+                goToGuideStep(currentStep + 1, "next");
+            }
+        );
 
         openPageButton.addEventListener(
             "click",
             function ()
             {
                 const step = guideSteps[currentStep];
+
+                clearGuideMode();
                 window.location.href = step.page;
             }
         );
@@ -1529,6 +1560,7 @@
             "click",
             function ()
             {
+                clearGuideMode();
                 window.location.href = "index.html";
             }
         );
@@ -1555,6 +1587,11 @@
             }
         );
 
+        window.addEventListener(
+            "pagehide",
+            clearGuideMode
+        );
+
         document.addEventListener(
             "keydown",
             function (event)
@@ -1576,6 +1613,7 @@
 
                 if (event.key === "Escape")
                 {
+                    clearGuideMode();
                     window.location.href = "index.html";
                 }
             }
