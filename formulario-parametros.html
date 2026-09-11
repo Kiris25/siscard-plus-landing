@@ -2200,15 +2200,40 @@
                 closeConfirmation();
                 return;
             }
+
             pendingRequestPayload.id = buildLocalDemoRequestId(
                 pendingRequestPayload
             );
             pendingRequestPayload.modoGuardado = "local";
+
             saveLocalCopies(pendingRequestPayload);
+
+            /*
+             * El formulario DEMO del recorrido se guarda únicamente en el
+             * navegador. Una vez guardado, se desactiva el modo del recorrido
+             * para que las solicitudes posteriores vuelvan al flujo normal y
+             * se aplique nuevamente la prohibición de usar DEMO.
+             */
+            sessionStorage.removeItem("siscardGuideMode");
+
+            const currentUrl = new URL(window.location.href);
+
+            if (currentUrl.searchParams.has("modoDemo")) {
+                currentUrl.searchParams.delete("modoDemo");
+
+                window.history.replaceState(
+                    {},
+                    document.title,
+                    `${currentUrl.pathname}${currentUrl.search}${currentUrl.hash}`
+                );
+            }
+
             const savedId = pendingRequestPayload.id;
             pendingRequestPayload = null;
+
             closeAccessDialog();
             closeConfirmation();
+
             document.getElementById("successRequestId").textContent =
                 `Solicitud ${savedId} registrada en este navegador.`;
             document.getElementById("successOverlay").hidden = false;
