@@ -9,10 +9,10 @@
     "producto": "Corporativo",
     "fechaSolicitud": "2026-09-11",
     "fechaRequerida": "2026-09-10T12:00",
-    "estado": "En revisión",
+    "estado": "Aprobada",
     "aprobador": "Seguridad",
     "fechaCreacion": "2026-09-11T16:13:24.896Z",
-    "fechaActualizacion": "2026-09-17T19:25:12.313Z",
+    "fechaActualizacion": "2026-09-17T19:25:24.952Z",
     "comentarios": [],
     "historial": [
       {
@@ -44,6 +44,12 @@
         "fecha": "2026-09-17T19:25:12.313Z",
         "usuario": "Seguridad",
         "comentario": "Solicitud actualizada a En revisión."
+      },
+      {
+        "estado": "Aprobada",
+        "fecha": "2026-09-17T19:25:24.952Z",
+        "usuario": "Seguridad",
+        "comentario": "Solicitud actualizada a Aprobada."
       }
     ],
     "parametros": [
@@ -62,7 +68,7 @@
         "producto": "Todos",
         "obligatorio": true,
         "valor": "BP",
-        "revision": "Pendiente",
+        "revision": "Correcto",
         "notaAprobador": ""
       },
       {
@@ -850,7 +856,7 @@
       }
     ],
     "fechaToma": "2026-09-11T16:15:53.082Z",
-    "fechaRevision": "2026-09-17T19:23:44.233Z"
+    "fechaRevision": "2026-09-17T19:25:24.952Z"
   },
   {
     "id": "FERFER105110926",
