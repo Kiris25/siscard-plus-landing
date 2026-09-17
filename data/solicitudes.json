@@ -12,7 +12,7 @@
     "estado": "Requiere información",
     "aprobador": "Seguridad",
     "fechaCreacion": "2026-09-11T16:13:24.896Z",
-    "fechaActualizacion": "2026-09-17T19:23:43.125Z",
+    "fechaActualizacion": "2026-09-17T19:23:44.233Z",
     "comentarios": [],
     "historial": [
       {
@@ -29,7 +29,7 @@
       },
       {
         "estado": "Requiere información",
-        "fecha": "2026-09-17T19:23:43.125Z",
+        "fecha": "2026-09-17T19:23:44.233Z",
         "usuario": "Seguridad",
         "comentario": "Solicitud actualizada a Requiere información."
       }
@@ -838,7 +838,7 @@
       }
     ],
     "fechaToma": "2026-09-11T16:15:53.082Z",
-    "fechaRevision": "2026-09-17T19:23:43.125Z"
+    "fechaRevision": "2026-09-17T19:23:44.233Z"
   },
   {
     "id": "FERFER105110926",
