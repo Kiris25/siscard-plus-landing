@@ -845,7 +845,7 @@
 
             <main class="content">
                 <div style="margin-bottom: 14px;">
-                    <a class="tertiary-button" href="formularios.html">
+                    <a class="tertiary-button" id="backToCatalog" href="formularios.html">
                         ← Volver al catálogo
                     </a>
                 </div>
@@ -861,7 +861,7 @@
 
                         <div class="document-code">
                             <strong id="documentCode">OPE-PA-FO-003</strong>
-                            <span id="documentOptionCode">Opción 05</span>
+                            <span id="documentOptionCode">Opción 05</span><span id="draftCode" style="margin-top:7px;color:var(--orange-dark);font-weight:850;overflow-wrap:anywhere;"></span>
                         </div>
                     </div>
 
@@ -1052,6 +1052,12 @@
             </footer>
         </section>
     </div>
+    <div class="confirmation-overlay" id="draftExitOverlay" hidden>
+        <section class="confirmation-dialog" role="dialog" aria-modal="true">
+            <header class="confirmation-header"><h2>Guardar borrador</h2><p>Hay información sin guardar. ¿Desea guardar el borrador antes de salir?</p></header>
+            <footer class="confirmation-actions"><button class="tertiary-button" id="cancelDraftExit" type="button">Cancelar</button><button class="tertiary-button" id="discardDraftExit" type="button">Salir sin guardar</button><button class="primary-button" id="saveDraftExit" type="button">Guardar borrador</button></footer>
+        </section>
+    </div>
     <aside class="parameter-tooltip" id="parameterTooltip" hidden></aside>
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
@@ -1072,7 +1078,12 @@
             path: "data/solicitudes.json"
         };
         const ACCESS_CREDENTIAL_KEY = "siscardAccessCredential";
+        const DRAFT_SETTINGS = { owner: "Kiris25", repository: "siscard-plus-landing", branch: "main", path: "data/borradores.json" };
         let pendingRequestPayload = null;
+        let currentDraftId = new URLSearchParams(window.location.search).get("borrador") || "";
+        let draftDirty = false;
+        let allowDraftExit = false;
+        let pendingExitUrl = "formularios.html";
 
         const OPTIONS = [
             ["05", "Consultar"], ["12", "Trabajar con"],
@@ -2079,7 +2090,7 @@
             const issuer = document.getElementById("issuerName").value.trim();
             const now = new Date().toISOString();
             return {
-                id: "BORRADOR",
+                id: currentDraftId || "BORRADOR",
                 tipo: "formulario-parametros",
                 opcion: currentOption,
                 cliente: client,
@@ -2137,6 +2148,76 @@
             const form = document.getElementById("requestForm");
             if (!form.reportValidity()) return false;
             return true;
+        }
+        function createDraftId() {
+            if (currentDraftId) return currentDraftId;
+            const stamp = new Date().toISOString().replace(/\D/g, "").slice(0, 14);
+            currentDraftId = `BRD-OP${String(currentOption).padStart(2, "0")}-${stamp}-${Math.random().toString(36).slice(2, 6).toUpperCase()}`;
+            document.getElementById("draftCode").textContent = currentDraftId;
+            return currentDraftId;
+        }
+        function draftApiUrl() {
+            const path = DRAFT_SETTINGS.path.split("/").map(encodeURIComponent).join("/");
+            return `https://api.github.com/repos/${DRAFT_SETTINGS.owner}/${DRAFT_SETTINGS.repository}/contents/${path}`;
+        }
+        function buildDraftPayload() {
+            const payload = collectPayloadData(false);
+            const previousCreated = window.loadedDraft?.fechaCreacion || new Date().toISOString();
+            return { ...payload, id: createDraftId(), estado: "Borrador", fechaCreacion: previousCreated, fechaActualizacion: new Date().toISOString() };
+        }
+        async function readRemoteDrafts(credential) {
+            const response = await fetch(`${draftApiUrl()}?ref=${encodeURIComponent(DRAFT_SETTINGS.branch)}&v=${Date.now()}`, { headers: githubHeaders(credential), cache: "no-store" });
+            if (response.status === 404) return { drafts: [], sha: "" };
+            if (response.status === 401 || response.status === 403) throw new Error("CREDENTIAL_INVALID");
+            if (!response.ok) throw new Error("DRAFT_READ_FAILED");
+            const file = await response.json();
+            const content = base64ToUtf8(file.content || "").trim();
+            const drafts = content ? JSON.parse(content) : [];
+            return { drafts: Array.isArray(drafts) ? drafts : [], sha: file.sha || "" };
+        }
+        async function persistDraft(credential) {
+            const current = await readRemoteDrafts(credential);
+            const payload = buildDraftPayload();
+            const drafts = current.drafts.filter((item) => String(item.id) !== String(payload.id));
+            drafts.unshift(payload);
+            const body = { message: `Guardar borrador ${payload.id}`, content: utf8ToBase64(`${JSON.stringify(drafts, null, 2)}\n`), branch: DRAFT_SETTINGS.branch };
+            if (current.sha) body.sha = current.sha;
+            const response = await fetch(draftApiUrl(), { method: "PUT", headers: { ...githubHeaders(credential), "Content-Type": "application/json" }, body: JSON.stringify(body) });
+            if (response.status === 401 || response.status === 403) throw new Error("CREDENTIAL_INVALID");
+            if (!response.ok) throw new Error("DRAFT_WRITE_FAILED");
+            localStorage.setItem(ACCESS_CREDENTIAL_KEY, credential);
+            window.loadedDraft = payload;
+            draftDirty = false;
+            return payload;
+        }
+        async function loadRequestedDraft() {
+            if (!currentDraftId) return false;
+            try {
+                const response = await fetch(`data/borradores.json?v=${Date.now()}`, { cache: "no-store" });
+                const drafts = response.ok ? await response.json() : [];
+                const draft = Array.isArray(drafts) ? drafts.find((item) => String(item.id) === String(currentDraftId)) : null;
+                if (!draft) { showToast("No se encontró el borrador solicitado."); return false; }
+                window.loadedDraft = draft;
+                document.getElementById("clientName").value = draft.cliente || "";
+                document.getElementById("issuerName").value = draft.emisor || "";
+                document.getElementById("requestedAction").value = draft.accion || "";
+                document.getElementById("productFilter").value = draft.producto || "Todos";
+                document.getElementById("requiredDateTime").value = draft.fechaRequerida || "";
+                allParameters = allParameters.map((parameter) => ({ ...parameter, value: draft.parametros?.find((item) => String(item.id) === String(parameter.id))?.valor || parameter.value || "" }));
+                document.getElementById("draftCode").textContent = currentDraftId;
+                renderParameters();
+                draftDirty = false;
+                return true;
+            } catch (error) { console.error(error); showToast("No fue posible cargar el borrador."); return false; }
+        }
+        function markDraftDirty() { draftDirty = true; createDraftId(); }
+        function openDraftExit(url = "formularios.html") { pendingExitUrl = url; document.getElementById("draftExitOverlay").hidden = false; document.body.style.overflow = "hidden"; }
+        function leaveDraftPage() { allowDraftExit = true; window.location.href = pendingExitUrl; }
+        async function saveDraftAndExit() {
+            const credential = readCredential();
+            if (!credential) { document.getElementById("draftExitOverlay").hidden = true; openAccessDialog("Ingrese la credencial y luego seleccione nuevamente Guardar borrador."); return; }
+            try { await persistDraft(credential); showToast("Borrador guardado."); leaveDraftPage(); }
+            catch (error) { if (error.message === "CREDENTIAL_INVALID") { localStorage.removeItem(ACCESS_CREDENTIAL_KEY); document.getElementById("draftExitOverlay").hidden = true; openAccessDialog("La credencial no es válida."); } else showToast("No fue posible guardar el borrador."); }
         }
         function containsForbiddenDemoWord(value) {
             return String(value || "")
@@ -2817,6 +2898,17 @@
             if (event.target.id === "confirmationOverlay") closeConfirmation();
         });
 
+        document.getElementById("backToCatalog").addEventListener("click", (event) => {
+            if (!draftDirty) return;
+            event.preventDefault();
+            openDraftExit(event.currentTarget.href);
+        });
+        document.getElementById("cancelDraftExit").onclick = () => { document.getElementById("draftExitOverlay").hidden = true; document.body.style.overflow = ""; };
+        document.getElementById("discardDraftExit").onclick = leaveDraftPage;
+        document.getElementById("saveDraftExit").onclick = saveDraftAndExit;
+        document.addEventListener("input", (event) => { if (event.target.matches("#requestForm input,#requestForm select,[data-entry-id],[data-other-for]")) markDraftDirty(); }, true);
+        document.addEventListener("change", (event) => { if (event.target.matches("#requestForm input,#requestForm select,[data-entry-id],[data-other-for]")) markDraftDirty(); }, true);
+        window.addEventListener("beforeunload", (event) => { if (draftDirty && !allowDraftExit) { event.preventDefault(); event.returnValue = ""; } });
         localStorage.removeItem("siscardTestAccessCredential");
         localStorage.removeItem("siscardDataMode");
         localStorage.removeItem("siscardDemoMode");
@@ -2826,9 +2918,9 @@
 
         loadConfiguration().finally(async () => {
             await loadOption(currentOption);
-            if (await findPreviousTemplate()) {
-                openTemplateDialog();
-            }
+            createDraftId();
+            const loaded = await loadRequestedDraft();
+            if (!loaded && await findPreviousTemplate()) openTemplateDialog();
         });
     </script>
 </body>
