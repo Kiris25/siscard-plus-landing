@@ -2152,7 +2152,7 @@
         function createDraftId() {
             if (currentDraftId) return currentDraftId;
             const stamp = new Date().toISOString().replace(/\D/g, "").slice(0, 14);
-            currentDraftId = `BRD-OP${String(currentOption).padStart(2, "0")}-${stamp}-${Math.random().toString(36).slice(2, 6).toUpperCase()}`;
+            currentDraftId = `TEMP-OP${String(currentOption).padStart(2, "0")}-${stamp}`;
             document.getElementById("draftCode").textContent = currentDraftId;
             return currentDraftId;
         }
