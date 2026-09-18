@@ -405,6 +405,13 @@
             color: var(--muted);
             font-size: 11px;
         }
+        .validation-rule-hint {
+            display: block;
+            margin: 5px 0 0;
+            color: #58595b;
+            font-size: 11px;
+            line-height: 1.35;
+        }
 
         .validation-message {
             display: block;
@@ -1123,55 +1130,79 @@
             return String(value || "")
                 .replace(/^[•*\-]\s*/, "")
                 .replace(/^\d+[.)]\s*/, "")
+                .replace(/[.]+$/, "")
                 .trim();
+        }
+        function uniqueValues(values) {
+            const seen = new Set();
+            return values.filter((value) => {
+                const key = normalize(value);
+                if (!key || seen.has(key)) return false;
+                seen.add(key);
+                return true;
+            });
         }
         function extractDefaultValue(rawValue) {
             const raw = String(rawValue || "");
-            const match = raw.match(/(?:^|[\r\n;])\s*(?:default|por defecto|predeterminado)\s*[:=\-]\s*([^\r\n;|]+)/i);
+            const match = raw.match(/(?:^|[\r\n;.]\s*)(?:default|por defecto|predeterminado)\s*[:=\-]\s*([^\r\n;|.]+)/i);
             return match ? cleanExampleOption(match[1]) : "";
+        }
+        function splitExampleList(value) {
+            return uniqueValues(String(value || "")
+                .split(/\s*(?:\r?\n|[,;|/])\s*/)
+                .map(cleanExampleOption)
+                .filter(Boolean));
+        }
+        function extractLeadAllowedValues(rawValue) {
+            const prefix = String(rawValue || "").split(/\bejemplo\s*:/i)[0].trim();
+            if (!prefix) return [];
+            const candidates = [];
+            const firstToken = prefix.match(/^\s*([A-Z0-9]{1,12})\b/);
+            if (firstToken && /\b(?:o|u|y|adem[aá]s|corresponde|moneda|c[oó]digo|valor)\b/i.test(prefix.slice(firstToken[0].length))) {
+                candidates.push(firstToken[1]);
+            }
+            const explicit = prefix.match(/(?:valor(?:es)?|c[oó]digo(?:s)?)\s+(?:permitido(?:s)?\s+)?(?:es|son|puede(?:n)? ser|admite)\s*[:=]?\s*([A-Z0-9]{1,12}(?:\s*[,/|]\s*[A-Z0-9]{1,12})*)/i);
+            if (explicit) candidates.push(...splitExampleList(explicit[1]));
+            return uniqueValues(candidates);
         }
         function extractExampleValues(rawValue) {
             const raw = String(rawValue || "");
-            const match = raw.match(/(?:^|[\r\n;])\s*ejemplo\s*:\s*([\s\S]*?)(?=(?:[\r\n;]\s*(?:default|por defecto|predeterminado)\s*[:=\-])|$)/i);
-            if (!match) return [];
-            const exampleBlock = match[1].trim();
+            const marker = /\bejemplo\s*:/i.exec(raw);
+            if (!marker) return [];
+            const afterMarker = raw.slice(marker.index + marker[0].length);
+            const exampleBlock = afterMarker
+                .split(/(?:^|[\r\n;.])\s*(?:default|por defecto|predeterminado)\s*[:=\-]/i)[0]
+                .trim();
             if (!exampleBlock) return [];
-            let parts = exampleBlock
-                .split(/\s*(?:\r?\n|[;,|/])\s*/)
-                .map(cleanExampleOption)
-                .filter(Boolean);
-            if (parts.length === 1) {
+            let values = splitExampleList(exampleBlock);
+            if (values.length === 1) {
                 const paired = exampleBlock.match(/[A-Za-z0-9]{1,12}\s*(?:=|–|-)\s*[^,;|/\r\n]+/g);
-                if (paired?.length > 1) parts = paired.map(cleanExampleOption);
+                if (paired?.length > 1) values = paired.map(cleanExampleOption);
             }
-            return [...new Set(parts.filter((value) => !/^(?:default|por defecto|predeterminado)\s*:/i.test(value)))];
+            return uniqueValues([
+                ...extractLeadAllowedValues(raw),
+                ...values.filter((value) => !/^(?:default|por defecto|predeterminado)\s*:/i.test(value))
+            ]);
         }
         function parseEnumeratedValues(record) {
             const originalRaw = rawAllowedValues(record);
             const exampleValues = extractExampleValues(originalRaw);
             if (exampleValues.length) return exampleValues;
             const raw = cleanAllowedValuesText(originalRaw)
-                .replace(/(?:^|[\r\n;])\s*(?:default|por defecto|predeterminado)\s*[:=\-]\s*[^\r\n;|]+/ig, "")
+                .replace(/(?:^|[\r\n;.])\s*(?:default|por defecto|predeterminado)\s*[:=\-]\s*[^\r\n;|.]+/ig, "")
                 .trim();
             if (!raw) return [];
-            const separatorPattern = /\s*(?:\r?\n|[;,|/])\s*/;
             const parts = raw
-                .split(separatorPattern)
+                .split(/\s*(?:\r?\n|[;,|/])\s*/)
                 .map(cleanAllowedValuesText)
                 .map(cleanExampleOption)
                 .filter(Boolean);
-            const pairedValues = parts.filter((value) =>
-                /^[A-Za-z0-9]{1,8}\s*(?:=|–|-)\s*.+/.test(value)
-            );
-            if (pairedValues.length >= 2) return [...new Set(pairedValues)];
+            const pairedValues = parts.filter((value) => /^[A-Za-z0-9]{1,8}\s*(?:=|–|-)\s*.+/.test(value));
+            if (pairedValues.length >= 2) return uniqueValues(pairedValues);
             const compactList = parts.filter((value) => value.length <= 80);
-            if (compactList.length >= 2 && compactList.length <= 30) return [...new Set(compactList)];
-            const products = raw.match(
-                /(?:visa|mastercard|american express|amex|local|internacional)\s+(?:cr[eé]dito|d[eé]bito|prepago|corporativo)/gi
-            );
-            return products?.length
-                ? [...new Set(products.map((value) => value.trim()))]
-                : [];
+            if (compactList.length >= 2 && compactList.length <= 30) return uniqueValues(compactList);
+            const products = raw.match(/(?:visa|mastercard|american express|amex|local|internacional)\s+(?:cr[eé]dito|d[eé]bito|prepago|corporativo)/gi);
+            return products?.length ? uniqueValues(products.map((value) => value.trim())) : [];
         }
         function matchesDefault(choice, defaultValue) {
             const choiceNormalized = normalize(choice);
@@ -1180,20 +1211,81 @@
             const choiceCode = normalize(String(choice).split(/\s*(?:=|–|-)\s*/)[0]);
             return choiceNormalized === defaultNormalized || choiceCode === defaultNormalized;
         }
-        function inputKind(parameter) {
-            const name = normalize(parameter.name);
-
-            if (/porcentaje|porc|tasa/.test(name)) {
-                return { type: "number", min: "0", max: "100", step: "0.01", reason: "Ingrese un porcentaje entre 0 y 100." };
+        function detectValidationRules(parameter) {
+            const text = normalize([
+                parameter.name,
+                parameter.rawValues,
+                parameter.description,
+                parameter.operation,
+                parameter.dependencies,
+                parameter.notes,
+                parameter.internalValidationText
+            ].join(" "));
+            const original = [
+                parameter.name,
+                parameter.rawValues,
+                parameter.description,
+                parameter.operation,
+                parameter.dependencies,
+                parameter.notes,
+                parameter.internalValidationText
+            ].join(" ");
+            const rules = { required: parameter.required || parameter.allowsBlank === false };
+            let match = original.match(/(?:c[oó]digo|valor|campo|longitud)?\s*(?:de|con)?\s*(\d+)\s*(?:d[ií]gitos?|caracteres?|posiciones?)/i);
+            if (match) rules.exactLength = Number(match[1]);
+            match = original.match(/(?:m[ií]nimo|min)\s*(?:de|:|=)?\s*(\d+)\s*(?:d[ií]gitos?|caracteres?|posiciones?)?/i);
+            if (match) rules.minLength = Number(match[1]);
+            match = original.match(/(?:m[aá]ximo|max)\s*(?:de|:|=)?\s*(\d+)\s*(?:d[ií]gitos?|caracteres?|posiciones?)?/i);
+            if (match) rules.maxLength = Number(match[1]);
+            match = original.match(/(?:entre|desde)\s*(-?\d+(?:[.,]\d+)?)\s*(?:y|a|hasta)\s*(-?\d+(?:[.,]\d+)?)/i);
+            if (match) {
+                rules.min = Number(match[1].replace(",", "."));
+                rules.max = Number(match[2].replace(",", "."));
+            } else {
+                match = original.match(/(?:m[ií]nimo|min)\s*(?:de|:|=)?\s*(-?\d+(?:[.,]\d+)?)/i);
+                if (match && !rules.minLength) rules.min = Number(match[1].replace(",", "."));
+                match = original.match(/(?:m[aá]ximo|max)\s*(?:de|:|=)?\s*(-?\d+(?:[.,]\d+)?)/i);
+                if (match && !rules.maxLength) rules.max = Number(match[1].replace(",", "."));
             }
-
-            if (/dias|dia|maximo de dias|cantidad de dias/.test(name)) {
-                return { type: "number", min: "0", step: "1", reason: "Ingrese una cantidad de días igual o mayor que 0." };
+            rules.digitsOnly = /(?:solo|unicamente|exclusivamente)?\s*(?:numerico|numerica|digitos|solo numeros)|codigo\s+(?:de\s+)?\d+\s+digitos/.test(text);
+            rules.lettersOnly = /(?:solo|unicamente|exclusivamente)\s+(?:letras|alfabetico)/.test(text);
+            rules.alphanumeric = /alfanumerico/.test(text);
+            if (/porcentaje|porc|tasa/.test(normalize(parameter.name)) && rules.min === undefined && rules.max === undefined) {
+                rules.min = 0;
+                rules.max = 100;
             }
-
-            return { type: "text", reason: "Ingrese un valor compatible con la ficha del parámetro." };
+            return rules;
         }
-
+        function validationRuleText(rules) {
+            const messages = [];
+            if (rules.required) messages.push("Obligatorio; no puede quedar en blanco");
+            if (rules.exactLength) messages.push(`Exactamente ${rules.exactLength} caracteres`);
+            else {
+                if (rules.minLength) messages.push(`Mínimo ${rules.minLength} caracteres`);
+                if (rules.maxLength) messages.push(`Máximo ${rules.maxLength} caracteres`);
+            }
+            if (rules.digitsOnly) messages.push("Solo dígitos");
+            else if (rules.lettersOnly) messages.push("Solo letras");
+            else if (rules.alphanumeric) messages.push("Solo letras y números");
+            if (rules.min !== undefined || rules.max !== undefined) {
+                messages.push(`Rango ${rules.min ?? "sin mínimo"} a ${rules.max ?? "sin máximo"}`);
+            }
+            return messages.join(" · ");
+        }
+        function inputKind(parameter) {
+            const rules = parameter.validationRules || detectValidationRules(parameter);
+            const numeric = rules.digitsOnly || rules.min !== undefined || rules.max !== undefined;
+            return {
+                type: numeric && !rules.exactLength && !rules.minLength && !rules.maxLength ? "number" : "text",
+                min: numeric && rules.min !== undefined ? String(rules.min) : undefined,
+                max: numeric && rules.max !== undefined ? String(rules.max) : undefined,
+                step: numeric && !rules.digitsOnly ? "any" : numeric ? "1" : undefined,
+                minlength: rules.exactLength || rules.minLength,
+                maxlength: rules.exactLength || rules.maxLength,
+                pattern: rules.digitsOnly ? `\\d${rules.exactLength ? `{${rules.exactLength}}` : "+"}` : rules.lettersOnly ? "[A-Za-zÁÉÍÓÚÜÑáéíóúüñ ]+" : rules.alphanumeric ? "[A-Za-z0-9ÁÉÍÓÚÜÑáéíóúüñ]+" : undefined,
+                reason: validationRuleText(rules) || "Ingrese un valor compatible con la ficha del parámetro."
+            };
+        }
         function productFilteredChoices(parameter) {
             const selectedProduct = document.getElementById("productFilter").value;
             if (selectedProduct === "Todos") return parameter.values;
@@ -1231,6 +1323,8 @@
                 required: false,
                 allowsBlank: true,
                 internalRuleFound: false,
+                internalValidationText: "",
+                validationRules: null,
                 value: extractDefaultValue(rawAllowedValues(record)) || "",
                 original: record
             };
@@ -1273,12 +1367,22 @@
                     "permiteBlancos", "Permite Blancos", "permite blancos",
                     "permite_blancos", "allowsBlank", "admiteBlancos"
                 ]);
-                return {
+                const merged = {
                     ...parameter,
                     required: required === true,
-                    allowsBlank: required !== true,
-                    internalRuleFound: required !== null || allowsBlank !== null
+                    allowsBlank: allowsBlank === null ? required !== true : allowsBlank,
+                    internalRuleFound: required !== null || allowsBlank !== null,
+                    internalValidationText: [
+                        field(internalRecord, ["valores", "valoresPermitidos"], ""),
+                        field(internalRecord, ["requisitosImplementacion", "requisitos de implementacion"], ""),
+                        field(internalRecord, ["configuracionComportamiento", "configuracion y comportamiento"], ""),
+                        field(internalRecord, ["condicionesOperativas", "condiciones operativas"], ""),
+                        field(internalRecord, ["ejemploOperativo", "ejemplo operativo"], "")
+                    ].join(" ")
                 };
+                merged.validationRules = detectValidationRules(merged);
+                merged.required = merged.required || merged.allowsBlank === false;
+                return merged;
             });
         }
 
@@ -1312,17 +1416,30 @@
                 .join("");
         }
 
+        function validationAttributes(parameter) {
+            const kind = inputKind(parameter);
+            return [
+                `type="${kind.type}"`,
+                kind.min !== undefined ? `min="${kind.min}"` : "",
+                kind.max !== undefined ? `max="${kind.max}"` : "",
+                kind.step !== undefined ? `step="${kind.step}"` : "",
+                kind.minlength ? `minlength="${kind.minlength}"` : "",
+                kind.maxlength ? `maxlength="${kind.maxlength}"` : "",
+                kind.pattern ? `pattern="${escapeHtml(kind.pattern)}"` : "",
+                `data-validation-reason="${escapeHtml(kind.reason)}"`
+            ].filter(Boolean).join(" ");
+        }
         function buildInput(parameter) {
+            parameter.validationRules ||= detectValidationRules(parameter);
+            parameter.required = parameter.required || parameter.validationRules.required;
             const choices = productFilteredChoices(parameter);
+            const ruleHint = validationRuleText(parameter.validationRules);
+            const ruleHtml = ruleHint ? `<small class="validation-rule-hint">Validación: ${escapeHtml(ruleHint)}</small>` : "";
             if (choices.length) {
                 const supportsOther = parameter.hasExample;
-                const selectedChoice = choices.find((choice) =>
-                    matchesDefault(choice, parameter.value || parameter.defaultValue)
-                ) || "";
+                const selectedChoice = choices.find((choice) => matchesDefault(choice, parameter.value || parameter.defaultValue)) || "";
                 if (selectedChoice && !parameter.value) parameter.value = selectedChoice;
-                const storedValueIsChoice = choices.some((choice) =>
-                    String(choice) === String(parameter.value)
-                );
+                const storedValueIsChoice = choices.some((choice) => String(choice) === String(parameter.value));
                 const usesOther = supportsOther && parameter.value && !storedValueIsChoice && !selectedChoice;
                 const defaultHint = parameter.defaultValue
                     ? `<small class="default-value-hint">Valor predeterminado: ${escapeHtml(parameter.defaultValue)}. Puede modificarse.</small>`
@@ -1331,22 +1448,17 @@
                     <select data-entry-id="${escapeHtml(parameter.id)}" data-supports-other="${supportsOther ? "true" : "false"}" ${parameter.required ? "required" : ""}>
                         <option value="" ${!parameter.value ? "selected" : ""} disabled hidden></option>
                         ${choices.map((value) => {
-                            const selected = String(value) === String(parameter.value) ||
-                                (!usesOther && matchesDefault(value, parameter.value));
-                            const label = parameter.defaultValue && matchesDefault(value, parameter.defaultValue)
-                                ? `${value} (Predeterminado)`
-                                : value;
+                            const selected = String(value) === String(parameter.value) || (!usesOther && matchesDefault(value, parameter.value));
+                            const label = parameter.defaultValue && matchesDefault(value, parameter.defaultValue) ? `${value} (Predeterminado)` : value;
                             return `<option value="${escapeHtml(value)}" ${selected ? "selected" : ""}>${escapeHtml(label)}</option>`;
                         }).join("")}
                         ${supportsOther ? `<option value="__OTROS__" ${usesOther ? "selected" : ""}>Otros</option>` : ""}
                     </select>
-                    ${supportsOther ? `<input class="other-value-input" type="text" data-other-for="${escapeHtml(parameter.id)}" value="${usesOther ? escapeHtml(parameter.value) : ""}" placeholder="Indique el otro valor" ${usesOther ? "" : "hidden"}>` : ""}
-                    ${defaultHint}
+                    ${supportsOther ? `<input class="other-value-input" ${validationAttributes(parameter)} data-other-for="${escapeHtml(parameter.id)}" value="${usesOther ? escapeHtml(parameter.value) : ""}" placeholder="Indique el otro valor" ${usesOther ? "" : "hidden"} ${parameter.required ? "required" : ""}>` : ""}
+                    ${defaultHint}${ruleHtml}
                     <small class="validation-message"></small>`;
             }
-            const kind = inputKind(parameter);
-            const attributes = [`type="${kind.type}"`, kind.min!==undefined?`min="${kind.min}"`:"", kind.max!==undefined?`max="${kind.max}"`:"", kind.step!==undefined?`step="${kind.step}"`:""].filter(Boolean).join(" ");
-            return `<input ${attributes} data-entry-id="${escapeHtml(parameter.id)}" ${parameter.required ? "required" : ""} data-validation-reason="${escapeHtml(kind.reason)}" placeholder="Digite el valor solicitado"><small class="validation-message"></small>`;
+            return `<input ${validationAttributes(parameter)} data-entry-id="${escapeHtml(parameter.id)}" ${parameter.required ? "required" : ""} placeholder="Digite el valor solicitado">${ruleHtml}<small class="validation-message"></small>`;
         }
         function renderParameters() {
             const selectedProduct = document.getElementById("productFilter").value;
@@ -1465,6 +1577,7 @@
             message.textContent = "";
             if (!parameter) return;
             parameter.value = value;
+            if (otherInput) otherInput.required = choseOther && parameter.required;
             if (choseOther && !value) {
                 control.classList.add("invalid");
                 otherInput?.classList.add("invalid");
@@ -1987,7 +2100,17 @@
         function openConfirmation() {
             if (!validateDemoWordRestriction()) return;
             if (!validateHeader()) return;
+            document.querySelectorAll("[data-entry-id]").forEach((control) => validateInput(control));
             synchronizeVisibleParameterValues();
+            const firstInvalidControl = [...document.querySelectorAll("[data-entry-id]")].find((control) =>
+                control.classList.contains("invalid") || !control.checkValidity()
+            );
+            if (firstInvalidControl) {
+                firstInvalidControl.scrollIntoView({ behavior: "smooth", block: "center" });
+                firstInvalidControl.focus();
+                showToast("Revise el valor: no cumple las reglas del parámetro.");
+                return;
+            }
             const selectedProduct =
                 document.getElementById("productFilter").value;
             const applicableParameters = allParameters.filter((parameter) =>
