@@ -396,6 +396,15 @@
             border-color: var(--red);
             background: #fff5f5;
         }
+        .other-value-input {
+            margin-top: 7px;
+        }
+        .default-value-hint {
+            display: block;
+            margin-top: 5px;
+            color: var(--muted);
+            font-size: 11px;
+        }
 
         .validation-message {
             display: block;
@@ -1110,39 +1119,67 @@
                 .replace(/^\s*(?:c[oó]digos?\s+de\s+producto(?:s)?(?:\s+como)?|c[oó]digos?\s+permitidos?(?:\s+como)?|valores?\s+permitidos?(?:\s+como)?|opciones?(?:\s+como)?)\s*[:\-]?\s*/i, "")
                 .trim();
         }
+        function cleanExampleOption(value) {
+            return String(value || "")
+                .replace(/^[•*\-]\s*/, "")
+                .replace(/^\d+[.)]\s*/, "")
+                .trim();
+        }
+        function extractDefaultValue(rawValue) {
+            const raw = String(rawValue || "");
+            const match = raw.match(/(?:^|[\r\n;])\s*(?:default|por defecto|predeterminado)\s*[:=\-]\s*([^\r\n;|]+)/i);
+            return match ? cleanExampleOption(match[1]) : "";
+        }
+        function extractExampleValues(rawValue) {
+            const raw = String(rawValue || "");
+            const match = raw.match(/(?:^|[\r\n;])\s*ejemplo\s*:\s*([\s\S]*?)(?=(?:[\r\n;]\s*(?:default|por defecto|predeterminado)\s*[:=\-])|$)/i);
+            if (!match) return [];
+            const exampleBlock = match[1].trim();
+            if (!exampleBlock) return [];
+            let parts = exampleBlock
+                .split(/\s*(?:\r?\n|[;,|/])\s*/)
+                .map(cleanExampleOption)
+                .filter(Boolean);
+            if (parts.length === 1) {
+                const paired = exampleBlock.match(/[A-Za-z0-9]{1,12}\s*(?:=|–|-)\s*[^,;|/\r\n]+/g);
+                if (paired?.length > 1) parts = paired.map(cleanExampleOption);
+            }
+            return [...new Set(parts.filter((value) => !/^(?:default|por defecto|predeterminado)\s*:/i.test(value)))];
+        }
         function parseEnumeratedValues(record) {
-            const raw = cleanAllowedValuesText(rawAllowedValues(record));
+            const originalRaw = rawAllowedValues(record);
+            const exampleValues = extractExampleValues(originalRaw);
+            if (exampleValues.length) return exampleValues;
+            const raw = cleanAllowedValuesText(originalRaw)
+                .replace(/(?:^|[\r\n;])\s*(?:default|por defecto|predeterminado)\s*[:=\-]\s*[^\r\n;|]+/ig, "")
+                .trim();
             if (!raw) return [];
-
             const separatorPattern = /\s*(?:\r?\n|[;,|/])\s*/;
             const parts = raw
                 .split(separatorPattern)
                 .map(cleanAllowedValuesText)
-                .map((value) => value.replace(/^[•*-]\s*/, "").trim())
+                .map(cleanExampleOption)
                 .filter(Boolean);
-
             const pairedValues = parts.filter((value) =>
                 /^[A-Za-z0-9]{1,8}\s*(?:=|–|-)\s*.+/.test(value)
             );
-
-            if (pairedValues.length >= 2) {
-                return [...new Set(pairedValues)];
-            }
-
+            if (pairedValues.length >= 2) return [...new Set(pairedValues)];
             const compactList = parts.filter((value) => value.length <= 80);
-            if (compactList.length >= 2 && compactList.length <= 30) {
-                return [...new Set(compactList)];
-            }
-
+            if (compactList.length >= 2 && compactList.length <= 30) return [...new Set(compactList)];
             const products = raw.match(
                 /(?:visa|mastercard|american express|amex|local|internacional)\s+(?:cr[eé]dito|d[eé]bito|prepago|corporativo)/gi
             );
-
             return products?.length
                 ? [...new Set(products.map((value) => value.trim()))]
                 : [];
         }
-
+        function matchesDefault(choice, defaultValue) {
+            const choiceNormalized = normalize(choice);
+            const defaultNormalized = normalize(defaultValue);
+            if (!choiceNormalized || !defaultNormalized) return false;
+            const choiceCode = normalize(String(choice).split(/\s*(?:=|–|-)\s*/)[0]);
+            return choiceNormalized === defaultNormalized || choiceCode === defaultNormalized;
+        }
         function inputKind(parameter) {
             const name = normalize(parameter.name);
 
@@ -1185,6 +1222,8 @@
                 product: field(record, FIELD_NAMES.product, "Todos"),
                 values: parseEnumeratedValues(record),
                 rawValues: rawAllowedValues(record),
+                hasExample: /(?:^|[\r\n;])\s*ejemplo\s*:/i.test(rawAllowedValues(record)),
+                defaultValue: extractDefaultValue(rawAllowedValues(record)),
                 description: field(record, FIELD_NAMES.description),
                 operation: field(record, FIELD_NAMES.operation),
                 dependencies: field(record, FIELD_NAMES.dependencies),
@@ -1192,7 +1231,7 @@
                 required: false,
                 allowsBlank: true,
                 internalRuleFound: false,
-                value: "",
+                value: extractDefaultValue(rawAllowedValues(record)) || "",
                 original: record
             };
         }
@@ -1276,14 +1315,33 @@
         function buildInput(parameter) {
             const choices = productFilteredChoices(parameter);
             if (choices.length) {
-                const instruction = choices.length <= 3
-                    ? `Seleccione: ${choices.join(" / ")}`
-                    : `Seleccione una de ${choices.length} opciones permitidas`;
+                const supportsOther = parameter.hasExample;
+                const selectedChoice = choices.find((choice) =>
+                    matchesDefault(choice, parameter.value || parameter.defaultValue)
+                ) || "";
+                if (selectedChoice && !parameter.value) parameter.value = selectedChoice;
+                const storedValueIsChoice = choices.some((choice) =>
+                    String(choice) === String(parameter.value)
+                );
+                const usesOther = supportsOther && parameter.value && !storedValueIsChoice && !selectedChoice;
+                const defaultHint = parameter.defaultValue
+                    ? `<small class="default-value-hint">Valor predeterminado: ${escapeHtml(parameter.defaultValue)}. Puede modificarse.</small>`
+                    : "";
                 return `
-                    <select data-entry-id="${escapeHtml(parameter.id)}" ${parameter.required ? "required" : ""}>
-                        <option value="" selected disabled hidden></option>
-                        ${choices.map(value => `<option value="${escapeHtml(value)}">${escapeHtml(value)}</option>`).join("")}
+                    <select data-entry-id="${escapeHtml(parameter.id)}" data-supports-other="${supportsOther ? "true" : "false"}" ${parameter.required ? "required" : ""}>
+                        <option value="" ${!parameter.value ? "selected" : ""} disabled hidden></option>
+                        ${choices.map((value) => {
+                            const selected = String(value) === String(parameter.value) ||
+                                (!usesOther && matchesDefault(value, parameter.value));
+                            const label = parameter.defaultValue && matchesDefault(value, parameter.defaultValue)
+                                ? `${value} (Predeterminado)`
+                                : value;
+                            return `<option value="${escapeHtml(value)}" ${selected ? "selected" : ""}>${escapeHtml(label)}</option>`;
+                        }).join("")}
+                        ${supportsOther ? `<option value="__OTROS__" ${usesOther ? "selected" : ""}>Otros</option>` : ""}
                     </select>
+                    ${supportsOther ? `<input class="other-value-input" type="text" data-other-for="${escapeHtml(parameter.id)}" value="${usesOther ? escapeHtml(parameter.value) : ""}" placeholder="Indique el otro valor" ${usesOther ? "" : "hidden"}>` : ""}
+                    ${defaultHint}
                     <small class="validation-message"></small>`;
             }
             const kind = inputKind(parameter);
@@ -1397,15 +1455,22 @@
             const parameter = allParameters.find((item) =>
                 String(item.id) === String(control.dataset.entryId)
             );
-
-            const message = control.parentElement.querySelector(".validation-message");
-            const value = control.value.trim();
-
+            const entry = control.closest(".parameter-entry");
+            const message = entry.querySelector(".validation-message");
+            const otherInput = entry.querySelector(`[data-other-for="${CSS.escape(String(control.dataset.entryId))}"]`);
+            const choseOther = control.tagName === "SELECT" && control.value === "__OTROS__";
+            const value = choseOther ? String(otherInput?.value || "").trim() : control.value.trim();
             control.classList.remove("valid", "invalid");
+            otherInput?.classList.remove("valid", "invalid");
             message.textContent = "";
-
             if (!parameter) return;
             parameter.value = value;
+            if (choseOther && !value) {
+                control.classList.add("invalid");
+                otherInput?.classList.add("invalid");
+                message.textContent = "Indique el valor correspondiente a Otros.";
+                return;
+            }
             if (!value) {
                 if (parameter.required) {
                     control.classList.add("invalid");
@@ -1413,31 +1478,22 @@
                 }
                 return;
             }
-
             const choices = productFilteredChoices(parameter);
-
-            if (choices.length && !choices.includes(value)) {
+            if (choices.length && !choseOther && !choices.includes(value)) {
                 control.classList.add("invalid");
-                control.value = "";
                 parameter.value = "";
-                message.textContent =
-                    "Valor rechazado: seleccione uno de los valores permitidos para el producto elegido.";
+                message.textContent = "Valor rechazado: seleccione uno de los valores permitidos para el producto elegido.";
                 return;
             }
-
-            if (!control.checkValidity()) {
+            if (!control.checkValidity() || (otherInput && !otherInput.checkValidity())) {
                 control.classList.add("invalid");
-                control.value = "";
                 parameter.value = "";
-                message.textContent =
-                    control.dataset.validationReason ||
-                    "El valor no cumple las reglas del parámetro.";
+                message.textContent = control.dataset.validationReason || "El valor no cumple las reglas del parámetro.";
                 return;
             }
-
             control.classList.add("valid");
+            if (choseOther) otherInput?.classList.add("valid");
         }
-
         function attachParameterEvents() {
             document.querySelectorAll("[data-toggle-id]").forEach((heading) => {
                 heading.addEventListener("click", (event) => {
@@ -1453,9 +1509,34 @@
                 const parameter = allParameters.find((item) =>
                     String(item.id) === String(control.dataset.entryId)
                 );
-                if (parameter?.value) control.value = parameter.value;
-                control.addEventListener("change", () => validateInput(control));
+                const otherInput = document.querySelector(
+                    `[data-other-for="${CSS.escape(String(control.dataset.entryId))}"]`
+                );
+                if (control.tagName === "SELECT") {
+                    const choiceExists = [...control.options].some((option) =>
+                        option.value === String(parameter?.value || "")
+                    );
+                    if (parameter?.value && choiceExists) control.value = parameter.value;
+                    else if (parameter?.value && otherInput) {
+                        control.value = "__OTROS__";
+                        otherInput.hidden = false;
+                        otherInput.value = parameter.value;
+                    }
+                } else if (parameter?.value) {
+                    control.value = parameter.value;
+                }
+                control.addEventListener("change", () => {
+                    if (otherInput) {
+                        const showOther = control.value === "__OTROS__";
+                        otherInput.hidden = !showOther;
+                        if (!showOther) otherInput.value = "";
+                        if (showOther) window.setTimeout(() => otherInput.focus(), 0);
+                    }
+                    validateInput(control);
+                });
                 control.addEventListener("blur", () => validateInput(control));
+                otherInput?.addEventListener("input", () => validateInput(control));
+                otherInput?.addEventListener("blur", () => validateInput(control));
             });
 
             document.querySelectorAll("[data-help-id]").forEach((button) => {
@@ -1782,7 +1863,12 @@
                     String(item.id) === String(control.dataset.entryId)
                 );
                 if (parameter) {
-                    parameter.value = String(control.value || "").trim();
+                    const otherInput = control.closest(".parameter-entry")?.querySelector(
+                        `[data-other-for="${CSS.escape(String(control.dataset.entryId))}"]`
+                    );
+                    parameter.value = control.value === "__OTROS__"
+                        ? String(otherInput?.value || "").trim()
+                        : String(control.value || "").trim();
                 }
             });
         }
