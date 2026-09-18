@@ -320,6 +320,18 @@
             justify-content: flex-end;
             gap: 6px;
         }
+        .dependency-indicator {
+            display: inline-grid;
+            place-items: center;
+            width: 24px;
+            height: 24px;
+            border: 1px solid var(--orange);
+            border-radius: 50%;
+            background: var(--orange-soft);
+            color: var(--orange-dark);
+            font-size: 13px;
+            line-height: 1;
+        }
         .required-indicator {
             display: inline-grid;
             place-items: center;
@@ -472,6 +484,49 @@
             color: var(--orange-dark);
             font-size: 12px;
             font-weight: 800;
+        }
+        .tooltip-dependencies {
+            margin-top: 8px;
+            padding-top: 7px;
+            border-top: 1px solid #e6e6e6;
+        }
+        .tooltip-dependencies strong {
+            display: block;
+            margin-bottom: 6px;
+            color: #58595b;
+            font-size: 10px;
+            text-transform: uppercase;
+        }
+        .tooltip-dependency-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        .tooltip-dependency-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 5px 8px;
+            border: 1px solid #ffb47f;
+            border-radius: 999px;
+            background: #fff5ec;
+            color: #8a3b00;
+            font-size: 11px;
+            font-weight: 800;
+            text-decoration: none;
+        }
+        .tooltip-dependency-link:hover,
+        .tooltip-dependency-link:focus {
+            border-color: var(--orange);
+            background: var(--orange);
+            color: #ffffff;
+            outline: none;
+        }
+        .tooltip-dependency-text {
+            margin: 0;
+            color: var(--muted);
+            font-size: 11px;
+            line-height: 1.35;
         }
 
         .empty-state,
@@ -1314,11 +1369,13 @@
                 product: field(record, FIELD_NAMES.product, "Todos"),
                 values: parseEnumeratedValues(record),
                 rawValues: rawAllowedValues(record),
-                hasExample: /(?:^|[\r\n;])\s*ejemplo\s*:/i.test(rawAllowedValues(record)),
+                hasExample: /\bejemplo\s*:/i.test(rawAllowedValues(record)),
                 defaultValue: extractDefaultValue(rawAllowedValues(record)),
                 description: field(record, FIELD_NAMES.description),
                 operation: field(record, FIELD_NAMES.operation),
                 dependencies: field(record, FIELD_NAMES.dependencies),
+                dependencyHtml: String(record.dependencias ?? record.dep ?? record.reglas ?? record.dependencies ?? ""),
+                hasDependencyLink: /<a\b[^>]*>/i.test(String(record.dependencias ?? record.dep ?? record.reglas ?? record.dependencies ?? "")),
                 notes: field(record, FIELD_NAMES.notes),
                 required: false,
                 allowsBlank: true,
@@ -1380,6 +1437,8 @@
                         field(internalRecord, ["ejemploOperativo", "ejemplo operativo"], "")
                     ].join(" ")
                 };
+                const internalDependencyHtml = String(internalRecord.dependencias ?? internalRecord.dep ?? internalRecord.reglas ?? "");
+                merged.hasDependencyLink = merged.hasDependencyLink || /<a\b[^>]*>/i.test(internalDependencyHtml);
                 merged.validationRules = detectValidationRules(merged);
                 merged.required = merged.required || merged.allowsBlank === false;
                 return merged;
@@ -1454,7 +1513,7 @@
                         }).join("")}
                         ${supportsOther ? `<option value="__OTROS__" ${usesOther ? "selected" : ""}>Otros</option>` : ""}
                     </select>
-                    ${supportsOther ? `<input class="other-value-input" ${validationAttributes(parameter)} data-other-for="${escapeHtml(parameter.id)}" value="${usesOther ? escapeHtml(parameter.value) : ""}" placeholder="Indique el otro valor" ${usesOther ? "" : "hidden"} ${parameter.required ? "required" : ""}>` : ""}
+                    ${supportsOther ? `<input class="other-value-input" ${validationAttributes(parameter)} data-other-for="${escapeHtml(parameter.id)}" value="${usesOther ? escapeHtml(parameter.value) : ""}" placeholder="Indique el otro valor" ${usesOther ? "" : "hidden"} ${usesOther && parameter.required ? "required" : ""}>` : ""}
                     ${defaultHint}${ruleHtml}
                     <small class="validation-message"></small>`;
             }
@@ -1524,6 +1583,9 @@
                                     <small>${highlightSearch(parameter.product || "Todos")}</small>
                                 </div>
                                 <div class="parameter-heading-actions">
+                                    ${parameter.hasDependencyLink
+                                        ? '<span class="dependency-indicator" title="Este parámetro tiene dependencias vinculadas" aria-label="Parámetro con dependencias">🔗</span>'
+                                        : ''}
                                     ${parameter.required
                                         ? '<span class="required-indicator" title="Campo obligatorio" aria-label="Campo obligatorio">*</span>'
                                         : ''}
@@ -1665,6 +1727,29 @@
             });
         }
 
+        function dependencyTooltipHtml(parameter) {
+            const container = document.createElement("div");
+            container.innerHTML = String(parameter.dependencyHtml || "");
+            const linkedElements = [...container.querySelectorAll("a")];
+            if (!linkedElements.length) {
+                const plain = plainText(parameter.dependencies || "");
+                return plain
+                    ? `<div class="tooltip-dependencies"><strong>Dependencias / Reglas</strong><p class="tooltip-dependency-text">${escapeHtml(plain)}</p></div>`
+                    : "";
+            }
+            const links = linkedElements.map((element) => {
+                const label = plainText(element.textContent || "Dependencia");
+                const target = element.dataset.target || "";
+                const url = new URL("https://kiris25.github.io/parametros-emisor-v2/");
+                url.searchParams.set("modo", "ficha");
+                url.searchParams.set("idioma", "es");
+                url.searchParams.set("ambito", "externo");
+                url.searchParams.set("opcion", currentOption);
+                if (target) url.searchParams.set("id", target);
+                return `<a class="tooltip-dependency-link" href="${escapeHtml(url.href)}" target="_blank" rel="noopener" title="Abrir ficha relacionada">🔗 ${escapeHtml(label)}</a>`;
+            }).join("");
+            return `<div class="tooltip-dependencies"><strong>Dependencias vinculadas</strong><div class="tooltip-dependency-list">${links}</div></div>`;
+        }
         function showTooltip(button, parameter) {
             if (!parameter) return;
 
@@ -1692,7 +1777,7 @@
                 ${row("Valores permitidos", allValues)}
                 ${row("¿Qué hace?", parameter.description)}
                 ${row("¿Cómo funciona?", parameter.operation)}
-                ${row("Dependencias / Reglas", parameter.dependencies)}
+                ${dependencyTooltipHtml(parameter)}
                 ${row("Notas", parameter.notes)}
                 <a class="tooltip-link" href="${url.href}">Abrir ficha completa →</a>
             `;
@@ -1713,6 +1798,9 @@
             }, 160);
         }
 
+        parameterTooltip.addEventListener("mouseenter", () => {
+            parameterTooltip.hidden = false;
+        });
         parameterTooltip.addEventListener("mouseleave", () => {
             parameterTooltip.hidden = true;
         });
