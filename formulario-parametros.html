@@ -1208,6 +1208,12 @@
                 return true;
             });
         }
+        function cleanChoiceAnnotation(value) {
+            return String(value || "")
+                .replace(/\s*\((?:valor\s+)?(?:por\s+)?(?:default|defecto|predeterminado)[^)]*\)\s*/ig, "")
+                .trim();
+        }
+
         function extractDefaultValue(rawValue) {
             const raw = plainText(rawValue || "")
                 .replace(/\u00a0/g, " ")
@@ -1217,35 +1223,31 @@
                 return "";
             }
 
-            const patterns = [
-                /\bdefault\s*(?:value|valor)?\s*[:=\-]?\s*([^\r\n;|]+)/i,
-                /\bvalor\s+(?:por\s+)?default\s*[:=\-]?\s*([^\r\n;|]+)/i,
-                /\bpor\s+defecto\s*[:=\-]?\s*([^\r\n;|]+)/i,
-                /\bpredeterminado\s*[:=\-]?\s*([^\r\n;|]+)/i
+            const parentheticalDefault = raw.match(
+                /(?:^|[\/|;,\r\n])\s*([^\/|;,\r\n]+?)\s*\((?:valor\s+)?(?:por\s+)?(?:default|defecto|predeterminado)\b[^)]*\)/i
+            );
+
+            if (parentheticalDefault) {
+                return cleanExampleOption(
+                    cleanChoiceAnnotation(parentheticalDefault[1])
+                );
+            }
+
+            const explicitPatterns = [
+                /\bdefault\s*(?:value|valor)?\s*[:=\-]\s*([^\r\n;|]+)/i,
+                /\bvalor\s+(?:por\s+)?default\s*[:=\-]\s*([^\r\n;|]+)/i,
+                /\bpor\s+defecto\s*[:=\-]\s*([^\r\n;|]+)/i,
+                /\bpredeterminado\s*[:=\-]\s*([^\r\n;|]+)/i
             ];
 
-            for (const pattern of patterns) {
+            for (const pattern of explicitPatterns) {
                 const match = raw.match(pattern);
 
-                if (!match) {
-                    continue;
+                if (match) {
+                    return cleanExampleOption(
+                        cleanChoiceAnnotation(match[1])
+                    );
                 }
-
-                let value = cleanExampleOption(match[1])
-                    .replace(/^es\s+/i, "")
-                    .replace(/\s+(?:y|pero)\s+puede\s+modificarse.*$/i, "")
-                    .replace(/\s+puede\s+modificarse.*$/i, "")
-                    .trim();
-
-                const pairedValue = value.match(
-                    /^([A-Za-z0-9]{1,20})\s*(?:=|–|-)\s*.+$/
-                );
-
-                if (pairedValue) {
-                    value = pairedValue[1];
-                }
-
-                return value;
             }
 
             return "";
@@ -1298,6 +1300,7 @@
             const parts = raw
                 .split(/\s*(?:\r?\n|[;,|/])\s*/)
                 .map(cleanAllowedValuesText)
+                .map(cleanChoiceAnnotation)
                 .map(cleanExampleOption)
                 .filter(Boolean);
             const pairedValues = parts.filter((value) => /^[A-Za-z0-9]{1,8}\s*(?:=|–|-)\s*.+/.test(value));
@@ -1558,121 +1561,93 @@
             parameter.validationRules ||= detectValidationRules(parameter);
             parameter.required = parameter.required || parameter.validationRules.required;
 
-            const detectedChoices = productFilteredChoices(parameter);
-            const choices = mergeDefaultWithChoices(
-                detectedChoices,
-                parameter.defaultValue
-            );
+            const detectedChoices = productFilteredChoices(parameter)
+                .map(cleanChoiceAnnotation)
+                .filter(Boolean);
+
+            const hasSelectableChoices =
+                parameter.hasExample || detectedChoices.length >= 2;
 
             const ruleHint = validationRuleText(parameter.validationRules);
             const ruleHtml = ruleHint
                 ? `<small class="validation-rule-hint">Validación: ${escapeHtml(ruleHint)}</small>`
                 : "";
 
-            if (!parameter.value && parameter.defaultValue) {
-                const matchingChoice = choices.find((choice) =>
-                    matchesDefault(choice, parameter.defaultValue)
-                );
-
-                parameter.value = matchingChoice || parameter.defaultValue;
-            }
-
-            if (choices.length) {
-                const supportsOther = parameter.hasExample;
-                const selectedChoice = choices.find((choice) =>
-                    matchesDefault(choice, parameter.value)
-                ) || "";
-
-                const storedValueIsChoice = choices.some((choice) =>
-                    matchesDefault(choice, parameter.value)
-                );
-
-                const usesOther = Boolean(
-                    supportsOther &&
-                    parameter.value &&
-                    !storedValueIsChoice
-                );
+            if (!hasSelectableChoices) {
+                if (!parameter.value && parameter.defaultValue) {
+                    parameter.value = parameter.defaultValue;
+                }
 
                 const defaultHint = parameter.defaultValue
                     ? `<small class="default-value-hint">Valor predeterminado aplicado: ${escapeHtml(parameter.defaultValue)}. Puede modificarse.</small>`
                     : "";
 
                 return `
-                    <select
+                    <input
+                        ${validationAttributes(parameter)}
                         data-entry-id="${escapeHtml(parameter.id)}"
-                        data-supports-other="${supportsOther ? "true" : "false"}"
+                        value="${escapeHtml(parameter.value || "")}"
                         ${parameter.required ? "required" : ""}
+                        placeholder="Digite el valor solicitado"
                     >
-                        <option
-                            value=""
-                            ${!parameter.value ? "selected" : ""}
-                            disabled
-                            hidden
-                        ></option>
-                        ${choices.map((value) => {
-                            const selected = !usesOther && (
-                                String(value) === String(parameter.value) ||
-                                matchesDefault(value, parameter.value)
-                            );
-
-                            const label = parameter.defaultValue &&
-                                matchesDefault(value, parameter.defaultValue)
-                                ? `${value} (Predeterminado)`
-                                : value;
-
-                            return `
-                                <option
-                                    value="${escapeHtml(value)}"
-                                    ${selected ? "selected" : ""}
-                                >
-                                    ${escapeHtml(label)}
-                                </option>
-                            `;
-                        }).join("")}
-                        ${supportsOther
-                            ? `
-                                <option
-                                    value="__OTROS__"
-                                    ${usesOther ? "selected" : ""}
-                                >
-                                    Otros
-                                </option>
-                            `
-                            : ""
-                        }
-                    </select>
-                    ${supportsOther
-                        ? `
-                            <input
-                                class="other-value-input"
-                                ${validationAttributes(parameter)}
-                                data-other-for="${escapeHtml(parameter.id)}"
-                                value="${usesOther ? escapeHtml(parameter.value) : ""}"
-                                placeholder="Indique el otro valor"
-                                ${usesOther ? "" : "hidden"}
-                                ${usesOther && parameter.required ? "required" : ""}
-                            >
-                        `
-                        : ""
-                    }
                     ${defaultHint}
                     ${ruleHtml}
                     <small class="validation-message"></small>
                 `;
             }
 
+            const choices = mergeDefaultWithChoices(
+                detectedChoices,
+                parameter.defaultValue
+            );
+
+            if (!parameter.value && parameter.defaultValue) {
+                parameter.value = choices.find((choice) =>
+                    matchesDefault(choice, parameter.defaultValue)
+                ) || parameter.defaultValue;
+            }
+
+            const supportsOther = parameter.hasExample;
+            const storedValueIsChoice = choices.some((choice) =>
+                matchesDefault(choice, parameter.value)
+            );
+            const usesOther = Boolean(
+                supportsOther && parameter.value && !storedValueIsChoice
+            );
             const defaultHint = parameter.defaultValue
                 ? `<small class="default-value-hint">Valor predeterminado aplicado: ${escapeHtml(parameter.defaultValue)}. Puede modificarse.</small>`
                 : "";
 
             return `
-                <input
-                    ${validationAttributes(parameter)}
+                <select
                     data-entry-id="${escapeHtml(parameter.id)}"
-                    value="${escapeHtml(parameter.value || "")}"
+                    data-supports-other="${supportsOther ? "true" : "false"}"
                     ${parameter.required ? "required" : ""}
-                    placeholder="Digite el valor solicitado"
                 >
+                    <option value="" ${!parameter.value ? "selected" : ""} disabled hidden></option>
+                    ${choices.map((value) => {
+                        const selected = !usesOther && matchesDefault(
+                            value,
+                            parameter.value
+                        );
+                        const label = parameter.defaultValue && matchesDefault(
+                            value,
+                            parameter.defaultValue
+                        )
+                            ? `${value} (Predeterminado)`
+                            : value;
+
+                        return `<option value="${escapeHtml(value)}" ${selected ? "selected" : ""}>${escapeHtml(label)}</option>`;
+                    }).join("")}
+                    ${supportsOther
+                        ? `<option value="__OTROS__" ${usesOther ? "selected" : ""}>Otros</option>`
+                        : ""
+                    }
+                </select>
+                ${supportsOther
+                    ? `<input class="other-value-input" ${validationAttributes(parameter)} data-other-for="${escapeHtml(parameter.id)}" value="${usesOther ? escapeHtml(parameter.value) : ""}" placeholder="Indique el otro valor" ${usesOther ? "" : "hidden"} ${usesOther && parameter.required ? "required" : ""}>`
+                    : ""
+                }
                 ${defaultHint}
                 ${ruleHtml}
                 <small class="validation-message"></small>
@@ -1812,8 +1787,20 @@
                 }
                 return;
             }
-            const choices = productFilteredChoices(parameter);
-            if (choices.length && !choseOther && !choices.includes(value)) {
+            const detectedChoices = productFilteredChoices(parameter)
+                .map(cleanChoiceAnnotation)
+                .filter(Boolean);
+            const choices = mergeDefaultWithChoices(
+                detectedChoices,
+                parameter.defaultValue
+            );
+            const hasSelectableChoices =
+                parameter.hasExample || detectedChoices.length >= 2;
+            if (
+                hasSelectableChoices &&
+                !choseOther &&
+                !choices.some((choice) => matchesDefault(choice, value))
+            ) {
                 control.classList.add("invalid");
                 parameter.value = "";
                 message.textContent = "Valor rechazado: seleccione uno de los valores permitidos para el producto elegido.";
