@@ -10,7 +10,7 @@
         .request-hero { padding: 30px; border: 1px solid var(--line); border-radius: var(--radius-large); background: linear-gradient(135deg,#ffffff 0%,#fff7f1 100%); box-shadow: var(--shadow-small); }
         .request-hero h1 { margin: 8px 0; color: var(--orange); font-size: clamp(34px,5vw,52px); font-weight: 300; }
         .request-hero p { max-width: 720px; margin: 0; color: var(--muted); line-height: 1.6; }
-        .request-types { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 16px; margin-top: 18px; }
+        .request-types { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 16px; margin-top: 18px; }
         .type-card { padding: 22px; border: 1px solid var(--line); border-top: 4px solid var(--orange); border-radius: var(--radius-large); background: #fff; box-shadow: var(--shadow-small); text-align: left; cursor: pointer; }
         .type-card.inactive { border-top-color: #9b9b9b; }
         .type-icon { display: grid; place-items: center; width: 46px; height: 46px; border-radius: 12px; background: var(--orange-soft); color: var(--orange); font-size: 23px; }
@@ -57,6 +57,11 @@
                         <strong>Solicitudes de formularios</strong>
                         <small>Otros trámites, configuraciones y servicios que se incorporen al portal.</small>
                     </button>
+                    <a class="type-card" href="formularios-abiertos.html" style="text-decoration:none;color:inherit;">
+                        <span class="type-icon">📝</span>
+                        <strong>Formularios abiertos</strong>
+                        <small>Consultar, continuar, duplicar o eliminar formularios guardados como borrador.</small>
+                    </a>
                 </section>
                 <section class="catalog" id="parameterCatalog" hidden>
                     <header class="catalog-head">
