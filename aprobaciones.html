@@ -1875,10 +1875,7 @@
                 );
 
                 visibleParameters = allParameters.filter((parameter) => {
-                    const productMatches = productApplies(
-                        parameter.product,
-                        selectedProduct,
-                    );
+                    const productMatches = true;
                     const searchableText = normalize(
                         [
                             parameter.name,
@@ -1959,7 +1956,13 @@
                             <div class="parameter-body">
                                 <div class="parameter-grid">
                                     <div class="parameter-entry">
-                                        <label>Valor enviado</label>
+                                        <label>Valor registrado</label>
+                                        <small style="display:block;margin-bottom:7px;color:var(--muted);">
+                                            ${parameter.visibleParaSolicitante
+                                                ? "Visible para el solicitante"
+                                                : "Parámetro interno no visible para el solicitante"}
+                                            · Origen: ${escapeHtml(parameter.valueOrigin || "usuario")}
+                                        </small>
                                         ${buildInput(parameter)}
                                         <div class="approval-review">
                                             <div class="approval-checks">
@@ -2368,6 +2371,10 @@
                     value: parameterValue(parameter),
                     reviewStatus: parameter.revision || parameter.reviewStatus || "Pendiente",
                     approvalNote: parameter.notaAprobador || parameter.approvalNote || "",
+                    defaultValue: parameter.valorPredeterminado || parameter.defaultValue || "",
+                    valueOrigin: parameter.origenValor || parameter.valueOrigin || "usuario",
+                    visibleParaSolicitante: parameter.visibleParaSolicitante !== false,
+                    aplicaAlProductoSeleccionado: parameter.aplicaAlProductoSeleccionado !== false,
                     values: Array.isArray(parameter.valoresPermitidos) ? parameter.valoresPermitidos : [],
                     rawValues: "",
                     description: "",
@@ -2813,7 +2820,11 @@
                     obligatorio: parameter.required,
                     valor: parameter.value,
                     revision: parameter.reviewStatus || "Pendiente",
-                    notaAprobador: parameter.approvalNote || ""
+                    notaAprobador: parameter.approvalNote || "",
+                    valorPredeterminado: parameter.defaultValue || "",
+                    origenValor: parameter.valueOrigin || "usuario",
+                    visibleParaSolicitante: parameter.visibleParaSolicitante !== false,
+                    aplicaAlProductoSeleccionado: parameter.aplicaAlProductoSeleccionado !== false
                 }));
                 selectedRequest = request;
             }
