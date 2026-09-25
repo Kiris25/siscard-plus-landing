@@ -855,7 +855,7 @@
 
                         <div class="document-title">
                             <strong>Evertec Costa Rica</strong>
-                            <span>Parámetros del emisor - TRT08SN0</span>
+                            <span>Parámetros del Emisor - TRT08SN0</span>
                             <span id="documentOptionTitle">OPC05 Parámetros generales del emisor</span>
                         </div>
 
@@ -2853,7 +2853,7 @@
             const selected = payload.parametros.filter((item) => item.valor);
             const rows = [
                 ["EVERTEC COSTA RICA", "", "", ""],
-                ["Parámetros del emisor - TRT08SN0", "", "", ""],
+                ["Parámetros del Emisor - TRT08SN0", "", "", ""],
                 [`OPC${currentOption} ${optionName(currentOption)}`, "", "", ""],
                 ["OPE-PA-FO-003", "", "", ""],
                 ["Incluir en Categoría: CR.TRAMITES.Parametros Siscard", "", "", ""],
@@ -2906,7 +2906,7 @@
             pdf.setFontSize(18);
             pdf.text("Evertec Costa Rica", 14, 19);
             pdf.setFontSize(12);
-            pdf.text("Parámetros del emisor - TRT08SN0", 14, 27);
+            pdf.text("Parámetros del Emisor - TRT08SN0", 14, 27);
             pdf.setFont("helvetica", "normal");
             pdf.text(`OPC${currentOption} ${optionName(currentOption)}`, 14, 34);
             pdf.setFont("helvetica", "bold");
