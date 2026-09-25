@@ -1389,17 +1389,12 @@
         }
 
         function detectValidationRules(parameter) {
-            const text = normalize([
-                parameter.name,
-                parameter.rawValues,
-                parameter.description,
-                parameter.operation,
-                parameter.dependencies,
-                parameter.notes,
-                parameter.internalValidationText
-            ].join(" "));
-            const original = [
-                parameter.name,
+            /*
+             * El nombre ayuda a determinar casos especiales, pero las reglas
+             * numéricas y de longitud se extraen del contenido de la ficha.
+             * Así, nombres como "Pago Mínimo" no se confunden con una regla.
+             */
+            const ruleSource = [
                 parameter.rawValues,
                 parameter.description,
                 parameter.operation,
@@ -1407,31 +1402,78 @@
                 parameter.notes,
                 parameter.internalValidationText
             ].join(" ");
-            const rules = { required: parameter.required || parameter.allowsBlank === false };
-            let match = original.match(/(?:c[oó]digo|valor|campo|longitud)?\s*(?:de|con)?\s*(\d+)\s*(?:d[ií]gitos?|caracteres?|posiciones?)/i);
+            const text = normalize(ruleSource);
+            const original = String(ruleSource || "");
+            const rules = {
+                required: parameter.required || parameter.allowsBlank === false
+            };
+
+            let match;
+
+            /* Longitud exacta: requiere una unidad explícita. */
+            match = original.match(
+                /(?:c[oó]digo|valor|campo|longitud)?\s*(?:de|con)?\s*(\d+)\s*(?:d[ií]gitos?|car[aá]cteres?|posiciones?)/i
+            );
             if (match) rules.exactLength = Number(match[1]);
-            match = original.match(/(?:m[ií]nimo|min)\s*(?:de|:|=)?\s*(\d+)\s*(?:d[ií]gitos?|caracteres?|posiciones?)?/i);
+
+            /*
+             * Longitud mínima/máxima: solo se activa cuando aparecen palabras
+             * de longitud. "Mínimo 15 días" ya no se interpreta como caracteres.
+             */
+            match = original.match(
+                /(?:longitud\s+)?m[ií]nima?\s*(?:de|:|=)?\s*(\d+)\s*(?:d[ií]gitos?|car[aá]cteres?|posiciones?)/i
+            );
             if (match) rules.minLength = Number(match[1]);
-            match = original.match(/(?:m[aá]ximo|max)\s*(?:de|:|=)?\s*(\d+)\s*(?:d[ií]gitos?|caracteres?|posiciones?)?/i);
+
+            match = original.match(
+                /(?:longitud\s+)?m[aá]xima?\s*(?:de|:|=)?\s*(\d+)\s*(?:d[ií]gitos?|car[aá]cteres?|posiciones?)/i
+            );
             if (match) rules.maxLength = Number(match[1]);
-            match = original.match(/(?:entre|desde)\s*(-?\d+(?:[.,]\d+)?)\s*(?:y|a|hasta)\s*(-?\d+(?:[.,]\d+)?)/i);
+
+            /* Rangos explícitos: 0 a 30, entre 0 y 30, desde 0 hasta 30. */
+            match = original.match(
+                /(?:cantidad\s+)?(?:entre|desde)?\s*(-?\d+(?:[.,]\d+)?)\s*(?:y|a|hasta)\s*(-?\d+(?:[.,]\d+)?)(?:\s*(?:d[ií]as?|meses?|a[nñ]os?|horas?|minutos?|por\s*ciento|%))?/i
+            );
             if (match) {
                 rules.min = Number(match[1].replace(",", "."));
                 rules.max = Number(match[2].replace(",", "."));
             } else {
-                match = original.match(/(?:m[ií]nimo|min)\s*(?:de|:|=)?\s*(-?\d+(?:[.,]\d+)?)/i);
-                if (match && !rules.minLength) rules.min = Number(match[1].replace(",", "."));
-                match = original.match(/(?:m[aá]ximo|max)\s*(?:de|:|=)?\s*(-?\d+(?:[.,]\d+)?)/i);
-                if (match && !rules.maxLength) rules.max = Number(match[1].replace(",", "."));
+                /* Límites aislados, pero con una etiqueta inequívoca. */
+                match = original.match(
+                    /(?:valor\s+)?m[ií]nimo(?:\s+permitido)?\s*(?:de|:|=)\s*(-?\d+(?:[.,]\d+)?)/i
+                );
+                if (match) rules.min = Number(match[1].replace(",", "."));
+
+                match = original.match(
+                    /(?:valor\s+)?m[aá]ximo(?:\s+permitido)?\s*(?:de|:|=)\s*(-?\d+(?:[.,]\d+)?)/i
+                );
+                if (match) rules.max = Number(match[1].replace(",", "."));
             }
-            rules.digitsOnly = /(?:solo|unicamente|exclusivamente)?\s*(?:numerico|numerica|digitos|solo numeros)|codigo\s+(?:de\s+)?\d+\s+digitos/.test(text);
-            rules.lettersOnly = /(?:solo|unicamente|exclusivamente)\s+(?:letras|alfabetico)/.test(text);
+
             rules.alphanumeric = /alfanumerico|alfa numerico|letras\s+y\s+numeros|letras\s+o\s+numeros/.test(text);
+            rules.lettersOnly = /(?:solo|unicamente|exclusivamente)\s+(?:letras|alfabetico)/.test(text);
+            rules.digitsOnly = /(?:solo|unicamente|exclusivamente)\s+(?:numeros|digitos)|(?:valor|campo|codigo)\s+numerico|codigo\s+(?:de\s+)?\d+\s+digitos/.test(text);
+
+            /* Una regla alfanumérica siempre prevalece sobre solo letras/dígitos. */
             if (rules.alphanumeric) {
                 rules.digitsOnly = false;
                 rules.lettersOnly = false;
             }
-            if (/porcentaje|porc|tasa/.test(normalize(parameter.name)) && rules.min === undefined && rules.max === undefined) {
+
+            /* Rangos expresados en días u otras cantidades generan input numérico. */
+            if (
+                rules.min !== undefined ||
+                rules.max !== undefined ||
+                /\bcantidad\b.*\b(?:dias?|meses?|anos?|horas?|minutos?)\b/.test(text)
+            ) {
+                if (!rules.alphanumeric && !rules.lettersOnly) rules.digitsOnly = true;
+            }
+
+            if (
+                /porcentaje|porc|tasa/.test(normalize(parameter.name)) &&
+                rules.min === undefined &&
+                rules.max === undefined
+            ) {
                 rules.min = 0;
                 rules.max = 100;
             }
