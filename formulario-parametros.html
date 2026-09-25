@@ -1426,7 +1426,11 @@
             }
             rules.digitsOnly = /(?:solo|unicamente|exclusivamente)?\s*(?:numerico|numerica|digitos|solo numeros)|codigo\s+(?:de\s+)?\d+\s+digitos/.test(text);
             rules.lettersOnly = /(?:solo|unicamente|exclusivamente)\s+(?:letras|alfabetico)/.test(text);
-            rules.alphanumeric = /alfanumerico/.test(text);
+            rules.alphanumeric = /alfanumerico|alfa numerico|letras\s+y\s+numeros|letras\s+o\s+numeros/.test(text);
+            if (rules.alphanumeric) {
+                rules.digitsOnly = false;
+                rules.lettersOnly = false;
+            }
             if (/porcentaje|porc|tasa/.test(normalize(parameter.name)) && rules.min === undefined && rules.max === undefined) {
                 rules.min = 0;
                 rules.max = 100;
