@@ -1864,6 +1864,70 @@
             control.classList.add("valid");
             if (choseOther) otherInput?.classList.add("valid");
         }
+        function parameterNavigationControls() {
+            return [...document.querySelectorAll("[data-entry-id]")]
+                .filter((control) => !control.disabled && control.offsetParent !== null);
+        }
+        function moveToParameter(currentControl, direction) {
+            const controls = parameterNavigationControls();
+            const currentIndex = controls.indexOf(currentControl);
+            if (currentIndex < 0) return;
+            const target = controls[currentIndex + direction];
+            if (!target) {
+                showToast(direction > 0
+                    ? "Último parámetro de la opción."
+                    : "Primer parámetro de la opción."
+                );
+                return;
+            }
+            target.focus({ preventScroll: true });
+            target.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
+        function changeSelectOption(select, direction) {
+            const options = [...select.options].filter((option) =>
+                !option.disabled && !option.hidden && option.value !== ""
+            );
+            if (!options.length) return;
+            let index = options.findIndex((option) => option.value === select.value);
+            if (index < 0) index = direction > 0 ? -1 : options.length;
+            const nextIndex = Math.max(0, Math.min(options.length - 1, index + direction));
+            const nextOption = options[nextIndex];
+            if (!nextOption || nextOption.value === select.value) return;
+            select.value = nextOption.value;
+            select.dispatchEvent(new Event("change", { bubbles: true }));
+        }
+        function handleParameterKeyboardNavigation(event) {
+            const control = event.currentTarget;
+            if (event.altKey || event.ctrlKey || event.metaKey) return;
+
+            if (event.key === "ArrowUp") {
+                event.preventDefault();
+                validateInput(control);
+                moveToParameter(control, -1);
+                return;
+            }
+            if (event.key === "ArrowDown") {
+                event.preventDefault();
+                validateInput(control);
+                moveToParameter(control, 1);
+                return;
+            }
+            if (event.key === "Enter") {
+                event.preventDefault();
+                validateInput(control);
+                moveToParameter(control, 1);
+                return;
+            }
+            if (control.tagName === "SELECT" && event.key === "ArrowLeft") {
+                event.preventDefault();
+                changeSelectOption(control, -1);
+                return;
+            }
+            if (control.tagName === "SELECT" && event.key === "ArrowRight") {
+                event.preventDefault();
+                changeSelectOption(control, 1);
+            }
+        }
         function attachParameterEvents() {
             document.querySelectorAll("[data-toggle-id]").forEach((heading) => {
                 heading.addEventListener("click", (event) => {
@@ -1904,8 +1968,21 @@
                     }
                     validateInput(control);
                 });
+                control.addEventListener("keydown", handleParameterKeyboardNavigation);
                 control.addEventListener("blur", () => validateInput(control));
                 otherInput?.addEventListener("input", () => validateInput(control));
+                otherInput?.addEventListener("keydown", (event) => {
+                    if (event.altKey || event.ctrlKey || event.metaKey) return;
+                    if (event.key === "ArrowUp") {
+                        event.preventDefault();
+                        validateInput(control);
+                        moveToParameter(control, -1);
+                    } else if (event.key === "ArrowDown" || event.key === "Enter") {
+                        event.preventDefault();
+                        validateInput(control);
+                        moveToParameter(control, 1);
+                    }
+                });
                 otherInput?.addEventListener("blur", () => validateInput(control));
             });
 
