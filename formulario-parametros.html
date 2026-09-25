@@ -1210,46 +1210,56 @@
         }
         function cleanChoiceAnnotation(value) {
             return String(value || "")
-                .replace(/\s*\((?:valor\s+)?(?:por\s+)?(?:default|defecto|predeterminado)[^)]*\)\s*/ig, "")
+                .replace(/\s*\((?:valor\s+)?(?:por\s+)?(?:default|defecto|predeterminado)\b[^)]*\)\s*/ig, "")
                 .trim();
         }
-
+        function isBlankDefault(value) {
+            return /^(?:en\s+blanco|vac[ií]o|sin\s+valor)$/i.test(
+                String(value || "").replace(/[.]+$/, "").trim()
+            );
+        }
+        function cleanDefaultValue(value) {
+            const cleaned = cleanExampleOption(
+                cleanChoiceAnnotation(String(value || ""))
+            )
+                .replace(/[.]+$/, "")
+                .trim();
+            return isBlankDefault(cleaned) ? "" : cleaned;
+        }
         function extractDefaultValue(rawValue) {
             const raw = plainText(rawValue || "")
                 .replace(/\u00a0/g, " ")
                 .trim();
+            if (!raw) return "";
 
-            if (!raw) {
-                return "";
-            }
-
+            /*
+             * Caso 1: la marca está unida a una opción.
+             * Ejemplo: I = Interno (Valor por defecto para Crédito) / E = Externo
+             * Se toma únicamente la opción ubicada antes del paréntesis.
+             */
             const parentheticalDefault = raw.match(
-                /(?:^|[\/|;,\r\n])\s*([^\/|;,\r\n]+?)\s*\((?:valor\s+)?(?:por\s+)?(?:default|defecto|predeterminado)\b[^)]*\)/i
+                /(?:^|[\/|;,\r\n])\s*([^\/|;,\r\n]+?)\s*\((?:(?:valor\s+)?(?:por\s+)?(?:default|defecto|predeterminado)|valor\s+predeterminado)\b[^)]*\)/i
             );
-
             if (parentheticalDefault) {
-                return cleanExampleOption(
-                    cleanChoiceAnnotation(parentheticalDefault[1])
-                );
+                return cleanDefaultValue(parentheticalDefault[1]);
             }
 
+            /*
+             * Caso 2: formato estándar con dos puntos.
+             * Admite condiciones entre la etiqueta y los dos puntos:
+             * Valor predeterminado para Crédito: I = Interno
+             */
             const explicitPatterns = [
-                /\bdefault\s*(?:value|valor)?\s*[:=\-]\s*([^\r\n;|]+)/i,
-                /\bvalor\s+(?:por\s+)?default\s*[:=\-]\s*([^\r\n;|]+)/i,
-                /\bpor\s+defecto\s*[:=\-]\s*([^\r\n;|]+)/i,
-                /\bpredeterminado\s*[:=\-]\s*([^\r\n;|]+)/i
+                /\bvalor\s+predeterminado(?:\s+para\s+[^:\r\n]+)?\s*[:=\-]\s*([^\r\n;|]+)/i,
+                /\bvalor\s+(?:por\s+)?defecto(?:\s+para\s+[^:\r\n]+)?\s*[:=\-]\s*([^\r\n;|]+)/i,
+                /\bpor\s+defecto(?:\s+para\s+[^:\r\n]+)?\s*[:=\-]\s*([^\r\n;|]+)/i,
+                /\bdefault(?:\s+value|\s+valor)?(?:\s+para\s+[^:\r\n]+)?\s*[:=\-]\s*([^\r\n;|]+)/i,
+                /\bpredeterminado(?:\s+para\s+[^:\r\n]+)?\s*[:=\-]\s*([^\r\n;|]+)/i
             ];
-
             for (const pattern of explicitPatterns) {
                 const match = raw.match(pattern);
-
-                if (match) {
-                    return cleanExampleOption(
-                        cleanChoiceAnnotation(match[1])
-                    );
-                }
+                if (match) return cleanDefaultValue(match[1]);
             }
-
             return "";
         }
         function splitExampleList(value) {
@@ -1269,6 +1279,31 @@
             const explicit = prefix.match(/(?:valor(?:es)?|c[oó]digo(?:s)?)\s+(?:permitido(?:s)?\s+)?(?:es|son|puede(?:n)? ser|admite)\s*[:=]?\s*([A-Z0-9]{1,12}(?:\s*[,/|]\s*[A-Z0-9]{1,12})*)/i);
             if (explicit) candidates.push(...splitExampleList(explicit[1]));
             return uniqueValues(candidates);
+        }
+        function extractSuggestedValues(rawValue) {
+            const raw = plainText(rawValue || "").replace(/\u00a0/g, " ");
+            if (!raw) return [];
+
+            /* Formato preferido: Valores sugeridos: */
+            let match = /\bvalores?\s+sugeridos?\s*:\s*/i.exec(raw);
+
+            /* Compatibilidad con fichas anteriores de máximos sugeridos por marca. */
+            if (!match) {
+                match = /\bm[aá]ximos?\s+(?:permitidos?\s+)?(?:por\s+las?\s+marcas?|sugeridos?)\s*:\s*/i.exec(raw);
+            }
+            if (!match) return [];
+
+            const block = raw.slice(match.index + match[0].length)
+                .split(/\b(?:valor\s+predeterminado|valor\s+(?:por\s+)?defecto|por\s+defecto|default|predeterminado)\b\s*(?:para\s+[^:\r\n]+)?\s*:/i)[0]
+                .trim();
+            if (!block) return [];
+
+            return uniqueValues(block
+                .split(/\s*(?:\r?\n|[;|/])\s*/)
+                .map(cleanExampleOption)
+                .filter(Boolean)
+                .filter(value => !/^(?:cantidad|valor|m[aá]ximo|m[ií]nimo)\b/i.test(value))
+            );
         }
         function extractExampleValues(rawValue) {
             const raw = String(rawValue || "");
@@ -1291,24 +1326,42 @@
         }
         function parseEnumeratedValues(record) {
             const originalRaw = rawAllowedValues(record);
+
+            const suggestedValues = extractSuggestedValues(originalRaw);
+            if (suggestedValues.length) return suggestedValues;
+
             const exampleValues = extractExampleValues(originalRaw);
             if (exampleValues.length) return exampleValues;
+
             const raw = cleanAllowedValuesText(originalRaw)
-                .replace(/(?:^|[\r\n;.])\s*(?:default|por defecto|predeterminado)\s*[:=\-]\s*[^\r\n;|.]+/ig, "")
+                .replace(/(?:^|[\r\n;.])\s*(?:valor\s+predeterminado|valor\s+(?:por\s+)?defecto|por\s+defecto|default|predeterminado)(?:\s+para\s+[^:\r\n]+)?\s*[:=\-]\s*[^\r\n;|.]+/ig, "")
                 .trim();
             if (!raw) return [];
+
             const parts = raw
                 .split(/\s*(?:\r?\n|[;,|/])\s*/)
                 .map(cleanAllowedValuesText)
                 .map(cleanChoiceAnnotation)
                 .map(cleanExampleOption)
-                .filter(Boolean);
-            const pairedValues = parts.filter((value) => /^[A-Za-z0-9]{1,8}\s*(?:=|–|-)\s*.+/.test(value));
+                .filter(Boolean)
+                .filter(value => !isBlankDefault(value));
+
+            const pairedValues = parts.filter((value) =>
+                /^[A-Za-z0-9]{1,8}\s*(?:=|–|-)\s*.+/.test(value)
+            );
             if (pairedValues.length >= 2) return uniqueValues(pairedValues);
+
             const compactList = parts.filter((value) => value.length <= 80);
-            if (compactList.length >= 2 && compactList.length <= 30) return uniqueValues(compactList);
-            const products = raw.match(/(?:visa|mastercard|american express|amex|local|internacional)\s+(?:cr[eé]dito|d[eé]bito|prepago|corporativo)/gi);
-            return products?.length ? uniqueValues(products.map((value) => value.trim())) : [];
+            if (compactList.length >= 2 && compactList.length <= 30) {
+                return uniqueValues(compactList);
+            }
+
+            const products = raw.match(
+                /(?:visa|mastercard|american express|amex|local|internacional)\s+(?:cr[eé]dito|d[eé]bito|prepago|corporativo)/gi
+            );
+            return products?.length
+                ? uniqueValues(products.map((value) => value.trim()))
+                : [];
         }
         function matchesDefault(choice, defaultValue) {
             const choiceNormalized = normalize(choice);
@@ -1439,6 +1492,7 @@
                 values: parseEnumeratedValues(record),
                 rawValues: rawAllowedValues(record),
                 hasExample: /\bejemplo\s*:/i.test(rawAllowedValues(record)),
+                hasSuggested: extractSuggestedValues(rawAllowedValues(record)).length > 0,
                 defaultValue: extractDefaultValue(rawAllowedValues(record)),
                 description: field(record, FIELD_NAMES.description),
                 operation: field(record, FIELD_NAMES.operation),
@@ -1607,7 +1661,7 @@
                 ) || parameter.defaultValue;
             }
 
-            const supportsOther = parameter.hasExample;
+            const supportsOther = parameter.hasSuggested || parameter.hasExample;
             const storedValueIsChoice = choices.some((choice) =>
                 matchesDefault(choice, parameter.value)
             );
@@ -1742,11 +1796,6 @@
                                                 ? '<span style="color:#c84630;font-weight:800;">*</span>'
                                                 : ''}
                                         </label>
-                                        <small style="display:block;margin-bottom:6px;color:${parameter.required ? '#a43725' : 'var(--muted)'};">
-                                            ${parameter.required
-                                                ? 'Campo obligatorio'
-                                                : 'Puede dejarse en blanco'}
-                                        </small>
                                         ${buildInput(parameter)}
                                     </div>
                                 </div>
