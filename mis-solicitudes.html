@@ -1463,14 +1463,20 @@
                 obligatorio: Boolean(parameter.obligatorio ?? parameter.required),
                 valor: String(parameter.valor ?? parameter.value ?? parameter.respuesta ?? ""),
                 revision: parameter.revision || parameter.reviewStatus || "Pendiente",
-                notaAprobador: parameter.notaAprobador || parameter.approvalNote || ""
+                notaAprobador: parameter.notaAprobador || parameter.approvalNote || "",
+                valorPredeterminado: parameter.valorPredeterminado || parameter.defaultValue || "",
+                origenValor: parameter.origenValor || parameter.valueOrigin || "usuario",
+                visibleParaSolicitante: parameter.visibleParaSolicitante !== false,
+                aplicaAlProductoSeleccionado: parameter.aplicaAlProductoSeleccionado !== false
             };
         }
         function normalizeRequest(request) {
             return {
                 ...request,
                 parametros: Array.isArray(request.parametros)
-                    ? request.parametros.map(normalizeParameter)
+                    ? request.parametros
+                        .map(normalizeParameter)
+                        .filter((parameter) => parameter.visibleParaSolicitante !== false)
                     : []
             };
         }
