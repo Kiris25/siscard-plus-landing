@@ -2419,22 +2419,28 @@
                         comentario: "Solicitud enviada para revisión."
                     }
                 ],
-                parametros: allParameters
-                    .filter((parameter) =>
-                        productApplies(
-                            parameter.product,
-                            document.getElementById("productFilter").value
-                        )
-                    )
-                    .map((parameter) => ({
+                parametros: allParameters.map((parameter) => {
+                    const selectedProduct = document.getElementById("productFilter").value;
+                    const visibleParaSolicitante = productApplies(parameter.product, selectedProduct);
+                    const userValue = String(parameter.value || "").trim();
+                    const defaultValue = String(parameter.defaultValue || "").trim();
+                    const finalValue = userValue || defaultValue;
+                    return {
                         id: parameter.id,
                         nombre: parameter.name,
                         producto: parameter.product,
                         obligatorio: parameter.required,
-                        valor: parameter.value,
+                        valor: finalValue,
+                        valorPredeterminado: defaultValue,
+                        origenValor: userValue
+                            ? (defaultValue && matchesDefault(userValue, defaultValue) ? "predeterminado" : "usuario")
+                            : (defaultValue ? "predeterminado" : "sin valor"),
+                        visibleParaSolicitante,
+                        aplicaAlProductoSeleccionado: visibleParaSolicitante,
                         revision: "Pendiente",
                         notaAprobador: ""
-                    }))
+                    };
+                })
             };
         }
 
@@ -2442,7 +2448,13 @@
             return collectPayloadData(true);
         }
         function exportPayload() {
-            return collectPayloadData(false);
+            const payload = collectPayloadData(false);
+            return {
+                ...payload,
+                parametros: payload.parametros.filter((parameter) =>
+                    parameter.visibleParaSolicitante !== false
+                )
+            };
         }
         function showToast(message) {
             const toast = document.getElementById("toast");
@@ -2634,7 +2646,9 @@
             }
             pendingRequestPayload = requestPayload();
             const payload = pendingRequestPayload;
-            const completed = payload.parametros.filter((item) => item.valor).length;
+            const completed = payload.parametros.filter((item) =>
+                item.visibleParaSolicitante !== false && item.valor
+            ).length;
             document.getElementById("confirmationSummary").innerHTML = `
                 <div class="confirmation-item"><strong>Cliente</strong><span>${escapeHtml(payload.cliente)}</span></div>
                 <div class="confirmation-item"><strong>Emisor</strong><span>${escapeHtml(payload.emisor)}</span></div>
